@@ -1,0 +1,964 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QBO Setup Guide — The Practice HUB</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --qbo-green:#2CA01C;--qbo-green-dk:#1e7a14;--qbo-green-lt:#e8f5e9;
+  --qbo-blue:#0077C5;--qbo-blue-lt:#e3f2fd;
+  --qbo-bg:#F4F5F7;--white:#fff;--navy:#0f172a;--navy2:#1e293b;
+  --text:#393A3D;--muted:#6B7280;--border:#E3E5E8;
+  --gold:#F59E0B;--gold-lt:#FFF8E1;--gold-dk:#D97706;
+  --red:#D32F2F;--red-lt:#FFEBEE;
+  --teal:#0d9488;--teal-lt:#ccfbf1;
+  --pulse-color:rgba(44,160,28,0.4);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--qbo-bg);color:var(--text);min-height:100vh;}
+
+/* TOP BAR */
+.topbar{background:var(--qbo-green);padding:0 24px;height:52px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:200;box-shadow:0 2px 8px rgba(0,0,0,0.15);}
+.tb-logo{color:#fff;font-family:'Sora';font-weight:800;font-size:0.95rem;display:flex;align-items:center;gap:8px;text-decoration:none;}
+.tb-logo-icon{background:rgba(255,255,255,0.2);border-radius:6px;width:28px;height:28px;display:flex;align-items:center;justify-content:center;}
+.tb-back{margin-left:auto;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);color:#fff;padding:5px 14px;border-radius:4px;font-size:0.78rem;font-weight:600;cursor:pointer;text-decoration:none;transition:background 0.15s;}
+.tb-back:hover{background:rgba(255,255,255,0.25);}
+
+/* PROGRESS BAR */
+.progress-wrap{background:rgba(0,0,0,0.1);height:4px;}
+.progress-fill{height:4px;background:#fff;transition:width 0.4s ease;}
+
+/* MAIN LAYOUT */
+.wrap{max-width:1000px;margin:0 auto;padding:28px 20px 60px;}
+
+/* TAB NAV */
+.tab-nav{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:24px;background:var(--white);border:1px solid var(--border);border-radius:10px;padding:8px;}
+.tab-btn{flex:1;min-width:100px;padding:8px 12px;border-radius:6px;border:none;background:transparent;cursor:pointer;font-family:'Plus Jakarta Sans';font-size:0.75rem;font-weight:600;color:var(--muted);transition:all 0.2s;display:flex;flex-direction:column;align-items:center;gap:3px;}
+.tab-btn:hover{background:var(--qbo-bg);color:var(--text);}
+.tab-btn.active{background:var(--qbo-green);color:#fff;}
+.tab-btn.done{background:var(--qbo-green-lt);color:var(--qbo-green);}
+.tab-icon{font-size:1.1rem;}
+.tab-label{font-size:0.68rem;text-align:center;line-height:1.3;}
+
+/* CONTENT AREA */
+.content-area{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start;}
+
+/* LEFT — SIMULATION */
+.sim-panel{background:var(--white);border:1px solid var(--border);border-radius:12px;overflow:hidden;position:sticky;top:72px;}
+.sim-topbar{background:var(--qbo-green);padding:8px 14px;display:flex;align-items:center;gap:8px;}
+.sim-dots{display:flex;gap:4px;}
+.sim-dot{width:10px;height:10px;border-radius:50%;}
+.sd-r{background:#ff5f57;}
+.sd-y{background:#ffbd2e;}
+.sd-g{background:#28c840;}
+.sim-url{flex:1;background:rgba(255,255,255,0.15);border-radius:4px;padding:3px 10px;font-family:'DM Mono';font-size:0.7rem;color:rgba(255,255,255,0.9);margin:0 8px;}
+.sim-body{padding:16px;min-height:380px;position:relative;}
+
+/* STEP INDICATOR */
+.step-indicator{display:flex;align-items:center;gap:8px;margin-bottom:14px;}
+.step-pill{background:var(--qbo-blue-lt);color:var(--qbo-blue);font-size:0.7rem;font-weight:700;padding:3px 10px;border-radius:12px;font-family:'DM Mono';}
+.step-title{font-size:0.82rem;font-weight:700;color:var(--navy);}
+
+/* MOCK SCREENS */
+.mock-screen{position:relative;}
+.mock-website{border:1px solid var(--border);border-radius:8px;overflow:hidden;background:#fff;}
+.mw-header{background:var(--navy2);padding:10px 14px;display:flex;align-items:center;gap:8px;}
+.mw-logo{color:#fff;font-family:'Sora';font-weight:800;font-size:0.82rem;}
+.mw-logo span{color:var(--gold);}
+.mw-nav{display:flex;gap:10px;margin-left:auto;}
+.mw-nav-item{color:rgba(255,255,255,0.7);font-size:0.72rem;}
+.mw-body{padding:20px;text-align:center;}
+.mw-hero-title{font-family:'Sora';font-size:1.1rem;font-weight:800;color:var(--navy);margin-bottom:6px;}
+.mw-hero-sub{font-size:0.75rem;color:var(--muted);margin-bottom:14px;}
+
+/* PULSING BUTTON */
+.mock-btn{display:inline-block;padding:9px 20px;border-radius:6px;font-weight:700;font-size:0.8rem;cursor:pointer;transition:all 0.2s;position:relative;}
+.mock-btn.pulse{animation:pulse-glow 1.5s infinite;}
+.mock-btn.qbo-primary{background:var(--qbo-green);color:#fff;}
+.mock-btn.qbo-secondary{background:transparent;border:2px solid var(--qbo-green);color:var(--qbo-green);}
+.mock-btn.qbo-blue{background:var(--qbo-blue);color:#fff;}
+
+@keyframes pulse-glow{
+  0%{box-shadow:0 0 0 0 var(--pulse-color);}
+  70%{box-shadow:0 0 0 12px rgba(44,160,28,0);}
+  100%{box-shadow:0 0 0 0 rgba(44,160,28,0);}
+}
+
+/* CLICK TOOLTIP */
+.click-tip{position:absolute;background:var(--navy);color:#fff;font-size:0.72rem;font-weight:600;padding:4px 10px;border-radius:6px;white-space:nowrap;pointer-events:none;z-index:10;}
+.click-tip::after{content:'';position:absolute;bottom:-5px;left:50%;transform:translateX(-50%);border:5px solid transparent;border-top-color:var(--navy);border-bottom:none;}
+
+/* FORM MOCK */
+.form-group{margin-bottom:10px;text-align:left;}
+.form-label{font-size:0.7rem;font-weight:600;color:var(--muted);margin-bottom:3px;display:block;}
+.form-input{width:100%;border:1px solid var(--border);border-radius:4px;padding:7px 10px;font-size:0.8rem;font-family:'Plus Jakarta Sans';color:var(--text);background:#fff;transition:border-color 0.2s;}
+.form-input.focused{border-color:var(--qbo-blue);box-shadow:0 0 0 2px rgba(0,119,197,0.1);}
+.form-input.filled{border-color:var(--qbo-green);background:var(--qbo-green-lt);}
+
+/* PLAN CARDS */
+.plan-cards{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin:10px 0;}
+.plan-card{border:2px solid var(--border);border-radius:6px;padding:8px;text-align:center;cursor:pointer;transition:all 0.2s;}
+.plan-card.selected{border-color:var(--qbo-green);background:var(--qbo-green-lt);}
+.plan-card.pulse-card{animation:card-pulse 1.5s infinite;}
+.plan-name{font-size:0.72rem;font-weight:700;color:var(--navy);}
+.plan-price{font-size:0.65rem;color:var(--muted);}
+@keyframes card-pulse{
+  0%{box-shadow:0 0 0 0 rgba(44,160,28,0.4);}
+  70%{box-shadow:0 0 0 8px rgba(44,160,28,0);}
+  100%{box-shadow:0 0 0 0 rgba(44,160,28,0);}
+}
+
+/* GEAR MENU */
+.gear-menu{background:#fff;border:1px solid var(--border);border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,0.12);padding:8px 0;min-width:180px;position:absolute;right:10px;top:40px;z-index:10;}
+.gear-section{padding:4px 0;}
+.gear-label{font-size:0.62rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);padding:4px 14px;}
+.gear-item{padding:7px 14px;font-size:0.78rem;cursor:pointer;color:var(--text);transition:background 0.1s;}
+.gear-item:hover{background:var(--qbo-bg);}
+.gear-item.highlight{background:var(--qbo-green-lt);color:var(--qbo-green);font-weight:600;animation:card-pulse 1.5s infinite;}
+
+/* QBO DASHBOARD MOCK */
+.qbo-dash{border:1px solid var(--border);border-radius:8px;overflow:hidden;}
+.qd-top{background:var(--qbo-green);padding:8px 12px;display:flex;align-items:center;gap:8px;}
+.qd-top span{color:#fff;font-size:0.78rem;font-weight:700;}
+.qd-body{padding:12px;display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.qd-card{background:var(--qbo-bg);border-radius:6px;padding:10px;text-align:center;}
+.qd-card-label{font-size:0.65rem;color:var(--muted);margin-bottom:4px;}
+.qd-card-val{font-size:0.9rem;font-weight:700;font-family:'DM Mono';color:var(--navy);}
+
+/* PROADVISOR MOCK */
+.pa-header{background:var(--navy2);padding:12px 14px;text-align:center;}
+.pa-logo{color:#fff;font-family:'Sora';font-size:0.9rem;font-weight:800;}
+.pa-logo span{color:var(--gold);}
+.pa-tagline{color:rgba(255,255,255,0.6);font-size:0.68rem;margin-top:2px;}
+.pa-body{padding:16px;text-align:center;}
+
+/* SUCCESS STATE */
+.success-state{text-align:center;padding:24px 16px;}
+.success-icon{font-size:3rem;margin-bottom:8px;}
+.success-title{font-family:'Sora';font-size:1rem;font-weight:800;color:var(--qbo-green);margin-bottom:4px;}
+.success-sub{font-size:0.78rem;color:var(--muted);line-height:1.6;}
+
+/* RIGHT — INSTRUCTIONS */
+.guide-panel{display:flex;flex-direction:column;gap:14px;}
+
+/* AUDIO PLAYER */
+.audio-wrap{background:var(--navy);border-radius:10px;padding:14px 16px;}
+.audio-label{font-size:0.68rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--gold);margin-bottom:8px;display:flex;align-items:center;gap:6px;}
+.audio-label::before{content:'🎙️';}
+audio{width:100%;height:36px;accent-color:var(--gold);}
+audio::-webkit-media-controls-panel{background:rgba(255,255,255,0.05);}
+
+/* STEP LIST */
+.step-list{background:var(--white);border:1px solid var(--border);border-radius:10px;overflow:hidden;}
+.step-list-header{background:var(--navy2);padding:10px 16px;font-size:0.78rem;font-weight:700;color:#fff;display:flex;align-items:center;gap:8px;}
+.step-item{display:flex;align-items:flex-start;gap:12px;padding:12px 16px;border-bottom:1px solid var(--border);cursor:pointer;transition:all 0.2s;}
+.step-item:last-child{border:none;}
+.step-item.active-step{background:var(--qbo-blue-lt);border-left:3px solid var(--qbo-blue);}
+.step-item.done-step{background:var(--qbo-green-lt);border-left:3px solid var(--qbo-green);}
+.step-num-circle{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.72rem;font-weight:700;flex-shrink:0;transition:all 0.2s;}
+.snc-default{background:var(--qbo-bg);color:var(--muted);border:1px solid var(--border);}
+.snc-active{background:var(--qbo-blue);color:#fff;}
+.snc-done{background:var(--qbo-green);color:#fff;}
+.step-text{flex:1;}
+.step-action{font-size:0.82rem;font-weight:600;color:var(--navy);}
+.step-detail{font-size:0.75rem;color:var(--muted);margin-top:2px;line-height:1.5;}
+.step-detail strong{color:var(--navy);}
+
+/* CLICK ME BUTTON */
+.click-me-btn{width:100%;padding:11px;border-radius:6px;border:none;background:var(--qbo-green);color:#fff;font-family:'Plus Jakarta Sans';font-size:0.85rem;font-weight:700;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:8px;}
+.click-me-btn:hover{background:var(--qbo-green-dk);transform:translateY(-1px);}
+.click-me-btn:disabled{background:var(--border);color:var(--muted);cursor:not-allowed;transform:none;}
+.click-me-btn.secondary{background:var(--qbo-blue);}
+.click-me-btn.secondary:hover{background:#005fa3;}
+
+/* FEEDBACK TOAST */
+.feedback-toast{position:fixed;bottom:24px;right:24px;background:var(--qbo-green);color:#fff;padding:12px 20px;border-radius:8px;font-size:0.85rem;font-weight:600;box-shadow:0 4px 20px rgba(0,0,0,0.2);transform:translateY(80px);opacity:0;transition:all 0.35s ease;z-index:999;display:flex;align-items:center;gap:8px;}
+.feedback-toast.show{transform:translateY(0);opacity:1;}
+.feedback-toast.error{background:var(--red);}
+
+/* NAV BUTTONS */
+.nav-row{display:flex;gap:10px;margin-top:20px;}
+.nav-btn{flex:1;padding:11px;border-radius:8px;border:none;font-family:'Plus Jakarta Sans';font-size:0.85rem;font-weight:700;cursor:pointer;transition:all 0.2s;}
+.nb-prev{background:var(--white);color:var(--muted);border:1px solid var(--border);}
+.nb-prev:hover{background:var(--qbo-bg);}
+.nb-next{background:var(--qbo-blue);color:#fff;}
+.nb-next:hover{background:#005fa3;}
+.nb-next:disabled{background:var(--border);color:var(--muted);cursor:not-allowed;}
+
+/* INFO BOX */
+.info-box{border-radius:8px;padding:12px 14px;font-size:0.8rem;line-height:1.65;display:flex;gap:10px;}
+.ib-gold{background:var(--gold-lt);border:1px solid rgba(245,158,11,0.25);}
+.ib-blue{background:var(--qbo-blue-lt);border:1px solid rgba(0,119,197,0.2);}
+.ib-green{background:var(--qbo-green-lt);border:1px solid rgba(44,160,28,0.2);}
+.ib-icon{font-size:1rem;flex-shrink:0;}
+.ib-text{color:var(--text);}
+.ib-text strong{color:var(--navy);}
+
+/* CONFETTI */
+.confetti-wrap{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:998;}
+.confetti-piece{position:absolute;width:8px;height:8px;border-radius:2px;animation:confetti-fall 3s ease-in forwards;}
+@keyframes confetti-fall{
+  0%{transform:translateY(-20px) rotate(0deg);opacity:1;}
+  100%{transform:translateY(100vh) rotate(720deg);opacity:0;}
+}
+
+@media(max-width:700px){
+  .content-area{grid-template-columns:1fr;}
+  .sim-panel{position:static;}
+  .tab-btn .tab-label{display:none;}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <a class="tb-logo" href="practicehub-dashboard.html">
+    <div class="tb-logo-icon">🐾</div>
+    The Practice HUB
+  </a>
+  <span style="color:rgba(255,255,255,0.7);font-size:0.8rem;">⚙️ QBO Setup Guide</span>
+  <a class="tb-back" href="practicehub-dashboard.html">← Dashboard</a>
+</div>
+<div class="progress-wrap"><div class="progress-fill" id="prog" style="width:16%"></div></div>
+
+<div class="wrap">
+
+  <!-- TAB NAV -->
+  <div class="tab-nav" id="tabNav">
+    <button class="tab-btn active" onclick="goTab(0)" id="tab0">
+      <span class="tab-icon">👋</span>
+      <span class="tab-label">Welcome</span>
+    </button>
+    <button class="tab-btn" onclick="goTab(1)" id="tab1">
+      <span class="tab-icon">🆓</span>
+      <span class="tab-label">Free Trial</span>
+    </button>
+    <button class="tab-btn" onclick="goTab(2)" id="tab2">
+      <span class="tab-icon">⭐</span>
+      <span class="tab-label">ProAdvisor</span>
+    </button>
+    <button class="tab-btn" onclick="goTab(3)" id="tab3">
+      <span class="tab-icon">🏢</span>
+      <span class="tab-label">Sample Co.</span>
+    </button>
+    <button class="tab-btn" onclick="goTab(4)" id="tab4">
+      <span class="tab-icon">🤔</span>
+      <span class="tab-label">Which One?</span>
+    </button>
+    <button class="tab-btn" onclick="goTab(5)" id="tab5">
+      <span class="tab-icon">✅</span>
+      <span class="tab-label">Done!</span>
+    </button>
+  </div>
+
+  <!-- ══════════ TAB 0 — WELCOME ══════════ -->
+  <div id="tabContent0">
+    <div class="content-area">
+      <!-- LEFT SIM -->
+      <div class="sim-panel">
+        <div class="sim-topbar">
+          <div class="sim-dots"><div class="sim-dot sd-r"></div><div class="sim-dot sd-y"></div><div class="sim-dot sd-g"></div></div>
+          <div class="sim-url">thepracticehub.com/qbo-setup</div>
+        </div>
+        <div class="sim-body">
+          <div class="step-indicator">
+            <span class="step-pill">INTRO</span>
+            <span class="step-title">Before you start the labs</span>
+          </div>
+          <!-- Welcome visual -->
+          <div style="text-align:center;padding:16px 0;">
+            <div style="font-size:3.5rem;margin-bottom:12px;">🐾</div>
+            <div style="font-family:'Sora';font-size:1.1rem;font-weight:800;color:var(--navy);margin-bottom:8px;">QBO Setup Guide</div>
+            <div style="font-size:0.8rem;color:var(--muted);line-height:1.7;margin-bottom:20px;">Before you can start any of the 6 labs — you need access to QuickBooks Online.<br><strong style="color:var(--navy);">The good news? You don't have to pay for it.</strong></div>
+            <div style="display:flex;flex-direction:column;gap:8px;">
+              <div style="background:var(--qbo-green-lt);border:1px solid rgba(44,160,28,0.2);border-radius:8px;padding:10px 14px;display:flex;align-items:center;gap:10px;text-align:left;">
+                <span style="font-size:1.2rem;">🆓</span>
+                <div><div style="font-size:0.8rem;font-weight:700;color:var(--navy);">Option 1 — Free Trial</div><div style="font-size:0.72rem;color:var(--muted);">30 days · Fastest setup · 2 minutes</div></div>
+              </div>
+              <div style="background:var(--gold-lt);border:1px solid rgba(245,158,11,0.2);border-radius:8px;padding:10px 14px;display:flex;align-items:center;gap:10px;text-align:left;">
+                <span style="font-size:1.2rem;">⭐</span>
+                <div><div style="font-size:0.8rem;font-weight:700;color:var(--navy);">Option 2 — ProAdvisor</div><div style="font-size:0.72rem;color:var(--muted);">Free forever · Best for career · Recommended ⭐</div></div>
+              </div>
+              <div style="background:var(--qbo-blue-lt);border:1px solid rgba(0,119,197,0.2);border-radius:8px;padding:10px 14px;display:flex;align-items:center;gap:10px;text-align:left;">
+                <span style="font-size:1.2rem;">🏢</span>
+                <div><div style="font-size:0.8rem;font-weight:700;color:var(--navy);">Option 3 — Sample Company</div><div style="font-size:0.72rem;color:var(--muted);">Instant · No signup · Great for exploring</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- RIGHT GUIDE -->
+      <div class="guide-panel">
+        <div class="audio-wrap">
+          <div class="audio-label">Coach Mic — Welcome</div>
+          <audio controls id="audio0" src="QBO-Intro-recording.mp3"></audio>
+        </div>
+        <div class="info-box ib-gold">
+          <div class="ib-icon">💡</div>
+          <div class="ib-text"><strong>Listen first, then follow along.</strong> Ate Mic will walk you through all 3 options in 7 minutes. Pick the one that works best for you — then come back here to do the steps.</div>
+        </div>
+        <div class="info-box ib-green">
+          <div class="ib-icon">🎯</div>
+          <div class="ib-text"><strong>For Phase 1 labs</strong> — Option 1 or Option 2. Either works perfectly. Most students choose Option 2 — free forever and it helps build your career.</div>
+        </div>
+        <button class="click-me-btn" onclick="goTab(1)">Next → Option 1: Free Trial →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ TAB 1 — FREE TRIAL ══════════ -->
+  <div id="tabContent1" style="display:none;">
+    <div class="content-area">
+      <!-- LEFT SIM -->
+      <div class="sim-panel">
+        <div class="sim-topbar">
+          <div class="sim-dots"><div class="sim-dot sd-r"></div><div class="sim-dot sd-y"></div><div class="sim-dot sd-g"></div></div>
+          <div class="sim-url" id="url1">quickbooks.intuit.com</div>
+        </div>
+        <div class="sim-body" id="simBody1">
+          <div class="step-indicator">
+            <span class="step-pill" id="stepPill1">STEP 1 OF 6</span>
+            <span class="step-title" id="stepTitle1">Go to the QBO website</span>
+          </div>
+          <div id="simScreen1">
+            <!-- Step 1 — Website -->
+            <div class="mock-website">
+              <div class="mw-header">
+                <div class="mw-logo">Quick<span>Books</span></div>
+                <div class="mw-nav">
+                  <span class="mw-nav-item">Products</span>
+                  <span class="mw-nav-item">Pricing</span>
+                  <span class="mw-nav-item">Sign In</span>
+                </div>
+              </div>
+              <div class="mw-body">
+                <div class="mw-hero-title">Smarter business tools</div>
+                <div class="mw-hero-sub">The #1 accounting software for small business</div>
+                <div style="position:relative;display:inline-block;">
+                  <button class="mock-btn qbo-primary pulse" onclick="sim1Step(2)" id="tryFreeBtn">Try it free →</button>
+                  <div class="click-tip" style="top:-32px;left:50%;transform:translateX(-50%);">👆 Click this!</div>
+                </div>
+                <div style="margin-top:10px;">
+                  <button class="mock-btn qbo-secondary" style="font-size:0.72rem;padding:6px 14px;">Sign in</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- RIGHT GUIDE -->
+      <div class="guide-panel">
+        <div class="audio-wrap">
+          <div class="audio-label">Coach Mic — Option 1: Free Trial</div>
+          <audio controls id="audio1" src="Tab-Free-Trial.mp3"></audio>
+        </div>
+        <div class="step-list">
+          <div class="step-list-header">🆓 Option 1 — Free Trial · 6 Steps</div>
+          <div class="step-item active-step" id="s1_1">
+            <div class="step-num-circle snc-active">1</div>
+            <div class="step-text"><div class="step-action">Go to quickbooks.intuit.com</div><div class="step-detail">Click the button on screen →</div></div>
+          </div>
+          <div class="step-item" id="s1_2">
+            <div class="step-num-circle snc-default">2</div>
+            <div class="step-text"><div class="step-action">Click "Try it free"</div><div class="step-detail">The green button on the homepage</div></div>
+          </div>
+          <div class="step-item" id="s1_3">
+            <div class="step-num-circle snc-default">3</div>
+            <div class="step-text"><div class="step-action">Enter your details</div><div class="step-detail">Name · Email · Password — no credit card!</div></div>
+          </div>
+          <div class="step-item" id="s1_4">
+            <div class="step-num-circle snc-default">4</div>
+            <div class="step-text"><div class="step-action">Choose Simple Start</div><div class="step-detail">Most affordable · Enough for all 6 labs</div></div>
+          </div>
+          <div class="step-item" id="s1_5">
+            <div class="step-num-circle snc-default">5</div>
+            <div class="step-text"><div class="step-action">Start Free Trial</div><div class="step-detail">No credit card needed</div></div>
+          </div>
+          <div class="step-item" id="s1_6">
+            <div class="step-num-circle snc-default">6</div>
+            <div class="step-text"><div class="step-action">QBO opens — you're in! ✅</div><div class="step-detail">30 days · More than enough for Phase 1</div></div>
+          </div>
+        </div>
+        <div class="info-box ib-gold">
+          <div class="ib-icon">⚠️</div>
+          <div class="ib-text"><strong>Set a reminder on Day 28</strong> to cancel if you don't want to continue. To cancel: Account Settings → Cancel Subscription.</div>
+        </div>
+        <div class="nav-row">
+          <button class="nav-btn nb-prev" onclick="goTab(0)">← Back</button>
+          <button class="nav-btn nb-next" onclick="goTab(2)">Option 2: ProAdvisor →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ TAB 2 — PROADVISOR ══════════ -->
+  <div id="tabContent2" style="display:none;">
+    <div class="content-area">
+      <!-- LEFT SIM -->
+      <div class="sim-panel">
+        <div class="sim-topbar">
+          <div class="sim-dots"><div class="sim-dot sd-r"></div><div class="sim-dot sd-y"></div><div class="sim-dot sd-g"></div></div>
+          <div class="sim-url">quickbooks.intuit.com/accountants</div>
+        </div>
+        <div class="sim-body">
+          <div class="step-indicator">
+            <span class="step-pill">OPTION 2</span>
+            <span class="step-title">ProAdvisor — Free Forever ⭐</span>
+          </div>
+          <div id="simScreen2">
+            <div class="mock-website">
+              <div class="pa-header">
+                <div class="pa-logo">Quick<span>Books</span> ProAdvisor</div>
+                <div class="pa-tagline">For Bookkeepers & Accountants</div>
+              </div>
+              <div class="pa-body">
+                <div style="font-size:0.85rem;font-weight:700;color:var(--navy);margin-bottom:4px;">Join the QuickBooks ProAdvisor Program</div>
+                <div style="font-size:0.72rem;color:var(--muted);margin-bottom:14px;">Free QBO access · Certification · Find-a-ProAdvisor listing</div>
+                <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:14px;">
+                  <div style="background:var(--qbo-green-lt);border-radius:6px;padding:6px 10px;font-size:0.68rem;color:var(--qbo-green);font-weight:600;">✓ Free Forever</div>
+                  <div style="background:var(--gold-lt);border-radius:6px;padding:6px 10px;font-size:0.68rem;color:var(--gold-dk);font-weight:600;">✓ Certification</div>
+                  <div style="background:var(--qbo-blue-lt);border-radius:6px;padding:6px 10px;font-size:0.68rem;color:var(--qbo-blue);font-weight:600;">✓ Client Directory</div>
+                </div>
+                <div style="position:relative;display:inline-block;">
+                  <button class="mock-btn qbo-primary pulse" onclick="sim2Step()">Join for Free →</button>
+                  <div class="click-tip" style="top:-32px;left:50%;transform:translateX(-50%);">👆 Click this!</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- RIGHT GUIDE -->
+      <div class="guide-panel">
+        <div class="audio-wrap">
+          <div class="audio-label">Coach Mic — Option 2: ProAdvisor</div>
+          <audio controls id="audio2" src="Tab2-Pro-Advisor-Recording.mp3"></audio>
+        </div>
+        <div class="step-list">
+          <div class="step-list-header">⭐ Option 2 — ProAdvisor · 6 Steps</div>
+          <div class="step-item active-step">
+            <div class="step-num-circle snc-active">1</div>
+            <div class="step-text"><div class="step-action">Go to quickbooks.intuit.com/accountants</div><div class="step-detail">Different URL from the regular QBO site</div></div>
+          </div>
+          <div class="step-item">
+            <div class="step-num-circle snc-default">2</div>
+            <div class="step-text"><div class="step-action">Click "Join for Free"</div><div class="step-detail">Or "Sign Up" — both work</div></div>
+          </div>
+          <div class="step-item">
+            <div class="step-num-circle snc-default">3</div>
+            <div class="step-text"><div class="step-action">Create your Intuit account</div><div class="step-detail">Name · Email · Password</div></div>
+          </div>
+          <div class="step-item">
+            <div class="step-num-circle snc-default">4</div>
+            <div class="step-text"><div class="step-action">Fill in your profile</div><div class="step-detail">Role: <strong>Bookkeeper</strong></div></div>
+          </div>
+          <div class="step-item">
+            <div class="step-num-circle snc-default">5</div>
+            <div class="step-text"><div class="step-action">Open QBO Accountant</div><div class="step-detail">Inside the ProAdvisor dashboard</div></div>
+          </div>
+          <div class="step-item">
+            <div class="step-num-circle snc-default">6</div>
+            <div class="step-text"><div class="step-action">Create practice company</div><div class="step-detail">Name it exactly: <strong>Juan's Pet Paradise</strong> ✅</div></div>
+          </div>
+        </div>
+        <div class="info-box ib-green">
+          <div class="ib-icon">⭐</div>
+          <div class="ib-text"><strong>This is Ate Mic's top recommendation.</strong> Free forever + certification + US clients can find you through the ProAdvisor directory. Sign up once, use forever. 💛</div>
+        </div>
+        <div class="nav-row">
+          <button class="nav-btn nb-prev" onclick="goTab(1)">← Option 1</button>
+          <button class="nav-btn nb-next" onclick="goTab(3)">Option 3: Sample Co. →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ TAB 3 — SAMPLE COMPANY ══════════ -->
+  <div id="tabContent3" style="display:none;">
+    <div class="content-area">
+      <!-- LEFT SIM -->
+      <div class="sim-panel">
+        <div class="sim-topbar">
+          <div class="sim-dots"><div class="sim-dot sd-r"></div><div class="sim-dot sd-y"></div><div class="sim-dot sd-g"></div></div>
+          <div class="sim-url">app.qbo.intuit.com</div>
+        </div>
+        <div class="sim-body">
+          <div class="step-indicator">
+            <span class="step-pill">OPTION 3</span>
+            <span class="step-title">Sample Company — Instant Access</span>
+          </div>
+          <div id="simScreen3" style="position:relative;">
+            <!-- QBO dashboard with gear -->
+            <div class="qbo-dash">
+              <div class="qd-top" style="justify-content:space-between;">
+                <span>📊 Dashboard — Craig's Landscaping</span>
+                <div style="position:relative;">
+                  <button class="mock-btn" style="background:rgba(255,255,255,0.15);color:#fff;padding:4px 8px;font-size:0.72rem;" onclick="toggleGear()" id="gearBtn">⚙️</button>
+                  <div class="gear-menu" id="gearMenu" style="display:none;">
+                    <div class="gear-section">
+                      <div class="gear-label">Settings</div>
+                      <div class="gear-item">Company Settings</div>
+                      <div class="gear-item">Chart of Accounts</div>
+                    </div>
+                    <div class="gear-section">
+                      <div class="gear-label">Your Company</div>
+                      <div class="gear-item highlight" onclick="sim3Step()">🏢 Sample company</div>
+                      <div class="gear-item">Subscriptions</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="qd-body">
+                <div class="qd-card"><div class="qd-card-label">Bank Accounts</div><div class="qd-card-val">$12,450</div></div>
+                <div class="qd-card"><div class="qd-card-label">Invoices Owed</div><div class="qd-card-val">$3,200</div></div>
+                <div class="qd-card"><div class="qd-card-label">Bills to Pay</div><div class="qd-card-val">$1,800</div></div>
+                <div class="qd-card"><div class="qd-card-label">Net Income</div><div class="qd-card-val">$8,640</div></div>
+              </div>
+            </div>
+            <div style="margin-top:10px;text-align:center;">
+              <div style="font-size:0.75rem;color:var(--muted);">👆 Click the ⚙️ gear icon above</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- RIGHT GUIDE -->
+      <div class="guide-panel">
+        <div class="audio-wrap">
+          <div class="audio-label">Coach Mic — Option 3: Sample Company</div>
+          <audio controls id="audio3" src="sample-company-tab.mp3"></audio>
+        </div>
+        <div class="step-list">
+          <div class="step-list-header">🏢 Option 3 — Sample Company · 5 Steps</div>
+          <div class="step-item active-step">
+            <div class="step-num-circle snc-active">1</div>
+            <div class="step-text"><div class="step-action">Log in to any QBO account</div><div class="step-detail">Any existing QBO account works</div></div>
+          </div>
+          <div class="step-item">
+            <div class="step-num-circle snc-default">2</div>
+            <div class="step-text"><div class="step-action">Click ⚙️ gear icon — top right</div><div class="step-detail">Click the gear on the simulation →</div></div>
+          </div>
+          <div class="step-item">
+            <div class="step-num-circle snc-default">3</div>
+            <div class="step-text"><div class="step-action">Find "Sample company"</div><div class="step-detail">Under "Your Company" section</div></div>
+          </div>
+          <div class="step-item">
+            <div class="step-num-circle snc-default">4</div>
+            <div class="step-text"><div class="step-action">Click it → Craig's Landscaping opens</div><div class="step-detail">Pre-built US business with real data</div></div>
+          </div>
+          <div class="step-item">
+            <div class="step-num-circle snc-default">5</div>
+            <div class="step-text"><div class="step-action">Explore freely ✅</div><div class="step-detail">Resets automatically — nothing is saved</div></div>
+          </div>
+        </div>
+        <div class="info-box ib-blue">
+          <div class="ib-icon">ℹ️</div>
+          <div class="ib-text"><strong>Best for exploring QBO first</strong> before starting the labs. Whatever you do in the Sample Company resets automatically — you can't break anything! 😊</div>
+        </div>
+        <div class="nav-row">
+          <button class="nav-btn nb-prev" onclick="goTab(2)">← Option 2</button>
+          <button class="nav-btn nb-next" onclick="goTab(4)">Which One? →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ TAB 4 — WHICH ONE ══════════ -->
+  <div id="tabContent4" style="display:none;">
+    <div class="content-area">
+      <!-- LEFT SIM -->
+      <div class="sim-panel">
+        <div class="sim-topbar">
+          <div class="sim-dots"><div class="sim-dot sd-r"></div><div class="sim-dot sd-y"></div><div class="sim-dot sd-g"></div></div>
+          <div class="sim-url">Which option is right for you?</div>
+        </div>
+        <div class="sim-body">
+          <div class="step-indicator">
+            <span class="step-pill">DECIDE</span>
+            <span class="step-title">Pick your option — click to choose</span>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:10px;">
+            <div class="mock-website" style="cursor:pointer;transition:all 0.2s;" onclick="pickOption(1)" id="opt1Card">
+              <div style="padding:14px 16px;display:flex;align-items:center;gap:12px;">
+                <span style="font-size:1.6rem;">🆓</span>
+                <div style="flex:1;">
+                  <div style="font-size:0.85rem;font-weight:700;color:var(--navy);">Option 1 — Free Trial</div>
+                  <div style="font-size:0.72rem;color:var(--muted);">I want the fastest setup right now</div>
+                </div>
+                <div style="font-size:0.72rem;font-weight:600;padding:3px 8px;border-radius:10px;background:var(--qbo-bg);color:var(--muted);">30 days</div>
+              </div>
+            </div>
+            <div class="mock-website" style="cursor:pointer;transition:all 0.2s;border:2px solid var(--gold);" onclick="pickOption(2)" id="opt2Card">
+              <div style="padding:14px 16px;display:flex;align-items:center;gap:12px;">
+                <span style="font-size:1.6rem;">⭐</span>
+                <div style="flex:1;">
+                  <div style="font-size:0.85rem;font-weight:700;color:var(--navy);">Option 2 — ProAdvisor <span style="color:var(--gold-dk);font-size:0.7rem;">← Recommended</span></div>
+                  <div style="font-size:0.72rem;color:var(--muted);">I'm serious about bookkeeping as a career</div>
+                </div>
+                <div style="font-size:0.72rem;font-weight:600;padding:3px 8px;border-radius:10px;background:var(--gold-lt);color:var(--gold-dk);">Free Forever</div>
+              </div>
+            </div>
+            <div class="mock-website" style="cursor:pointer;transition:all 0.2s;" onclick="pickOption(3)" id="opt3Card">
+              <div style="padding:14px 16px;display:flex;align-items:center;gap:12px;">
+                <span style="font-size:1.6rem;">🏢</span>
+                <div style="flex:1;">
+                  <div style="font-size:0.85rem;font-weight:700;color:var(--navy);">Option 3 — Sample Company</div>
+                  <div style="font-size:0.72rem;color:var(--muted);">I just want to explore QBO first</div>
+                </div>
+                <div style="font-size:0.72rem;font-weight:600;padding:3px 8px;border-radius:10px;background:var(--qbo-blue-lt);color:var(--qbo-blue);">Instant</div>
+              </div>
+            </div>
+          </div>
+          <div id="choiceResult" style="margin-top:12px;display:none;"></div>
+        </div>
+      </div>
+      <!-- RIGHT GUIDE -->
+      <div class="guide-panel">
+        <div class="audio-wrap">
+          <div class="audio-label">Coach Mic — Which Option?</div>
+          <audio controls id="audio4" src="QBO-options-what-to-choose.mp3"></audio>
+        </div>
+        <div class="step-list">
+          <div class="step-list-header">🤔 Quick Summary</div>
+          <div class="step-item">
+            <div class="step-num-circle" style="background:var(--qbo-green-lt);color:var(--qbo-green);border:none;">🆓</div>
+            <div class="step-text"><div class="step-action">Free Trial → Fastest setup</div><div class="step-detail">Done in 2 minutes. Perfect if you want to start right now.</div></div>
+          </div>
+          <div class="step-item" style="background:var(--gold-lt);">
+            <div class="step-num-circle" style="background:var(--gold);color:#fff;border:none;">⭐</div>
+            <div class="step-text"><div class="step-action">ProAdvisor → Best choice</div><div class="step-detail">Free forever + certification + career opportunity. Ate Mic's top pick. 💛</div></div>
+          </div>
+          <div class="step-item">
+            <div class="step-num-circle" style="background:var(--qbo-blue-lt);color:var(--qbo-blue);border:none;">🏢</div>
+            <div class="step-text"><div class="step-action">Sample Company → Explore first</div><div class="step-detail">No setup. Great for exploring before committing.</div></div>
+          </div>
+        </div>
+        <div class="info-box ib-gold">
+          <div class="ib-icon">💛</div>
+          <div class="ib-text"><strong>For Phase 1 labs — Option 1 or Option 2.</strong> Either works perfectly. Click your choice on the simulation screen!</div>
+        </div>
+        <div class="nav-row">
+          <button class="nav-btn nb-prev" onclick="goTab(3)">← Sample Co.</button>
+          <button class="nav-btn nb-next" onclick="goTab(5)">Finish Setup →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ TAB 5 — DONE ══════════ -->
+  <div id="tabContent5" style="display:none;">
+    <div class="content-area">
+      <!-- LEFT SIM -->
+      <div class="sim-panel">
+        <div class="sim-topbar">
+          <div class="sim-dots"><div class="sim-dot sd-r"></div><div class="sim-dot sd-y"></div><div class="sim-dot sd-g"></div></div>
+          <div class="sim-url">Setup Complete! ✅</div>
+        </div>
+        <div class="sim-body">
+          <div class="success-state">
+            <div class="success-icon">🎉</div>
+            <div class="success-title">QBO Setup Complete!</div>
+            <div class="success-sub">Your QuickBooks Online is ready.<br>Juan's Pet Paradise is set up and waiting.<br><br>Here's what comes next:</div>
+            <div style="margin-top:16px;display:flex;flex-direction:column;gap:8px;text-align:left;">
+              <div style="background:var(--qbo-green-lt);border-radius:8px;padding:10px 14px;font-size:0.8rem;display:flex;align-items:center;gap:10px;">
+                <span>1️⃣</span><div><strong>Finish Pre-Orientation</strong> if not done yet</div>
+              </div>
+              <div style="background:var(--qbo-blue-lt);border-radius:8px;padding:10px 14px;font-size:0.8rem;display:flex;align-items:center;gap:10px;">
+                <span>2️⃣</span><div><strong>Open Lesson 0</strong> — Quick Recall before S01</div>
+              </div>
+              <div style="background:var(--gold-lt);border-radius:8px;padding:10px 14px;font-size:0.8rem;display:flex;align-items:center;gap:10px;">
+                <span>3️⃣</span><div><strong>Start S01</strong> — Bank Reconciliation lab</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- RIGHT GUIDE -->
+      <div class="guide-panel">
+        <div class="audio-wrap">
+          <div class="audio-label">Coach Mic — See You in Lesson 0!</div>
+          <audio controls id="audio5" src="closing-tab.mp3" onended="launchConfetti()"></audio>
+        </div>
+        <div class="info-box ib-green">
+          <div class="ib-icon">✅</div>
+          <div class="ib-text"><strong>You're all set!</strong> If you run into any issues during setup, post your question in the secret group and Ate Mic will help you out.</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:10px;margin-top:4px;">
+          <a href="lesson0-phase1.html" style="text-decoration:none;">
+            <button class="click-me-btn">→ Open Lesson 0 — Quick Recall</button>
+          </a>
+          <a href="practicehub-dashboard.html" style="text-decoration:none;">
+            <button class="click-me-btn secondary">← Back to Dashboard</button>
+          </a>
+        </div>
+        <div class="nav-row">
+          <button class="nav-btn nb-prev" onclick="goTab(4)">← Which One?</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /wrap -->
+
+<!-- TOAST -->
+<div class="feedback-toast" id="toast"></div>
+
+<!-- CONFETTI CONTAINER -->
+<div class="confetti-wrap" id="confettiWrap"></div>
+
+<script>
+let currentTab = 0;
+const totalTabs = 6;
+const tabColors = ['#2CA01C','#0077C5','#F59E0B','#0d9488','#7C3AED','#2CA01C'];
+
+// ── TAB NAVIGATION ──
+function goTab(n){
+  // Hide all
+  for(let i=0;i<totalTabs;i++){
+    const c=document.getElementById('tabContent'+i);
+    const t=document.getElementById('tab'+i);
+    if(c) c.style.display='none';
+    if(t){t.classList.remove('active');}
+  }
+  // Mark previous tabs as done
+  for(let i=0;i<n;i++){
+    const t=document.getElementById('tab'+i);
+    if(t){t.classList.remove('active');t.classList.add('done');}
+  }
+  // Show current
+  const cur=document.getElementById('tabContent'+n);
+  const curTab=document.getElementById('tab'+n);
+  if(cur) cur.style.display='block';
+  if(curTab){curTab.classList.add('active');curTab.classList.remove('done');}
+  currentTab=n;
+  // Progress
+  document.getElementById('prog').style.width=((n+1)/totalTabs*100)+'%';
+  // Auto-play audio
+  const audio=document.getElementById('audio'+n);
+  if(audio){
+    // Pause all other audios
+    for(let i=0;i<totalTabs;i++){
+      const a=document.getElementById('audio'+i);
+      if(a&&i!==n) a.pause();
+    }
+  }
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+// ── SIM 1 — FREE TRIAL STEPS ──
+let sim1Current = 1;
+function sim1Step(step){
+  sim1Current = step;
+  const body = document.getElementById('simScreen1');
+  const pill = document.getElementById('stepPill1');
+  const title = document.getElementById('stepTitle1');
+  const url = document.getElementById('url1');
+
+  // Update step list
+  for(let i=1;i<=6;i++){
+    const el=document.getElementById('s1_'+i);
+    if(!el) continue;
+    const circle=el.querySelector('.step-num-circle');
+    el.classList.remove('active-step','done-step');
+    circle.className='step-num-circle';
+    if(i<step){el.classList.add('done-step');circle.classList.add('snc-done');circle.textContent='✓';}
+    else if(i===step){el.classList.add('active-step');circle.classList.add('snc-active');circle.textContent=i;}
+    else{circle.classList.add('snc-default');circle.textContent=i;}
+  }
+
+  if(step===2){
+    pill.textContent='STEP 2 OF 6';title.textContent='Click "Try it free"';
+    url.textContent='quickbooks.intuit.com';
+    body.innerHTML=`
+      <div class="mock-website">
+        <div class="mw-header"><div class="mw-logo">Quick<span style="color:var(--gold)">Books</span></div></div>
+        <div class="mw-body">
+          <div class="mw-hero-title">Sign up for QuickBooks Online</div>
+          <div class="mw-hero-sub">Create your account — no credit card needed</div>
+          <div class="form-group"><label class="form-label">Full Name</label><input class="form-input" placeholder="Enter your name" onclick="this.classList.add('focused')" onblur="if(this.value)this.classList.add('filled')"></div>
+          <div class="form-group"><label class="form-label">Email Address</label><input class="form-input" placeholder="your@email.com" onclick="this.classList.add('focused')" onblur="if(this.value)this.classList.add('filled')"></div>
+          <div class="form-group"><label class="form-label">Password</label><input class="form-input" type="password" placeholder="Create password" onclick="this.classList.add('focused')" onblur="if(this.value)this.classList.add('filled')"></div>
+          <div style="position:relative;display:inline-block;margin-top:8px;">
+            <button class="mock-btn qbo-primary pulse" onclick="sim1Step(3)">Continue →</button>
+            <div class="click-tip" style="top:-32px;left:50%;transform:translateX(-50%);">👆 Fill in & Continue</div>
+          </div>
+        </div>
+      </div>`;
+  } else if(step===3){
+    pill.textContent='STEP 3 OF 6';title.textContent='Choose your plan';
+    body.innerHTML=`
+      <div class="mock-website">
+        <div class="mw-header"><div class="mw-logo">Quick<span style="color:var(--gold)">Books</span></div></div>
+        <div class="mw-body">
+          <div class="mw-hero-title">Choose a plan</div>
+          <div class="mw-hero-sub">All plans include a 30-day free trial</div>
+          <div class="plan-cards">
+            <div class="plan-card pulse-card" onclick="sim1Step(4)" id="simplePlan">
+              <div class="plan-name">Simple Start</div>
+              <div class="plan-price">$21/mo after trial</div>
+              <div style="font-size:0.65rem;color:var(--qbo-green);font-weight:700;margin-top:4px;">✅ Recommended</div>
+            </div>
+            <div class="plan-card" onclick="sim1Step(4)">
+              <div class="plan-name">Essentials</div>
+              <div class="plan-price">$31/mo after trial</div>
+            </div>
+            <div class="plan-card" onclick="sim1Step(4)">
+              <div class="plan-name">Plus</div>
+              <div class="plan-price">$46/mo after trial</div>
+            </div>
+          </div>
+          <div style="font-size:0.7rem;color:var(--muted);margin-top:6px;">👆 Click Simple Start — enough for all 6 labs</div>
+        </div>
+      </div>`;
+  } else if(step===4){
+    pill.textContent='STEP 4 OF 6';title.textContent='Start Free Trial';
+    body.innerHTML=`
+      <div class="mock-website">
+        <div class="mw-header"><div class="mw-logo">Quick<span style="color:var(--gold)">Books</span></div></div>
+        <div class="mw-body">
+          <div style="background:var(--qbo-green-lt);border:1px solid rgba(44,160,28,0.2);border-radius:8px;padding:10px;margin-bottom:12px;font-size:0.75rem;color:var(--qbo-green);font-weight:600;">✅ Simple Start selected · No credit card required</div>
+          <div style="font-size:0.82rem;font-weight:700;color:var(--navy);margin-bottom:8px;">Ready to start your free trial?</div>
+          <div style="position:relative;display:inline-block;">
+            <button class="mock-btn qbo-primary pulse" onclick="sim1Step(5)" style="font-size:0.85rem;padding:10px 24px;">Start Free Trial →</button>
+            <div class="click-tip" style="top:-32px;left:50%;transform:translateX(-50%);">👆 Click to start!</div>
+          </div>
+          <div style="font-size:0.68rem;color:var(--muted);margin-top:8px;">You won't be charged during the trial period</div>
+        </div>
+      </div>`;
+  } else if(step===5){
+    pill.textContent='STEP 5 OF 6';title.textContent='QBO is setting up...';
+    body.innerHTML=`
+      <div style="text-align:center;padding:24px;">
+        <div style="font-size:2.5rem;margin-bottom:12px;">⏳</div>
+        <div style="font-size:0.85rem;font-weight:700;color:var(--navy);">Setting up your QuickBooks...</div>
+        <div style="font-size:0.75rem;color:var(--muted);margin:8px 0 16px;">This takes about 30 seconds</div>
+        <div style="background:var(--border);border-radius:10px;height:6px;overflow:hidden;"><div style="background:var(--qbo-green);height:6px;border-radius:10px;animation:loading-bar 2s ease forwards;" id="loadBar"></div></div>
+      </div>`;
+    setTimeout(()=>sim1Step(6), 2000);
+  } else if(step===6){
+    pill.textContent='STEP 6 OF 6';title.textContent='You\'re in! ✅';
+    url.textContent='app.qbo.intuit.com/dashboard';
+    body.innerHTML=`
+      <div class="qbo-dash">
+        <div class="qd-top" style="justify-content:space-between;">
+          <span>📊 Dashboard</span>
+          <span style="font-size:0.72rem;opacity:0.8;">Juan's Pet Paradise</span>
+        </div>
+        <div class="qd-body">
+          <div class="qd-card"><div class="qd-card-label">Checking</div><div class="qd-card-val" style="color:var(--qbo-green);">$9,850</div></div>
+          <div class="qd-card"><div class="qd-card-label">Invoices</div><div class="qd-card-val">$0</div></div>
+          <div class="qd-card"><div class="qd-card-label">Bills</div><div class="qd-card-val">$0</div></div>
+          <div class="qd-card"><div class="qd-card-label">Net Income</div><div class="qd-card-val">$0</div></div>
+        </div>
+      </div>
+      <div style="text-align:center;margin-top:12px;">
+        <div style="font-size:0.82rem;font-weight:700;color:var(--qbo-green);">🎉 You're in! QBO is ready.</div>
+        <div style="font-size:0.72rem;color:var(--muted);margin-top:4px;">30-day free trial started · Juan's Pet Paradise set up ✅</div>
+      </div>`;
+    showToast('🎉 Free Trial set up! QBO is ready!', false);
+  }
+}
+
+// ── SIM 2 — PROADVISOR ──
+function sim2Step(){
+  const body = document.getElementById('simScreen2');
+  body.innerHTML=`
+    <div class="success-state">
+      <div class="success-icon">⭐</div>
+      <div class="success-title">ProAdvisor Account Created!</div>
+      <div class="success-sub">Welcome to QuickBooks ProAdvisor.<br>Your free QBO access is ready — forever.<br><br>Remember: Name your practice company exactly <strong>"Juan's Pet Paradise"</strong></div>
+    </div>`;
+  showToast('⭐ ProAdvisor signup complete! Free forever!', false);
+}
+
+// ── SIM 3 — SAMPLE COMPANY ──
+function toggleGear(){
+  const menu=document.getElementById('gearMenu');
+  menu.style.display=menu.style.display==='none'?'block':'none';
+}
+function sim3Step(){
+  const body=document.getElementById('simScreen3');
+  document.getElementById('gearMenu').style.display='none';
+  body.innerHTML=`
+    <div class="qbo-dash">
+      <div class="qd-top" style="justify-content:space-between;">
+        <span>📊 Sample Company</span>
+        <span style="font-size:0.7rem;opacity:0.8;background:rgba(255,255,255,0.15);padding:2px 8px;border-radius:10px;">Practice Mode</span>
+      </div>
+      <div class="qd-body">
+        <div class="qd-card"><div class="qd-card-label">Checking</div><div class="qd-card-val" style="color:var(--qbo-green);">$12,450</div></div>
+        <div class="qd-card"><div class="qd-card-label">Invoices</div><div class="qd-card-val">$3,200</div></div>
+        <div class="qd-card"><div class="qd-card-label">Bills</div><div class="qd-card-val">$1,800</div></div>
+        <div class="qd-card"><div class="qd-card-label">Net Income</div><div class="qd-card-val">$8,640</div></div>
+      </div>
+    </div>
+    <div style="text-align:center;margin-top:10px;">
+      <div style="font-size:0.78rem;font-weight:700;color:var(--teal);">🏢 Craig's Landscaping — Sample Company</div>
+      <div style="font-size:0.7rem;color:var(--muted);margin-top:3px;">Explore freely · Resets automatically ✅</div>
+    </div>`;
+  showToast('🏢 Sample Company opened! Explore freely!', false);
+}
+
+// ── OPTION PICKER ──
+function pickOption(n){
+  const cards=['opt1Card','opt2Card','opt3Card'];
+  cards.forEach((id,i)=>{
+    const el=document.getElementById(id);
+    if(i+1===n){
+      el.style.border='2px solid var(--qbo-green)';
+      el.style.background='var(--qbo-green-lt)';
+    } else {
+      el.style.border='1px solid var(--border)';
+      el.style.background='';
+    }
+  });
+  const result=document.getElementById('choiceResult');
+  const msgs=[
+    {icon:'🆓',text:'<strong>Great choice!</strong> Go to quickbooks.intuit.com and click "Try it free." Done in 2 minutes.',color:'var(--qbo-green-lt)',border:'rgba(44,160,28,0.3)'},
+    {icon:'⭐',text:'<strong>Excellent!</strong> Go to quickbooks.intuit.com/accountants and click "Join for Free." This is the best long-term choice. 💛',color:'var(--gold-lt)',border:'rgba(245,158,11,0.3)'},
+    {icon:'🏢',text:'<strong>Good start!</strong> Log in to QBO → click ⚙️ gear icon → Sample company. Perfect for exploring first.',color:'var(--qbo-blue-lt)',border:'rgba(0,119,197,0.3)'},
+  ];
+  const m=msgs[n-1];
+  result.style.display='block';
+  result.innerHTML=`<div style="background:${m.color};border:1px solid ${m.border};border-radius:8px;padding:12px 14px;font-size:0.8rem;display:flex;gap:8px;align-items:flex-start;"><span>${m.icon}</span><div>${m.text}</div></div>`;
+  showToast(`Option ${n} selected! ✅`, false);
+}
+
+// ── TOAST ──
+function showToast(msg, isError=false){
+  const t=document.getElementById('toast');
+  t.textContent=msg;
+  t.className='feedback-toast'+(isError?' error':'');
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 3000);
+}
+
+// ── CONFETTI ──
+function launchConfetti(){
+  const wrap=document.getElementById('confettiWrap');
+  const colors=['#2CA01C','#F59E0B','#0077C5','#e05555','#a78bfa','#2dd4bf'];
+  for(let i=0;i<60;i++){
+    const p=document.createElement('div');
+    p.className='confetti-piece';
+    p.style.left=Math.random()*100+'%';
+    p.style.background=colors[Math.floor(Math.random()*colors.length)];
+    p.style.animationDelay=Math.random()*2+'s';
+    p.style.animationDuration=(2+Math.random()*2)+'s';
+    p.style.width=(6+Math.random()*8)+'px';
+    p.style.height=(6+Math.random()*8)+'px';
+    wrap.appendChild(p);
+  }
+  setTimeout(()=>wrap.innerHTML='', 5000);
+}
+
+// ── LOADING BAR ANIMATION ──
+const style=document.createElement('style');
+style.textContent=`@keyframes loading-bar{from{width:0}to{width:100%}}`;
+document.head.appendChild(style);
+
+// Init
+goTab(0);
+</script>
+</body>
+</html>
