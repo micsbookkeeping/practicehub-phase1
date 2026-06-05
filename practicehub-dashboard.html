@@ -1,0 +1,1113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Practice HUB — Juan's Pet Paradise</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* QBO Colors */
+  --qbo-green:#2CA01C;--qbo-green-dark:#1e7a14;--qbo-green-lt:#e8f5e9;
+  --qbo-blue:#0077C5;--qbo-blue-dark:#005fa3;--qbo-blue-lt:#e3f2fd;
+  --qbo-bg:#F4F5F7;--qbo-white:#FFFFFF;
+  --qbo-text:#393A3D;--qbo-muted:#6B7280;--qbo-border:#E3E5E8;
+  --qbo-red:#D32F2F;--qbo-red-lt:#FFEBEE;
+  --qbo-orange:#F59E0B;--qbo-orange-lt:#FFF8E1;
+  --qbo-purple:#7C3AED;--qbo-purple-lt:#EDE9FE;
+  /* HUB Brand */
+  --gold:#F59E0B;--gold-lt:#FFF8E1;--gold-dark:#D97706;
+  --navy:#1e293b;
+  --sidebar-w:220px;
+  --topbar-h:52px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;font-family:'Inter',sans-serif;color:var(--qbo-text);background:var(--qbo-bg);font-size:14px;}
+
+/* ── TOPBAR ── */
+.topbar{
+  position:fixed;top:0;left:0;right:0;height:var(--topbar-h);
+  background:var(--qbo-green);
+  display:flex;align-items:center;padding:0 16px;
+  z-index:200;gap:12px;
+  box-shadow:0 2px 8px rgba(0,0,0,0.15);
+}
+.tb-logo{display:flex;align-items:center;gap:8px;color:#fff;font-weight:700;font-size:0.95rem;text-decoration:none;}
+.tb-logo-icon{background:rgba(255,255,255,0.2);border-radius:6px;width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-size:1rem;}
+.tb-company{color:rgba(255,255,255,0.9);font-size:0.82rem;margin-left:8px;padding-left:12px;border-left:1px solid rgba(255,255,255,0.3);}
+.tb-company strong{color:#fff;font-weight:600;}
+.tb-right{margin-left:auto;display:flex;align-items:center;gap:8px;}
+.tb-btn{background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.25);color:#fff;padding:5px 12px;border-radius:4px;font-size:0.78rem;font-weight:500;cursor:pointer;display:flex;align-items:center;gap:5px;transition:background 0.15s;}
+.tb-btn:hover{background:rgba(255,255,255,0.25);}
+.tb-btn.new{background:#fff;color:var(--qbo-green);font-weight:700;}
+.tb-btn.new:hover{background:#f0f0f0;}
+.tb-avatar{width:28px;height:28px;border-radius:50%;background:var(--gold);color:#fff;font-weight:700;font-size:0.78rem;display:flex;align-items:center;justify-content:center;cursor:pointer;}
+
+/* ── SIDEBAR ── */
+.sidebar{
+  position:fixed;top:var(--topbar-h);left:0;bottom:0;
+  width:var(--sidebar-w);background:var(--qbo-white);
+  border-right:1px solid var(--qbo-border);
+  overflow-y:auto;z-index:100;
+  display:flex;flex-direction:column;
+}
+.sb-section{padding:8px 0;}
+.sb-section-label{font-size:0.65rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--qbo-muted);padding:8px 16px 4px;}
+.sb-item{display:flex;align-items:center;gap:10px;padding:8px 16px;cursor:pointer;color:var(--qbo-text);font-size:0.82rem;font-weight:500;transition:all 0.1s;border-left:3px solid transparent;text-decoration:none;}
+.sb-item:hover{background:var(--qbo-bg);color:var(--qbo-blue);}
+.sb-item.active{background:var(--qbo-blue-lt);color:var(--qbo-blue);border-left-color:var(--qbo-blue);font-weight:600;}
+.sb-item.locked{color:#adb5bd;cursor:not-allowed;}
+.sb-item.locked:hover{background:transparent;color:#adb5bd;}
+.sb-icon{font-size:1rem;width:20px;text-align:center;flex-shrink:0;}
+.sb-badge{margin-left:auto;font-size:0.65rem;font-weight:700;padding:2px 6px;border-radius:10px;}
+.sb-done{background:var(--qbo-green-lt);color:var(--qbo-green);}
+.sb-current{background:var(--qbo-blue-lt);color:var(--qbo-blue);}
+.sb-lock{background:var(--qbo-bg);color:#adb5bd;}
+.sb-divider{height:1px;background:var(--qbo-border);margin:4px 0;}
+.sb-coach{margin:auto 12px 12px;background:linear-gradient(135deg,#FFF8E1,#FFF3CD);border:1px solid #F59E0B33;border-radius:8px;padding:12px;text-align:center;}
+.sb-coach-name{font-size:0.75rem;font-weight:700;color:var(--gold-dark);margin-bottom:4px;}
+.sb-coach-text{font-size:0.72rem;color:#78716c;line-height:1.5;}
+
+/* ── MAIN ── */
+.main{margin-left:var(--sidebar-w);margin-top:var(--topbar-h);min-height:calc(100vh - var(--topbar-h));padding:24px;}
+
+/* ── PANELS ── */
+.panel{display:none;}
+.panel.active{display:block;}
+
+/* ── PAGE HEADER ── */
+.page-header{background:var(--qbo-white);border:1px solid var(--qbo-border);border-radius:8px;padding:20px 24px;margin-bottom:20px;display:flex;align-items:center;gap:16px;}
+.ph-icon{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0;}
+.ph-title{font-size:1.1rem;font-weight:700;color:var(--navy);}
+.ph-sub{font-size:0.8rem;color:var(--qbo-muted);margin-top:2px;}
+.ph-right{margin-left:auto;}
+
+/* ── CARDS ── */
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;margin-bottom:20px;}
+.card{background:var(--qbo-white);border:1px solid var(--qbo-border);border-radius:8px;padding:20px;transition:box-shadow 0.2s,border-color 0.2s;cursor:pointer;}
+.card:hover{box-shadow:0 4px 16px rgba(0,0,0,0.08);border-color:#c5c8d0;}
+.card.locked{opacity:0.6;cursor:not-allowed;}
+.card.completed{border-left:3px solid var(--qbo-green);}
+.card.current{border-left:3px solid var(--qbo-blue);}
+.card-top{display:flex;align-items:flex-start;gap:12px;margin-bottom:12px;}
+.card-icon{width:40px;height:40px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0;}
+.ci-green{background:var(--qbo-green-lt);}
+.ci-blue{background:var(--qbo-blue-lt);}
+.ci-gold{background:var(--gold-lt);}
+.ci-purple{background:var(--qbo-purple-lt);}
+.ci-red{background:var(--qbo-red-lt);}
+.ci-grey{background:var(--qbo-bg);}
+.card-title{font-size:0.9rem;font-weight:700;color:var(--navy);margin-bottom:3px;}
+.card-sub{font-size:0.75rem;color:var(--qbo-muted);}
+.card-desc{font-size:0.8rem;color:var(--qbo-muted);line-height:1.6;margin-bottom:14px;}
+.card-footer{display:flex;align-items:center;justify-content:space-between;}
+.card-status{font-size:0.72rem;font-weight:600;padding:3px 8px;border-radius:10px;}
+.cs-done{background:var(--qbo-green-lt);color:var(--qbo-green);}
+.cs-active{background:var(--qbo-blue-lt);color:var(--qbo-blue);}
+.cs-locked{background:var(--qbo-bg);color:#adb5bd;}
+.cs-gold{background:var(--gold-lt);color:var(--gold-dark);}
+.card-btn{font-size:0.75rem;font-weight:600;padding:5px 12px;border-radius:4px;border:none;cursor:pointer;transition:all 0.15s;}
+.cb-green{background:var(--qbo-green);color:#fff;}
+.cb-green:hover{background:var(--qbo-green-dark);}
+.cb-blue{background:var(--qbo-blue);color:#fff;}
+.cb-blue:hover{background:var(--qbo-blue-dark);}
+.cb-grey{background:var(--qbo-bg);color:#adb5bd;cursor:not-allowed;}
+.cb-gold{background:var(--gold);color:#fff;}
+.cb-gold:hover{background:var(--gold-dark);}
+
+/* ── QBO SIMULATOR ── */
+.qbo-sim{background:var(--qbo-white);border:1px solid var(--qbo-border);border-radius:8px;overflow:hidden;margin-bottom:20px;}
+.qbo-sim-bar{background:var(--qbo-green);padding:8px 16px;display:flex;align-items:center;gap:12px;}
+.qsb-title{color:#fff;font-size:0.82rem;font-weight:600;}
+.qsb-right{margin-left:auto;display:flex;gap:8px;}
+.qsb-btn{background:rgba(255,255,255,0.15);border:none;color:#fff;padding:4px 10px;border-radius:3px;font-size:0.72rem;cursor:pointer;font-family:'Inter';}
+.qsb-btn:hover{background:rgba(255,255,255,0.25);}
+.qbo-sim-body{padding:0;}
+
+/* RECONCILE */
+.recon-header{background:#f8f9fa;border-bottom:1px solid var(--qbo-border);padding:12px 20px;display:flex;align-items:center;gap:20px;flex-wrap:wrap;}
+.rh-item{display:flex;flex-direction:column;gap:2px;}
+.rh-label{font-size:0.68rem;color:var(--qbo-muted);text-transform:uppercase;letter-spacing:1px;font-weight:600;}
+.rh-value{font-size:0.95rem;font-weight:700;color:var(--navy);font-family:'DM Mono';}
+.rh-value.red{color:var(--qbo-red);}
+.rh-value.green{color:var(--qbo-green);}
+.rh-divider{width:1px;height:36px;background:var(--qbo-border);}
+.diff-box{margin-left:auto;padding:8px 16px;border-radius:6px;text-align:center;min-width:120px;}
+.diff-box.nonzero{background:var(--qbo-red-lt);border:1px solid rgba(211,47,47,0.2);}
+.diff-box.zero{background:var(--qbo-green-lt);border:1px solid rgba(44,160,28,0.2);}
+.diff-label{font-size:0.65rem;text-transform:uppercase;letter-spacing:1px;font-weight:700;margin-bottom:2px;}
+.diff-box.nonzero .diff-label{color:var(--qbo-red);}
+.diff-box.zero .diff-label{color:var(--qbo-green);}
+.diff-amount{font-size:1.2rem;font-weight:700;font-family:'DM Mono';}
+.diff-box.nonzero .diff-amount{color:var(--qbo-red);}
+.diff-box.zero .diff-amount{color:var(--qbo-green);}
+
+/* TRANSACTION TABLE */
+.txn-table{width:100%;border-collapse:collapse;}
+.txn-table th{background:#f8f9fa;padding:8px 12px;text-align:left;font-size:0.7rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--qbo-muted);border-bottom:2px solid var(--qbo-border);}
+.txn-table td{padding:9px 12px;border-bottom:1px solid var(--qbo-border);font-size:0.82rem;vertical-align:middle;}
+.txn-table tr:hover td{background:#f8f9fa;}
+.txn-table tr.cleared td{background:#f0faf0;}
+.txn-chk{width:16px;height:16px;cursor:pointer;accent-color:var(--qbo-green);}
+.txn-date{font-family:'DM Mono';font-size:0.78rem;color:var(--qbo-muted);}
+.txn-name{font-weight:500;color:var(--navy);}
+.txn-type{font-size:0.72rem;padding:2px 6px;border-radius:4px;background:var(--qbo-bg);color:var(--qbo-muted);}
+.txn-amt{font-family:'DM Mono';font-weight:600;text-align:right;}
+.txn-amt.debit{color:var(--qbo-red);}
+.txn-amt.credit{color:var(--qbo-green);}
+.txn-match{font-size:0.75rem;font-weight:600;}
+.txn-ok{color:var(--qbo-green);}
+.txn-err{color:var(--qbo-red);}
+.txn-warn{color:var(--qbo-orange);}
+.txn-time{color:#adb5bd;}
+
+/* COACH MIC PANEL */
+.coach-panel{background:linear-gradient(135deg,#FFFBEB,#FFF8E1);border:1px solid #F59E0B44;border-radius:8px;padding:16px;margin-bottom:16px;display:flex;gap:14px;}
+.coach-avatar{width:40px;height:40px;border-radius:50%;background:var(--gold);color:#fff;font-weight:800;font-size:0.9rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.coach-body{flex:1;}
+.coach-name{font-size:0.7rem;font-weight:700;color:var(--gold-dark);margin-bottom:4px;letter-spacing:1px;text-transform:uppercase;}
+.coach-msg{font-size:0.85rem;color:#78716c;line-height:1.7;}
+.coach-msg strong{color:var(--navy);}
+
+/* HINT BUTTONS */
+.hint-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;}
+.hint-btn{font-size:0.75rem;padding:5px 12px;border-radius:4px;border:1px solid var(--gold);background:#fff;color:var(--gold-dark);cursor:pointer;font-weight:600;transition:all 0.15s;}
+.hint-btn:hover{background:var(--gold-lt);}
+.hint-reveal{background:var(--gold-lt);border-radius:6px;padding:10px 14px;font-size:0.82rem;color:#78716c;line-height:1.65;margin-top:8px;display:none;}
+.hint-reveal.show{display:block;}
+.hint-reveal strong{color:var(--navy);}
+
+/* FINISH BUTTON */
+.finish-row{padding:16px 20px;background:#f8f9fa;border-top:1px solid var(--qbo-border);display:flex;align-items:center;gap:12px;}
+.finish-btn{padding:9px 24px;border-radius:4px;border:none;font-size:0.85rem;font-weight:700;cursor:pointer;font-family:'Inter';transition:all 0.2s;}
+.fb-green{background:var(--qbo-green);color:#fff;}
+.fb-green:hover{background:var(--qbo-green-dark);}
+.fb-disabled{background:var(--qbo-bg);color:#adb5bd;cursor:not-allowed;}
+.finish-note{font-size:0.78rem;color:var(--qbo-muted);}
+
+/* SOLUTION PANEL */
+.solution-panel{background:var(--qbo-white);border:1px solid var(--qbo-border);border-radius:8px;overflow:hidden;margin-bottom:20px;display:none;}
+.solution-panel.show{display:block;}
+.sol-header{background:var(--navy);padding:14px 20px;display:flex;align-items:center;gap:12px;}
+.sol-title{color:#fff;font-size:0.9rem;font-weight:700;}
+.sol-sub{color:#94a3b8;font-size:0.75rem;margin-top:2px;}
+.sol-body{padding:20px;}
+.sol-step{display:flex;gap:14px;padding:12px 0;border-bottom:1px solid var(--qbo-border);}
+.sol-step:last-child{border:none;}
+.sol-num{width:28px;height:28px;border-radius:50%;background:var(--qbo-green-lt);color:var(--qbo-green);font-weight:700;font-size:0.8rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.sol-content{flex:1;}
+.sol-action{font-size:0.88rem;font-weight:600;color:var(--navy);margin-bottom:3px;}
+.sol-detail{font-size:0.8rem;color:var(--qbo-muted);line-height:1.6;}
+.sol-detail strong{color:var(--navy);}
+.sol-loom{background:var(--navy);border-radius:8px;padding:20px;text-align:center;margin-top:16px;}
+.sol-loom-icon{font-size:2rem;margin-bottom:8px;}
+.sol-loom-title{color:#fff;font-size:0.9rem;font-weight:700;margin-bottom:4px;}
+.sol-loom-sub{color:#94a3b8;font-size:0.78rem;margin-bottom:14px;}
+.sol-loom-btn{background:var(--gold);color:#fff;border:none;padding:9px 20px;border-radius:4px;font-size:0.82rem;font-weight:700;cursor:pointer;font-family:'Inter';}
+
+/* SUCCESS BANNER */
+.success-banner{background:var(--qbo-green-lt);border:1px solid rgba(44,160,28,0.3);border-radius:8px;padding:16px 20px;display:flex;align-items:center;gap:14px;margin-bottom:16px;display:none;}
+.success-banner.show{display:flex;}
+.sb-icon2{font-size:1.8rem;}
+.sb-text{}
+.sb-title{font-size:0.95rem;font-weight:700;color:var(--qbo-green);margin-bottom:2px;}
+.sb-sub{font-size:0.8rem;color:#2d6a27;}
+.sb-action{margin-left:auto;}
+
+/* LEARN SECTION */
+.learn-item{background:var(--qbo-white);border:1px solid var(--qbo-border);border-radius:8px;padding:16px 20px;margin-bottom:12px;display:flex;align-items:center;gap:16px;cursor:pointer;transition:all 0.2s;}
+.learn-item:hover{box-shadow:0 2px 12px rgba(0,0,0,0.06);border-color:#c5c8d0;}
+.li-num{width:36px;height:36px;border-radius:50%;background:var(--qbo-blue-lt);color:var(--qbo-blue);font-weight:700;font-size:0.85rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.li-num.done{background:var(--qbo-green-lt);color:var(--qbo-green);}
+.li-body{flex:1;}
+.li-title{font-size:0.9rem;font-weight:600;color:var(--navy);}
+.li-sub{font-size:0.75rem;color:var(--qbo-muted);margin-top:2px;}
+.li-right{display:flex;align-items:center;gap:10px;}
+.li-time{font-size:0.72rem;color:var(--qbo-muted);}
+.li-btn{font-size:0.75rem;font-weight:600;padding:5px 14px;border-radius:4px;border:none;cursor:pointer;font-family:'Inter';}
+
+/* PROGRESS BAR */
+.progress-section{background:var(--qbo-white);border:1px solid var(--qbo-border);border-radius:8px;padding:20px;margin-bottom:20px;}
+.prog-title{font-size:0.82rem;font-weight:700;color:var(--navy);margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;}
+.prog-track{display:flex;align-items:center;gap:0;}
+.prog-step{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;position:relative;}
+.prog-step::before{content:'';position:absolute;top:14px;left:-50%;width:100%;height:2px;background:var(--qbo-border);z-index:0;}
+.prog-step:first-child::before{display:none;}
+.prog-step.done::before{background:var(--qbo-green);}
+.prog-dot{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.72rem;font-weight:700;z-index:1;border:2px solid var(--qbo-border);background:#fff;}
+.prog-dot.done{background:var(--qbo-green);border-color:var(--qbo-green);color:#fff;}
+.prog-dot.current{background:var(--qbo-blue);border-color:var(--qbo-blue);color:#fff;}
+.prog-dot.locked{background:#fff;color:#adb5bd;}
+.prog-label{font-size:0.65rem;color:var(--qbo-muted);text-align:center;max-width:60px;}
+.prog-label.done{color:var(--qbo-green);}
+.prog-label.current{color:var(--qbo-blue);font-weight:600;}
+
+/* RESOURCES */
+.res-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;}
+.res-card{background:var(--qbo-white);border:1px solid var(--qbo-border);border-radius:8px;padding:16px;display:flex;flex-direction:column;gap:8px;}
+.res-icon{font-size:1.5rem;}
+.res-title{font-size:0.85rem;font-weight:600;color:var(--navy);}
+.res-desc{font-size:0.75rem;color:var(--qbo-muted);line-height:1.5;flex:1;}
+.res-btn{font-size:0.75rem;font-weight:600;padding:6px 12px;border-radius:4px;border:1px solid var(--qbo-border);background:#fff;color:var(--qbo-blue);cursor:pointer;font-family:'Inter';text-align:center;text-decoration:none;display:block;transition:all 0.15s;}
+.res-btn:hover{background:var(--qbo-blue-lt);border-color:var(--qbo-blue);}
+
+/* EXPAND CONTENT */
+.expand-content{display:none;border-top:1px solid var(--qbo-border);margin-top:12px;padding-top:12px;}
+.expand-content.show{display:block;}
+
+/* INFO TABLE */
+.info-table{width:100%;border-collapse:collapse;font-size:0.82rem;}
+.info-table td{padding:7px 12px;border-bottom:1px solid var(--qbo-border);}
+.info-table td:first-child{color:var(--qbo-muted);font-weight:500;width:45%;}
+.info-table td:last-child{font-family:'DM Mono';font-size:0.78rem;color:var(--navy);font-weight:600;}
+.info-table tr:last-child td{border:none;}
+
+/* COA TABLE */
+.coa-wrap{overflow-x:auto;}
+.coa-tbl{width:100%;border-collapse:collapse;font-size:0.78rem;}
+.coa-tbl th{background:var(--navy);color:#fff;padding:7px 10px;text-align:left;font-size:0.68rem;letter-spacing:1px;text-transform:uppercase;}
+.coa-tbl td{padding:6px 10px;border-bottom:1px solid var(--qbo-border);}
+.coa-tbl tr:hover td{background:#f8f9fa;}
+.coa-section td{font-size:0.65rem;font-weight:800;letter-spacing:2px;text-transform:uppercase;padding:8px 10px 4px;background:var(--qbo-bg);}
+.coa-asset{color:var(--qbo-blue);}
+.coa-liability{color:var(--qbo-red);}
+.coa-equity{color:var(--qbo-purple,#7C3AED);}
+.coa-income{color:var(--qbo-green);}
+.coa-expense{color:var(--qbo-orange);}
+.acc-num{font-family:'DM Mono';color:var(--qbo-muted);font-size:0.72rem;}
+.acc-name{font-weight:600;color:var(--navy);}
+.acc-pill{font-size:0.65rem;padding:1px 6px;border-radius:8px;font-weight:600;}
+.ap-bank{background:var(--qbo-blue-lt);color:var(--qbo-blue);}
+.ap-ar{background:var(--qbo-green-lt);color:var(--qbo-green);}
+.ap-exp{background:var(--qbo-red-lt);color:var(--qbo-red);}
+.ap-inc{background:var(--qbo-green-lt);color:var(--qbo-green);}
+.ap-other{background:var(--gold-lt);color:var(--gold-dark);}
+
+/* MISC */
+.section-title{font-size:0.75rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--qbo-muted);margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--qbo-border);}
+.alert{border-radius:6px;padding:10px 14px;font-size:0.82rem;margin-bottom:12px;display:flex;gap:8px;line-height:1.55;}
+.alert-blue{background:var(--qbo-blue-lt);border:1px solid rgba(0,119,197,0.2);color:#005fa3;}
+.alert-gold{background:var(--gold-lt);border:1px solid rgba(245,158,11,0.2);color:#92400e;}
+.alert-green{background:var(--qbo-green-lt);border:1px solid rgba(44,160,28,0.2);color:#1e7a14;}
+
+@media(max-width:768px){
+  .sidebar{display:none;}
+  .main{margin-left:0;}
+  .cards{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+
+<!-- ══════════ TOP BAR ══════════ -->
+<div class="topbar">
+  <a class="tb-logo" href="#">
+    <div class="tb-logo-icon">🐾</div>
+    The Practice HUB
+  </a>
+  <div class="tb-company">Company: <strong>Juan's Pet Paradise</strong></div>
+  <div class="tb-right">
+    <button class="tb-btn new" onclick="showPanel('practice')">+ New</button>
+    <button class="tb-btn" onclick="showPanel('resources')">⚙️ Settings</button>
+    <div class="tb-avatar" title="Coach Mic">M</div>
+  </div>
+</div>
+
+<!-- ══════════ SIDEBAR ══════════ -->
+<div class="sidebar">
+  <div class="sb-section">
+    <div class="sb-section-label">Navigation</div>
+    <div class="sb-item active" onclick="showPanel('dashboard');setActive(this)">
+      <span class="sb-icon">🏠</span> Dashboard
+    </div>
+  </div>
+  <div class="sb-divider"></div>
+  <div class="sb-section">
+    <div class="sb-section-label">🎓 Learn</div>
+    <div class="sb-item" onclick="showPanel('learn');setActive(this)">
+      <span class="sb-icon">📖</span> Foundation Lessons
+      <span class="sb-badge sb-current">5</span>
+    </div>
+  </div>
+  <div class="sb-divider"></div>
+  <div class="sb-section">
+    <div class="sb-section-label">⚙️ Setup</div>
+    <div class="sb-item" onclick="showPanel('setup');setActive(this)">
+      <span class="sb-icon">🏢</span> QBO Company Setup
+    </div>
+    <div class="sb-item" onclick="showPanel('coa');setActive(this)">
+      <span class="sb-icon">📋</span> Chart of Accounts
+    </div>
+  </div>
+  <div class="sb-divider"></div>
+  <div class="sb-section">
+    <div class="sb-section-label">🧪 Practice</div>
+    <div class="sb-item" onclick="showPanel('lesson0');setActive(this)">
+      <span class="sb-icon">⚡</span> Lesson 0 — Quick Recall
+      <span class="sb-badge sb-done">✓</span>
+    </div>
+    <div class="sb-item" onclick="showPanel('s01');setActive(this)">
+      <span class="sb-icon">🏦</span> S01 — Bank Recon
+      <span class="sb-badge sb-current">Now</span>
+    </div>
+    <div class="sb-item locked">
+      <span class="sb-icon">📄</span> S02 — AR/AP
+      <span class="sb-badge sb-lock">🔒</span>
+    </div>
+    <div class="sb-item locked">
+      <span class="sb-icon">📦</span> S03 — Inventory
+      <span class="sb-badge sb-lock">🔒</span>
+    </div>
+    <div class="sb-item locked">
+      <span class="sb-icon">👥</span> S04 — Payroll
+      <span class="sb-badge sb-lock">🔒</span>
+    </div>
+    <div class="sb-item locked">
+      <span class="sb-icon">🧹</span> S05 — Cleanup
+      <span class="sb-badge sb-lock">🔒</span>
+    </div>
+    <div class="sb-item locked">
+      <span class="sb-icon">🚨</span> S06 — Crisis Mode
+      <span class="sb-badge sb-lock">🔒</span>
+    </div>
+  </div>
+  <div class="sb-divider"></div>
+  <div class="sb-section">
+    <div class="sb-section-label">📁 Resources</div>
+    <div class="sb-item" onclick="showPanel('resources');setActive(this)">
+      <span class="sb-icon">📚</span> Cheat Sheets & Tools
+    </div>
+  </div>
+
+  <div class="sb-coach">
+    <div class="sb-coach-name">🎙️ Coach Mic</div>
+    <div class="sb-coach-text">Hi! I'm here to help. Open any lab and I'll guide you through it.</div>
+  </div>
+</div>
+
+<!-- ══════════ MAIN CONTENT ══════════ -->
+<div class="main">
+
+<!-- ─────────── DASHBOARD ─────────── -->
+<div class="panel active" id="panel-dashboard">
+  <div class="page-header">
+    <div class="ph-icon ci-green">🐾</div>
+    <div>
+      <div class="ph-title">Welcome to The Practice HUB</div>
+      <div class="ph-sub">Juan's Pet Paradise · San Antonio, TX · March 2024</div>
+    </div>
+  </div>
+
+  <!-- Progress -->
+  <div class="progress-section">
+    <div class="prog-title">Your Progress <span style="color:var(--qbo-muted);font-weight:400">Phase 1 — S01 of 6</span></div>
+    <div class="prog-track">
+      <div class="prog-step done">
+        <div class="prog-dot done">✓</div>
+        <div class="prog-label done">Learn</div>
+      </div>
+      <div class="prog-step done">
+        <div class="prog-dot done">✓</div>
+        <div class="prog-label done">Setup</div>
+      </div>
+      <div class="prog-step done">
+        <div class="prog-dot done">✓</div>
+        <div class="prog-label done">Lesson 0</div>
+      </div>
+      <div class="prog-step current">
+        <div class="prog-dot current">→</div>
+        <div class="prog-label current">S01</div>
+      </div>
+      <div class="prog-step locked">
+        <div class="prog-dot locked">🔒</div>
+        <div class="prog-label">S02</div>
+      </div>
+      <div class="prog-step locked">
+        <div class="prog-dot locked">🔒</div>
+        <div class="prog-label">S03–S06</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick cards -->
+  <div class="section-title">Where to Go</div>
+  <div class="cards">
+    <div class="card current" onclick="showPanel('learn');setActiveById('panel-learn')">
+      <div class="card-top">
+        <div class="card-icon ci-blue">📖</div>
+        <div><div class="card-title">Foundation Lessons</div><div class="card-sub">Watch once · 5 topics</div></div>
+      </div>
+      <div class="card-desc">What is bookkeeping, the accounting equation, debits & credits, the cycle, and transaction flow.</div>
+      <div class="card-footer">
+        <span class="card-status cs-active">In Progress</span>
+        <button class="card-btn cb-blue" onclick="event.stopPropagation();showPanel('learn')">Open →</button>
+      </div>
+    </div>
+    <div class="card" onclick="showPanel('setup')">
+      <div class="card-top">
+        <div class="card-icon ci-green">⚙️</div>
+        <div><div class="card-title">QBO Setup</div><div class="card-sub">Do once · ~20 min</div></div>
+      </div>
+      <div class="card-desc">Set up Juan's Pet Paradise in QBO — company info, bank account, vendors, customers.</div>
+      <div class="card-footer">
+        <span class="card-status cs-done">✓ Ready</span>
+        <button class="card-btn cb-green" onclick="event.stopPropagation();showPanel('setup')">Review →</button>
+      </div>
+    </div>
+    <div class="card current" onclick="showPanel('s01')">
+      <div class="card-top">
+        <div class="card-icon ci-blue">🏦</div>
+        <div><div class="card-title">S01 — Bank Reconciliation</div><div class="card-sub">Juan's Pet Paradise · March 2024</div></div>
+      </div>
+      <div class="card-desc">14 transactions. 3 discrepancies. Target: $0.00 difference. This is your first real simulation.</div>
+      <div class="card-footer">
+        <span class="card-status cs-active">▶ Current</span>
+        <button class="card-btn cb-blue" onclick="event.stopPropagation();showPanel('s01')">Start Lab →</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-top">
+        <div class="card-icon ci-gold">🎙️</div>
+        <div><div class="card-title">Coach Mic</div><div class="card-sub">Hints · Feedback · Encouragement</div></div>
+      </div>
+      <div class="card-desc">Stuck on a transaction? Coach Mic is inside every lab with hints and real-time feedback.</div>
+      <div class="card-footer">
+        <span class="card-status cs-gold">Always On</span>
+        <button class="card-btn cb-gold" onclick="event.stopPropagation();showPanel('s01')">Open Lab →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ─────────── LEARN ─────────── -->
+<div class="panel" id="panel-learn">
+  <div class="page-header">
+    <div class="ph-icon ci-blue">📖</div>
+    <div>
+      <div class="ph-title">Foundation Lessons</div>
+      <div class="ph-sub">Watch once · Understand the WHY before the HOW</div>
+    </div>
+  </div>
+  <div class="alert alert-blue">ℹ️ Watch each lesson before entering the simulator. These are the concepts behind every transaction you'll record.</div>
+
+  <div class="learn-item" onclick="toggleExpand('learn1')">
+    <div class="li-num done">✓</div>
+    <div class="li-body"><div class="li-title">What Is Bookkeeping, Really?</div><div class="li-sub">Not QBO. Not reconciliation. Not AI. The real WHY.</div></div>
+    <div class="li-right"><span class="li-time">~8 min</span><button class="li-btn cb-green">Watch ▶</button></div>
+  </div>
+  <div class="expand-content" id="learn1">
+    <div style="padding:12px;background:#f8f9fa;border-radius:6px;font-size:0.82rem;color:var(--qbo-muted);line-height:1.7;">
+      <strong style="color:var(--navy);">Key Takeaway:</strong> Bookkeeping answers 3 questions — How much did we make? How much do we owe? How much do we have? Everything else is just a tool for answering those accurately.<br><br>
+      <div style="background:var(--qbo-white);border:1px solid var(--qbo-border);border-radius:6px;padding:12px;text-align:center;margin-top:8px;">
+        🎬 <strong>Coach Mic's Walkthrough</strong><br>
+        <span style="font-size:0.75rem;">Paste your Loom link here when ready</span><br>
+        <button class="li-btn cb-blue" style="margin-top:8px;">▶ Watch Loom</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="learn-item" onclick="toggleExpand('learn2')">
+    <div class="li-num done">✓</div>
+    <div class="li-body"><div class="li-title">The Accounting Equation</div><div class="li-sub">Assets = Liabilities + Equity — why it must always balance</div></div>
+    <div class="li-right"><span class="li-time">~5 min</span><button class="li-btn cb-green">Watch ▶</button></div>
+  </div>
+  <div class="expand-content" id="learn2">
+    <div style="padding:12px;background:#f8f9fa;border-radius:6px;font-size:0.82rem;color:var(--qbo-muted);line-height:1.7;">
+      <strong style="color:var(--navy);">Key Takeaway:</strong> Every transaction touches at least two accounts and keeps both sides equal. This is why debits always equal credits.<br><br>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;">
+        <div style="flex:1;min-width:120px;background:#E3F2FD;border-radius:6px;padding:10px;text-align:center;"><div style="font-size:0.7rem;color:var(--qbo-blue);font-weight:700;text-transform:uppercase;">ASSETS</div><div style="font-size:0.85rem;font-weight:700;color:var(--navy);">What you OWN</div></div>
+        <div style="display:flex;align-items:center;font-size:1.2rem;color:var(--qbo-muted);">=</div>
+        <div style="flex:1;min-width:120px;background:#FFEBEE;border-radius:6px;padding:10px;text-align:center;"><div style="font-size:0.7rem;color:var(--qbo-red);font-weight:700;text-transform:uppercase;">LIABILITIES</div><div style="font-size:0.85rem;font-weight:700;color:var(--navy);">What you OWE</div></div>
+        <div style="display:flex;align-items:center;font-size:1.2rem;color:var(--qbo-muted);">+</div>
+        <div style="flex:1;min-width:120px;background:#EDE9FE;border-radius:6px;padding:10px;text-align:center;"><div style="font-size:0.7rem;color:#7C3AED;font-weight:700;text-transform:uppercase;">EQUITY</div><div style="font-size:0.85rem;font-weight:700;color:var(--navy);">Owner's Share</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="learn-item" onclick="toggleExpand('learn3')">
+    <div class="li-num">3</div>
+    <div class="li-body"><div class="li-title">Debits & Credits</div><div class="li-sub">Left side, right side — which direction increases each account type</div></div>
+    <div class="li-right"><span class="li-time">~8 min</span><button class="li-btn cb-blue">Watch ▶</button></div>
+  </div>
+  <div class="expand-content" id="learn3">
+    <div style="padding:12px;background:#f8f9fa;border-radius:6px;font-size:0.82rem;color:var(--qbo-muted);">
+      <strong style="color:var(--navy);">DEAD CLIC Rule:</strong><br>
+      <strong>D</strong>ividends · <strong>E</strong>xpenses · <strong>A</strong>ssets · <strong>D</strong>rawings → increased by DEBIT<br>
+      <strong>C</strong>apital · <strong>L</strong>iabilities · <strong>I</strong>ncome · <strong>C</strong>ontributions → increased by CREDIT
+    </div>
+  </div>
+
+  <div class="learn-item" onclick="toggleExpand('learn4')">
+    <div class="li-num">4</div>
+    <div class="li-body"><div class="li-title">The Accounting Cycle</div><div class="li-sub">8 steps · Every month · Every client</div></div>
+    <div class="li-right"><span class="li-time">~5 min</span><button class="li-btn cb-blue">Watch ▶</button></div>
+  </div>
+  <div class="expand-content" id="learn4">
+    <div style="padding:12px;background:#f8f9fa;border-radius:6px;font-size:0.82rem;color:var(--qbo-muted);line-height:1.8;">
+      1. Identify Transactions → 2. Record Entries → 3. Post to Ledger → 4. Trial Balance → 5. Adjusting Entries → 6. Financial Statements → <strong style="color:var(--qbo-blue);">7. Bank Reconciliation ← You are here (S01)</strong> → 8. Close the Books
+    </div>
+  </div>
+
+  <div class="learn-item" onclick="toggleExpand('learn5')">
+    <div class="li-num">5</div>
+    <div class="li-body"><div class="li-title">Transaction Flow</div><div class="li-sub">What happens on the reports when you record each type of entry</div></div>
+    <div class="li-right"><span class="li-time">~6 min</span><button class="li-btn cb-blue">Watch ▶</button></div>
+  </div>
+  <div class="expand-content" id="learn5">
+    <div style="padding:12px;background:#f8f9fa;border-radius:6px;font-size:0.82rem;color:var(--qbo-muted);line-height:1.8;">
+      Every transaction ripples into reports. Record a sale → P&L Revenue goes up. Pay an expense → Net Income goes down. That's why accuracy matters.
+    </div>
+  </div>
+</div>
+
+<!-- ─────────── SETUP ─────────── -->
+<div class="panel" id="panel-setup">
+  <div class="page-header">
+    <div class="ph-icon ci-green">⚙️</div>
+    <div><div class="ph-title">QBO Company Setup</div><div class="ph-sub">This is what your QBO settings screen looks like — do this once before S01</div></div>
+  </div>
+  <div class="alert alert-gold">💡 This is a mockup of QBO's Settings screen. Follow these steps in your actual QBO to set up Juan's Pet Paradise.</div>
+
+  <!-- QBO SETTINGS MOCKUP -->
+  <div style="background:var(--qbo-white);border:1px solid var(--qbo-border);border-radius:8px;overflow:hidden;margin-bottom:20px;">
+
+    <!-- QBO Top bar -->
+    <div style="background:var(--qbo-green);padding:8px 16px;display:flex;align-items:center;gap:12px;">
+      <span style="color:#fff;font-size:0.85rem;font-weight:700;">⚙️ Settings — Company Settings</span>
+      <span style="color:rgba(255,255,255,0.6);font-size:0.75rem;margin-left:auto;">Juan's Pet Paradise</span>
+    </div>
+
+    <!-- Settings layout -->
+    <div style="display:grid;grid-template-columns:180px 1fr;min-height:400px;">
+
+      <!-- Left nav -->
+      <div style="background:#f8f9fa;border-right:1px solid var(--qbo-border);padding:12px 0;">
+        <div style="padding:8px 16px;font-size:0.72rem;font-weight:700;color:var(--qbo-muted);letter-spacing:1px;text-transform:uppercase;">Settings</div>
+        <div style="padding:8px 16px;font-size:0.82rem;font-weight:600;color:var(--qbo-blue);background:var(--qbo-blue-lt);border-left:3px solid var(--qbo-blue);">Company</div>
+        <div style="padding:8px 16px;font-size:0.82rem;color:var(--qbo-muted);">Billing & Subscription</div>
+        <div style="padding:8px 16px;font-size:0.82rem;color:var(--qbo-muted);">Usage</div>
+        <div style="padding:8px 16px;font-size:0.82rem;font-weight:600;color:var(--qbo-blue);background:var(--qbo-blue-lt);border-left:3px solid var(--qbo-blue);margin-top:8px;">Advanced</div>
+        <div style="padding:8px 16px;font-size:0.82rem;color:var(--qbo-muted);">Sales</div>
+        <div style="padding:8px 16px;font-size:0.82rem;color:var(--qbo-muted);">Expenses</div>
+        <div style="padding:8px 16px;font-size:0.82rem;color:var(--qbo-muted);">Payments</div>
+      </div>
+
+      <!-- Main content -->
+      <div style="padding:20px;">
+
+        <!-- Company Info -->
+        <div style="font-size:0.9rem;font-weight:700;color:var(--navy);margin-bottom:14px;padding-bottom:8px;border-bottom:1px solid var(--qbo-border);">Company Info</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px;">
+          <div>
+            <div style="font-size:0.72rem;color:var(--qbo-muted);margin-bottom:4px;font-weight:600;">Company name</div>
+            <div style="border:1px solid var(--qbo-border);border-radius:4px;padding:8px 12px;font-size:0.85rem;background:#fff;color:var(--navy);font-weight:600;">Juan's Pet Paradise</div>
+          </div>
+          <div>
+            <div style="font-size:0.72rem;color:var(--qbo-muted);margin-bottom:4px;font-weight:600;">Legal name</div>
+            <div style="border:1px solid var(--qbo-border);border-radius:4px;padding:8px 12px;font-size:0.85rem;background:#fff;color:var(--navy);">Juan's Pet Paradise</div>
+          </div>
+          <div>
+            <div style="font-size:0.72rem;color:var(--qbo-muted);margin-bottom:4px;font-weight:600;">EIN</div>
+            <div style="border:1px solid var(--qbo-border);border-radius:4px;padding:8px 12px;font-size:0.85rem;background:#fff;font-family:'DM Mono';color:var(--navy);">47-1234567</div>
+          </div>
+          <div>
+            <div style="font-size:0.72rem;color:var(--qbo-muted);margin-bottom:4px;font-weight:600;">Industry</div>
+            <div style="border:1px solid var(--qbo-border);border-radius:4px;padding:8px 12px;font-size:0.85rem;background:#fff;color:var(--navy);">Pet Care Services</div>
+          </div>
+          <div>
+            <div style="font-size:0.72rem;color:var(--qbo-muted);margin-bottom:4px;font-weight:600;">Address</div>
+            <div style="border:1px solid var(--qbo-border);border-radius:4px;padding:8px 12px;font-size:0.85rem;background:#fff;color:var(--navy);">123 Commerce Blvd<br>San Antonio, TX 78201</div>
+          </div>
+          <div>
+            <div style="font-size:0.72rem;color:var(--qbo-muted);margin-bottom:4px;font-weight:600;">Email</div>
+            <div style="border:1px solid var(--qbo-border);border-radius:4px;padding:8px 12px;font-size:0.85rem;background:#fff;color:var(--navy);">juan@juanspetparadise.com</div>
+          </div>
+        </div>
+
+        <!-- Advanced / Accounting Method -->
+        <div style="font-size:0.9rem;font-weight:700;color:var(--navy);margin-bottom:14px;padding-bottom:8px;border-bottom:1px solid var(--qbo-border);">Advanced — Accounting</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px;">
+          <div>
+            <div style="font-size:0.72rem;color:var(--qbo-muted);margin-bottom:4px;font-weight:600;">Accounting method ⚠️</div>
+            <div style="border:2px solid var(--qbo-green);border-radius:4px;padding:8px 12px;font-size:0.85rem;background:var(--qbo-green-lt);color:var(--qbo-green);font-weight:700;">Accrual ✓</div>
+            <div style="font-size:0.7rem;color:var(--qbo-red);margin-top:4px;">⚠️ Never change to Cash — all labs use Accrual</div>
+          </div>
+          <div>
+            <div style="font-size:0.72rem;color:var(--qbo-muted);margin-bottom:4px;font-weight:600;">Tax form</div>
+            <div style="border:1px solid var(--qbo-border);border-radius:4px;padding:8px 12px;font-size:0.85rem;background:#fff;color:var(--navy);">Schedule C (Form 1040)</div>
+          </div>
+          <div>
+            <div style="font-size:0.72rem;color:var(--qbo-muted);margin-bottom:4px;font-weight:600;">First month of fiscal year</div>
+            <div style="border:1px solid var(--qbo-border);border-radius:4px;padding:8px 12px;font-size:0.85rem;background:#fff;color:var(--navy);">January</div>
+          </div>
+          <div>
+            <div style="font-size:0.72rem;color:var(--qbo-muted);margin-bottom:4px;font-weight:600;">Business type</div>
+            <div style="border:1px solid var(--qbo-border);border-radius:4px;padding:8px 12px;font-size:0.85rem;background:#fff;color:var(--navy);">Sole Proprietorship</div>
+          </div>
+        </div>
+
+        <!-- Bank Account -->
+        <div style="font-size:0.9rem;font-weight:700;color:var(--navy);margin-bottom:14px;padding-bottom:8px;border-bottom:1px solid var(--qbo-border);">Bank Account Setup</div>
+        <div style="background:var(--qbo-blue-lt);border:1px solid rgba(0,119,197,0.2);border-radius:6px;padding:14px;margin-bottom:14px;font-size:0.82rem;color:#005fa3;">
+          📍 Go to: <strong>Accounting → Chart of Accounts → New → Bank → Checking</strong>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+          <div>
+            <div style="font-size:0.72rem;color:var(--qbo-muted);margin-bottom:4px;font-weight:600;">Account type</div>
+            <div style="border:1px solid var(--qbo-border);border-radius:4px;padding:8px 12px;font-size:0.85rem;background:#fff;color:var(--navy);">Bank</div>
+          </div>
+          <div>
+            <div style="font-size:0.72rem;color:var(--qbo-muted);margin-bottom:4px;font-weight:600;">Detail type</div>
+            <div style="border:1px solid var(--qbo-border);border-radius:4px;padding:8px 12px;font-size:0.85rem;background:#fff;color:var(--navy);">Checking</div>
+          </div>
+          <div>
+            <div style="font-size:0.72rem;color:var(--qbo-muted);margin-bottom:4px;font-weight:600;">Account name</div>
+            <div style="border:1px solid var(--qbo-border);border-radius:4px;padding:8px 12px;font-size:0.85rem;background:#fff;color:var(--navy);font-weight:600;">Checking</div>
+          </div>
+          <div>
+            <div style="font-size:0.72rem;color:var(--qbo-muted);margin-bottom:4px;font-weight:600;">Bank name</div>
+            <div style="border:1px solid var(--qbo-border);border-radius:4px;padding:8px 12px;font-size:0.85rem;background:#fff;color:var(--navy);">First National Bank of San Antonio</div>
+          </div>
+          <div>
+            <div style="font-size:0.72rem;color:var(--qbo-muted);margin-bottom:4px;font-weight:600;">Opening balance</div>
+            <div style="border:2px solid var(--qbo-green);border-radius:4px;padding:8px 12px;font-size:0.85rem;background:var(--qbo-green-lt);color:var(--qbo-green);font-weight:700;font-family:'DM Mono';">$9,850.00</div>
+          </div>
+          <div>
+            <div style="font-size:0.72rem;color:var(--qbo-muted);margin-bottom:4px;font-weight:600;">As of date</div>
+            <div style="border:2px solid var(--qbo-green);border-radius:4px;padding:8px 12px;font-size:0.85rem;background:var(--qbo-green-lt);color:var(--qbo-green);font-weight:700;font-family:'DM Mono';">03/01/2024</div>
+          </div>
+        </div>
+
+        <!-- Save button -->
+        <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--qbo-border);display:flex;gap:10px;">
+          <div style="background:var(--qbo-green);color:#fff;padding:8px 20px;border-radius:4px;font-size:0.85rem;font-weight:700;cursor:pointer;">Save</div>
+          <div style="background:#fff;color:var(--qbo-muted);padding:8px 20px;border-radius:4px;font-size:0.85rem;border:1px solid var(--qbo-border);cursor:pointer;">Cancel</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Trial Balance mockup -->
+  <div style="font-size:0.82rem;font-weight:700;color:var(--navy);margin-bottom:10px;">✅ Verify Setup — Trial Balance (Reports → Trial Balance → March 1, 2024)</div>
+  <div style="background:var(--qbo-white);border:1px solid var(--qbo-border);border-radius:8px;overflow:hidden;margin-bottom:20px;">
+    <div style="background:var(--qbo-green);padding:8px 16px;display:flex;align-items:center;gap:12px;">
+      <span style="color:#fff;font-size:0.82rem;font-weight:700;">📊 Trial Balance — March 1, 2024</span>
+    </div>
+    <table style="width:100%;border-collapse:collapse;font-size:0.82rem;">
+      <thead><tr style="background:#f8f9fa;"><th style="padding:8px 16px;text-align:left;color:var(--qbo-muted);font-size:0.7rem;letter-spacing:1px;text-transform:uppercase;border-bottom:2px solid var(--qbo-border);">Account</th><th style="padding:8px 16px;text-align:right;color:var(--qbo-muted);font-size:0.7rem;letter-spacing:1px;text-transform:uppercase;border-bottom:2px solid var(--qbo-border);">Debit</th><th style="padding:8px 16px;text-align:right;color:var(--qbo-muted);font-size:0.7rem;letter-spacing:1px;text-transform:uppercase;border-bottom:2px solid var(--qbo-border);">Credit</th></tr></thead>
+      <tbody>
+        <tr><td style="padding:9px 16px;border-bottom:1px solid var(--qbo-border);font-weight:600;color:var(--navy);">Checking</td><td style="padding:9px 16px;border-bottom:1px solid var(--qbo-border);text-align:right;font-family:'DM Mono';color:var(--qbo-green);font-weight:700;">$9,850.00</td><td style="padding:9px 16px;border-bottom:1px solid var(--qbo-border);text-align:right;font-family:'DM Mono';color:var(--qbo-muted);">—</td></tr>
+        <tr><td style="padding:9px 16px;border-bottom:1px solid var(--qbo-border);font-weight:600;color:var(--navy);">Opening Balance Equity</td><td style="padding:9px 16px;border-bottom:1px solid var(--qbo-border);text-align:right;font-family:'DM Mono';color:var(--qbo-muted);">—</td><td style="padding:9px 16px;border-bottom:1px solid var(--qbo-border);text-align:right;font-family:'DM Mono';color:var(--qbo-green);font-weight:700;">$9,850.00</td></tr>
+        <tr style="background:var(--qbo-green-lt);"><td style="padding:9px 16px;font-weight:800;color:var(--navy);">TOTAL</td><td style="padding:9px 16px;text-align:right;font-family:'DM Mono';font-weight:800;color:var(--qbo-green);">$9,850.00</td><td style="padding:9px 16px;text-align:right;font-family:'DM Mono';font-weight:800;color:var(--qbo-green);">$9,850.00</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="alert alert-green">✅ Both sides equal $9,850.00 — the accounting equation is balanced. Setup is complete. You are ready for S01!</div>
+  <div style="text-align:center;padding:12px 0;">
+    <button class="card-btn cb-blue" style="padding:10px 28px;" onclick="showPanel('coa')">Next → Chart of Accounts →</button>
+  </div>
+</div>
+
+<!-- ─────────── COA ─────────── -->
+<div class="panel" id="panel-coa">
+  <div class="page-header">
+    <div class="ph-icon ci-blue">📋</div>
+    <div><div class="ph-title">Chart of Accounts</div><div class="ph-sub">Accounting → Chart of Accounts — this is what it looks like in QBO</div></div>
+  </div>
+  <div class="alert alert-blue">ℹ️ This is a mockup of QBO's Chart of Accounts screen. In real QBO: <strong>Accounting → Chart of Accounts → New</strong> to add each account below.</div>
+
+  <!-- QBO COA MOCKUP -->
+  <div style="background:var(--qbo-white);border:1px solid var(--qbo-border);border-radius:8px;overflow:hidden;margin-bottom:20px;">
+
+    <!-- QBO Top bar -->
+    <div style="background:var(--qbo-green);padding:8px 16px;display:flex;align-items:center;gap:12px;">
+      <span style="color:#fff;font-size:0.82rem;font-weight:700;">📋 Chart of Accounts</span>
+      <span style="color:rgba(255,255,255,0.6);font-size:0.75rem;">Juan's Pet Paradise</span>
+      <div style="margin-left:auto;display:flex;gap:8px;">
+        <div style="background:rgba(255,255,255,0.15);border:none;color:#fff;padding:4px 12px;border-radius:3px;font-size:0.72rem;cursor:pointer;">Import</div>
+        <div style="background:#fff;color:var(--qbo-green);padding:4px 12px;border-radius:3px;font-size:0.72rem;font-weight:700;cursor:pointer;">+ New</div>
+      </div>
+    </div>
+
+    <!-- Search bar -->
+    <div style="padding:12px 16px;border-bottom:1px solid var(--qbo-border);display:flex;gap:10px;align-items:center;">
+      <div style="border:1px solid var(--qbo-border);border-radius:4px;padding:6px 12px;font-size:0.82rem;color:var(--qbo-muted);flex:1;max-width:280px;">🔍 Search accounts...</div>
+      <div style="font-size:0.75rem;color:var(--qbo-muted);">Showing 28 accounts</div>
+    </div>
+
+    <!-- COA Table -->
+    <div class="coa-wrap">
+      <table class="coa-tbl">
+        <thead><tr><th style="width:80px;">#</th><th>Account Name</th><th>Type</th><th>Detail Type</th><th>Balance</th><th>Used In</th><th>Action</th></tr></thead>
+        <tbody>
+          <!-- ASSETS -->
+          <tr class="coa-section"><td colspan="7" class="coa-asset">▼ ASSETS</td></tr>
+          <tr><td class="acc-num">1000</td><td class="acc-name">Checking</td><td><span class="acc-pill ap-bank">Bank</span></td><td style="font-size:0.75rem;color:var(--qbo-muted);">Checking</td><td style="font-family:'DM Mono';font-size:0.78rem;color:var(--qbo-green);">$9,850.00</td><td style="font-size:0.72rem;color:var(--qbo-muted);">S01–S06</td><td style="font-size:0.72rem;color:var(--qbo-blue);cursor:pointer;">Edit</td></tr>
+          <tr><td class="acc-num">1100</td><td class="acc-name">Accounts Receivable (AR)</td><td><span class="acc-pill ap-ar">A/R</span></td><td style="font-size:0.75rem;color:var(--qbo-muted);">Accounts Receivable</td><td style="font-family:'DM Mono';font-size:0.78rem;color:var(--qbo-muted);">$0.00</td><td style="font-size:0.72rem;color:var(--qbo-muted);">S02</td><td style="font-size:0.72rem;color:var(--qbo-blue);cursor:pointer;">Edit</td></tr>
+          <tr><td class="acc-num">1200</td><td class="acc-name">Inventory Asset</td><td><span class="acc-pill ap-other">Other Current Asset</span></td><td style="font-size:0.75rem;color:var(--qbo-muted);">Inventory</td><td style="font-family:'DM Mono';font-size:0.78rem;color:var(--qbo-muted);">$0.00</td><td style="font-size:0.72rem;color:var(--qbo-muted);">S03</td><td style="font-size:0.72rem;color:var(--qbo-blue);cursor:pointer;">Edit</td></tr>
+          <tr><td class="acc-num">1300</td><td class="acc-name">Prepaid Expenses</td><td><span class="acc-pill ap-other">Other Current Asset</span></td><td style="font-size:0.75rem;color:var(--qbo-muted);">Prepaid Expenses</td><td style="font-family:'DM Mono';font-size:0.78rem;color:var(--qbo-muted);">$0.00</td><td style="font-size:0.72rem;color:var(--qbo-muted);">S05</td><td style="font-size:0.72rem;color:var(--qbo-blue);cursor:pointer;">Edit</td></tr>
+          <tr><td class="acc-num">1500</td><td class="acc-name">Equipment</td><td><span class="acc-pill" style="background:var(--qbo-purple-lt);color:#7C3AED;">Fixed Asset</span></td><td style="font-size:0.75rem;color:var(--qbo-muted);">Machinery & Equipment</td><td style="font-family:'DM Mono';font-size:0.78rem;color:var(--qbo-muted);">$0.00</td><td style="font-size:0.72rem;color:var(--qbo-muted);">S05</td><td style="font-size:0.72rem;color:var(--qbo-blue);cursor:pointer;">Edit</td></tr>
+
+          <!-- LIABILITIES -->
+          <tr class="coa-section"><td colspan="7" class="coa-liability">▼ LIABILITIES</td></tr>
+          <tr><td class="acc-num">2000</td><td class="acc-name">Accounts Payable (AP)</td><td><span class="acc-pill ap-exp">A/P</span></td><td style="font-size:0.75rem;color:var(--qbo-muted);">Accounts Payable</td><td style="font-family:'DM Mono';font-size:0.78rem;color:var(--qbo-muted);">$0.00</td><td style="font-size:0.72rem;color:var(--qbo-muted);">S02–S05</td><td style="font-size:0.72rem;color:var(--qbo-blue);cursor:pointer;">Edit</td></tr>
+          <tr><td class="acc-num">2100</td><td class="acc-name">SS Tax Payable</td><td><span class="acc-pill ap-exp">Other Current Liability</span></td><td style="font-size:0.75rem;color:var(--qbo-muted);">Payroll Tax Payable</td><td style="font-family:'DM Mono';font-size:0.78rem;color:var(--qbo-muted);">$0.00</td><td style="font-size:0.72rem;color:var(--qbo-muted);">S04</td><td style="font-size:0.72rem;color:var(--qbo-blue);cursor:pointer;">Edit</td></tr>
+          <tr><td class="acc-num">2110</td><td class="acc-name">Medicare Tax Payable</td><td><span class="acc-pill ap-exp">Other Current Liability</span></td><td style="font-size:0.75rem;color:var(--qbo-muted);">Payroll Tax Payable</td><td style="font-family:'DM Mono';font-size:0.78rem;color:var(--qbo-muted);">$0.00</td><td style="font-size:0.72rem;color:var(--qbo-muted);">S04</td><td style="font-size:0.72rem;color:var(--qbo-blue);cursor:pointer;">Edit</td></tr>
+          <tr><td class="acc-num">2120</td><td class="acc-name">Federal Income Tax Payable</td><td><span class="acc-pill ap-exp">Other Current Liability</span></td><td style="font-size:0.75rem;color:var(--qbo-muted);">Payroll Tax Payable</td><td style="font-family:'DM Mono';font-size:0.78rem;color:var(--qbo-muted);">$0.00</td><td style="font-size:0.72rem;color:var(--qbo-muted);">S04</td><td style="font-size:0.72rem;color:var(--qbo-blue);cursor:pointer;">Edit</td></tr>
+          <tr><td class="acc-num">2130</td><td class="acc-name">FUTA Payable</td><td><span class="acc-pill ap-exp">Other Current Liability</span></td><td style="font-size:0.75rem;color:var(--qbo-muted);">Payroll Tax Payable</td><td style="font-family:'DM Mono';font-size:0.78rem;color:var(--qbo-muted);">$0.00</td><td style="font-size:0.72rem;color:var(--qbo-muted);">S04</td><td style="font-size:0.72rem;color:var(--qbo-blue);cursor:pointer;">Edit</td></tr>
+
+          <!-- EQUITY -->
+          <tr class="coa-section"><td colspan="7" class="coa-equity">▼ EQUITY</td></tr>
+          <tr><td class="acc-num">3000</td><td class="acc-name">Owner's Capital</td><td><span class="acc-pill" style="background:var(--qbo-purple-lt);color:#7C3AED;">Equity</span></td><td style="font-size:0.75rem;color:var(--qbo-muted);">Owner's Equity</td><td style="font-family:'DM Mono';font-size:0.78rem;color:var(--qbo-muted);">$0.00</td><td style="font-size:0.72rem;color:var(--qbo-muted);">S05–S06</td><td style="font-size:0.72rem;color:var(--qbo-blue);cursor:pointer;">Edit</td></tr>
+          <tr><td class="acc-num">3200</td><td class="acc-name">Retained Earnings</td><td><span class="acc-pill" style="background:var(--qbo-purple-lt);color:#7C3AED;">Equity</span></td><td style="font-size:0.75rem;color:var(--qbo-muted);">Retained Earnings</td><td style="font-family:'DM Mono';font-size:0.78rem;color:var(--qbo-muted);">$0.00</td><td style="font-size:0.72rem;color:var(--qbo-muted);">All</td><td style="font-size:0.72rem;color:var(--qbo-blue);cursor:pointer;">Edit</td></tr>
+
+          <!-- INCOME -->
+          <tr class="coa-section"><td colspan="7" class="coa-income">▼ INCOME</td></tr>
+          <tr><td class="acc-num">4000</td><td class="acc-name">Sales of Product Income</td><td><span class="acc-pill ap-inc">Income</span></td><td style="font-size:0.75rem;color:var(--qbo-muted);">Sales of Product Income</td><td style="font-family:'DM Mono';font-size:0.78rem;color:var(--qbo-muted);">$0.00</td><td style="font-size:0.72rem;color:var(--qbo-muted);">S01–S03</td><td style="font-size:0.72rem;color:var(--qbo-blue);cursor:pointer;">Edit</td></tr>
+          <tr><td class="acc-num">4100</td><td class="acc-name">Service Revenue</td><td><span class="acc-pill ap-inc">Income</span></td><td style="font-size:0.75rem;color:var(--qbo-muted);">Service / Fee Income</td><td style="font-family:'DM Mono';font-size:0.78rem;color:var(--qbo-muted);">$0.00</td><td style="font-size:0.72rem;color:var(--qbo-muted);">S01–S02</td><td style="font-size:0.72rem;color:var(--qbo-blue);cursor:pointer;">Edit</td></tr>
+          <tr><td class="acc-num">4200</td><td class="acc-name">Grooming Revenue</td><td><span class="acc-pill ap-inc">Income</span></td><td style="font-size:0.75rem;color:var(--qbo-muted);">Service / Fee Income</td><td style="font-family:'DM Mono';font-size:0.78rem;color:var(--qbo-muted);">$0.00</td><td style="font-size:0.72rem;color:var(--qbo-muted);">S02–S03</td><td style="font-size:0.72rem;color:var(--qbo-blue);cursor:pointer;">Edit</td></tr>
+          <tr><td class="acc-num">4300</td><td class="acc-name">Interest Income</td><td><span class="acc-pill ap-inc">Other Income</span></td><td style="font-size:0.75rem;color:var(--qbo-muted);">Interest Earned</td><td style="font-family:'DM Mono';font-size:0.78rem;color:var(--qbo-muted);">$0.00</td><td style="font-size:0.72rem;color:var(--qbo-muted);">S01</td><td style="font-size:0.72rem;color:var(--qbo-blue);cursor:pointer;">Edit</td></tr>
+
+          <!-- COGS -->
+          <tr class="coa-section"><td colspan="7" class="coa-expense">▼ COST OF GOODS SOLD</td></tr>
+          <tr><td class="acc-num">5000</td><td class="acc-name">Cost of Goods Sold (COGS)</td><td><span class="acc-pill ap-exp">COGS</span></td><td style="font-size:0.75rem;color:var(--qbo-muted);">Supplies & Materials</td><td style="font-family:'DM Mono';font-size:0.78rem;color:var(--qbo-muted);">$0.00</td><td style="font-size:0.72rem;color:var(--qbo-muted);">S03</td><td style="font-size:0.72rem;color:var(--qbo-blue);cursor:pointer;">Edit</td></tr>
+          <tr><td class="acc-num">5100</td><td class="acc-name">Inventory Shrinkage Expense</td><td><span class="acc-pill ap-exp">COGS</span></td><td style="font-size:0.75rem;color:var(--qbo-muted);">Supplies & Materials</td><td style="font-family:'DM Mono';font-size:0.78rem;color:var(--qbo-muted);">$0.00</td><td style="font-size:0.72rem;color:var(--qbo-muted);">S03</td><td style="font-size:0.72rem;color:var(--qbo-blue);cursor:pointer;">Edit</td></tr>
+
+          <!-- EXPENSES -->
+          <tr class="coa-section"><td colspan="7" class="coa-expense">▼ EXPENSES</td></tr>
+          <tr><td class="acc-num">6000</td><td class="acc-name">Payroll Expense</td><td><span class="acc-pill ap-exp">Expense</span></td><td style="font-size:0.75rem;color:var(--qbo-muted);">Wages & Salaries</td><td style="font-family:'DM Mono';font-size:0.78rem;color:var(--qbo-muted);">$0.00</td><td style="font-size:0.72rem;color:var(--qbo-muted);">S01, S04</td><td style="font-size:0.72rem;color:var(--qbo-blue);cursor:pointer;">Edit</td></tr>
+          <tr><td class="acc-num">6010</td><td class="acc-name">Payroll Tax Expense</td><td><span class="acc-pill ap-exp">Expense</span></td><td style="font-size:0.75rem;color:var(--qbo-muted);">Payroll Expenses</td><td style="font-family:'DM Mono';font-size:0.78rem;color:var(--qbo-muted);">$0.00</td><td style="font-size:0.72rem;color:var(--qbo-muted);">S04</td><td style="font-size:0.72rem;color:var(--qbo-blue);cursor:pointer;">Edit</td></tr>
+          <tr><td class="acc-num">6100</td><td class="acc-name">Rent Expense</td><td><span class="acc-pill ap-exp">Expense</span></td><td style="font-size:0.75rem;color:var(--qbo-muted);">Rent or Lease</td><td style="font-family:'DM Mono';font-size:0.78rem;color:var(--qbo-muted);">$0.00</td><td style="font-size:0.72rem;color:var(--qbo-muted);">S02, S05</td><td style="font-size:0.72rem;color:var(--qbo-blue);cursor:pointer;">Edit</td></tr>
+          <tr><td class="acc-num">6200</td><td class="acc-name">Utilities Expense</td><td><span class="acc-pill ap-exp">Expense</span></td><td style="font-size:0.75rem;color:var(--qbo-muted);">Utilities</td><td style="font-family:'DM Mono';font-size:0.78rem;color:var(--qbo-muted);">$0.00</td><td style="font-size:0.72rem;color:var(--qbo-muted);">S02</td><td style="font-size:0.72rem;color:var(--qbo-blue);cursor:pointer;">Edit</td></tr>
+          <tr><td class="acc-num">6300</td><td class="acc-name">Advertising & Marketing</td><td><span class="acc-pill ap-exp">Expense</span></td><td style="font-size:0.75rem;color:var(--qbo-muted);">Advertising/Promotional</td><td style="font-family:'DM Mono';font-size:0.78rem;color:var(--qbo-muted);">$0.00</td><td style="font-size:0.72rem;color:var(--qbo-muted);">S02, S05</td><td style="font-size:0.72rem;color:var(--qbo-blue);cursor:pointer;">Edit</td></tr>
+          <tr><td class="acc-num">6400</td><td class="acc-name">Medical Supplies Expense</td><td><span class="acc-pill ap-exp">Expense</span></td><td style="font-size:0.75rem;color:var(--qbo-muted);">Supplies</td><td style="font-family:'DM Mono';font-size:0.78rem;color:var(--qbo-muted);">$0.00</td><td style="font-size:0.72rem;color:var(--qbo-muted);">S02, S05</td><td style="font-size:0.72rem;color:var(--qbo-blue);cursor:pointer;">Edit</td></tr>
+          <tr><td class="acc-num">6600</td><td class="acc-name">Bank Charges & Fees</td><td><span class="acc-pill ap-exp">Expense</span></td><td style="font-size:0.75rem;color:var(--qbo-muted);">Bank Charges</td><td style="font-family:'DM Mono';font-size:0.78rem;color:var(--qbo-muted);">$0.00</td><td style="font-size:0.72rem;color:var(--qbo-muted);">S01</td><td style="font-size:0.72rem;color:var(--qbo-blue);cursor:pointer;">Edit</td></tr>
+          <tr><td class="acc-num">6700</td><td class="acc-name">Contractor Expense</td><td><span class="acc-pill ap-exp">Expense</span></td><td style="font-size:0.75rem;color:var(--qbo-muted);">Outside Services</td><td style="font-family:'DM Mono';font-size:0.78rem;color:var(--qbo-muted);">$0.00</td><td style="font-size:0.72rem;color:var(--qbo-muted);">S04</td><td style="font-size:0.72rem;color:var(--qbo-blue);cursor:pointer;">Edit</td></tr>
+          <tr><td class="acc-num">6800</td><td class="acc-name">Meals & Entertainment</td><td><span class="acc-pill ap-exp">Expense</span></td><td style="font-size:0.75rem;color:var(--qbo-muted);">Entertainment</td><td style="font-family:'DM Mono';font-size:0.78rem;color:var(--qbo-muted);">$0.00</td><td style="font-size:0.72rem;color:var(--qbo-muted);">S05</td><td style="font-size:0.72rem;color:var(--qbo-blue);cursor:pointer;">Edit</td></tr>
+          <tr><td class="acc-num">6900</td><td class="acc-name">Vehicle Expense</td><td><span class="acc-pill ap-exp">Expense</span></td><td style="font-size:0.75rem;color:var(--qbo-muted);">Auto</td><td style="font-family:'DM Mono';font-size:0.78rem;color:var(--qbo-muted);">$0.00</td><td style="font-size:0.72rem;color:var(--qbo-muted);">S05</td><td style="font-size:0.72rem;color:var(--qbo-blue);cursor:pointer;">Edit</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="alert alert-green">✅ All 28 accounts are set up. Your Chart of Accounts is complete. You are ready to start S01!</div>
+
+  <!-- Coach Mic COA Walkthrough -->
+  <div style="background:var(--navy);border-radius:12px;padding:24px;margin:16px 0;text-align:center;">
+    <div style="font-size:1.5rem;margin-bottom:8px;">🎬</div>
+    <div style="color:#fff;font-size:0.95rem;font-weight:700;margin-bottom:4px;">Coach Mic's COA Walkthrough</div>
+    <div style="color:#94a3b8;font-size:0.78rem;margin-bottom:16px;">Watch Ate Mic explain the Chart of Accounts — stories, not account names</div>
+    <!-- Loom Video Embed -->
+    <div style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:8px;margin-bottom:16px;">
+      <iframe src="https://www.loom.com/embed/a1ec337d29ac46c18a18639213c60bfd" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen style="position:absolute;top:0;left:0;width:100%;height:100%;border-radius:8px;"></iframe>
+    </div>
+    <!-- Audio fallback -->
+    <div style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:12px;margin-top:8px;">
+      <div style="color:#94a3b8;font-size:0.72rem;margin-bottom:8px;">🎧 Prefer audio only? Listen here:</div>
+      <audio controls style="width:100%;accent-color:var(--gold);">
+        <source src="COA-Dashboard.mp3" type="audio/mpeg">
+        Your browser does not support the audio element.
+      </audio>
+    </div>
+  </div>
+
+  <div style="text-align:center;padding:12px 0;">
+    <button class="card-btn cb-blue" style="padding:10px 28px;" onclick="showPanel('lesson0')">Next → Lesson 0 Quick Recall →</button>
+  </div>
+</div>
+
+<!-- ─────────── LESSON 0 ─────────── -->
+<div class="panel" id="panel-lesson0">
+  <div class="page-header">
+    <div class="ph-icon ci-gold">⚡</div>
+    <div><div class="ph-title">Lesson 0 — Quick Recall</div><div class="ph-sub">Read before S01 · ~10 min</div></div>
+  </div>
+  <div class="coach-panel">
+    <div class="coach-avatar">M</div>
+    <div class="coach-body">
+      <div class="coach-name">🎙️ Coach Mic</div>
+      <div class="coach-msg">Before you touch the simulator — make sure these 5 things are loaded in your brain. This is your warm-up. Students who read this first catch errors <strong>twice as fast.</strong></div>
+    </div>
+  </div>
+  <div class="cards">
+    <div class="card completed"><div class="card-top"><div class="card-icon ci-blue">⚖️</div><div><div class="card-title">Accounting Equation</div><div class="card-sub">Assets = Liabilities + Equity</div></div></div><div class="card-desc">Every journal entry keeps this balanced. QBO enforces it — but knowing why helps you catch errors instantly.</div><div class="card-footer"><span class="card-status cs-done">✓ Reviewed</span></div></div>
+    <div class="card completed"><div class="card-top"><div class="card-icon ci-blue">↕️</div><div><div class="card-title">Debit & Credit</div><div class="card-sub">DEAD CLIC — the one table to remember</div></div></div><div class="card-desc">Debit = left. Credit = right. Which direction increases depends on the account type.</div><div class="card-footer"><span class="card-status cs-done">✓ Reviewed</span></div></div>
+    <div class="card completed"><div class="card-top"><div class="card-icon ci-green">🔄</div><div><div class="card-title">Accounting Cycle</div><div class="card-sub">8 steps · S01 = Steps 2, 4, 7</div></div></div><div class="card-desc">You're working inside Record Entries, Trial Balance, and Bank Reconciliation today.</div><div class="card-footer"><span class="card-status cs-done">✓ Reviewed</span></div></div>
+    <div class="card completed"><div class="card-top"><div class="card-icon ci-gold">💸</div><div><div class="card-title">Transaction Flow</div><div class="card-sub">What changes on reports when you record</div></div></div><div class="card-desc">Every entry ripples. Wrong amount = wrong P&L = wrong Balance Sheet.</div><div class="card-footer"><span class="card-status cs-done">✓ Reviewed</span></div></div>
+    <div class="card completed"><div class="card-top"><div class="card-icon ci-green">💻</div><div><div class="card-title">QBO Navigation</div><div class="card-sub">Banking Center + Reports = your S01 zones</div></div></div><div class="card-desc">Banking Center to reconcile. Reports to verify. + New to add entries.</div><div class="card-footer"><span class="card-status cs-done">✓ Reviewed</span></div></div>
+  </div>
+  <div style="text-align:center;padding:16px 0;">
+    <button class="card-btn cb-blue" style="padding:12px 32px;font-size:0.9rem;" onclick="showPanel('s01')">✅ I'm Ready — Start S01 →</button>
+  </div>
+</div>
+
+<!-- ─────────── S01 LAB ─────────── -->
+<div class="panel" id="panel-s01">
+  <div class="page-header">
+    <div class="ph-icon ci-blue">🏦</div>
+    <div><div class="ph-title">S01 — Bank Reconciliation</div><div class="ph-sub">Juan's Pet Paradise · First National Bank · March 2024</div></div>
+    <div class="ph-right"><span style="font-size:0.75rem;color:var(--qbo-muted);">Target: </span><span style="font-size:0.9rem;font-weight:700;color:var(--qbo-green);font-family:'DM Mono'">$0.00</span></div>
+  </div>
+
+  <!-- Coach Mic -->
+  <div class="coach-panel">
+    <div class="coach-avatar">M</div>
+    <div class="coach-body">
+      <div class="coach-name">🎙️ Coach Mic</div>
+      <div class="coach-msg" id="coach-msg">Welcome to S01! Start by reading the scenario — understand the client before touching any numbers. Then study the bank statement carefully. <strong>The bank is always right.</strong></div>
+      <div class="hint-row">
+        <button class="hint-btn" onclick="showHint('h1')">💡 What's my goal?</button>
+        <button class="hint-btn" onclick="showHint('h2')">💡 Where do I start?</button>
+        <button class="hint-btn" onclick="showHint('h3')">💡 Difference not $0?</button>
+      </div>
+      <div class="hint-reveal" id="h1">Your goal is to make the QBO Checking account balance match the bank statement closing balance of <strong>$34,390.00</strong>. Find the 3 discrepancies and fix them. Leave the timing item alone.</div>
+      <div class="hint-reveal" id="h2">Start with the <strong>Scenario tab</strong> — know the client. Then read the <strong>Bank Statement</strong> top to bottom before touching QBO. Students who skip this take twice as long to find errors.</div>
+      <div class="hint-reveal" id="h3">Work backwards from the number. <strong>−$35?</strong> Bank fee not added. <strong>+$45?</strong> Interest not recorded. <strong>−$180?</strong> VetMed still shows $420. Check your ending balance too — must be exactly $34,390.00.</div>
+    </div>
+  </div>
+
+  <!-- QBO Simulator -->
+  <div class="qbo-sim">
+    <div class="qbo-sim-bar">
+      <span class="qsb-title">🏦 Reconcile — Checking Account · March 2024</span>
+      <div class="qsb-right">
+        <button class="qsb-btn" onclick="showHint('h1')">Help</button>
+        <button class="qsb-btn" onclick="checkFinish()">Finish Now</button>
+      </div>
+    </div>
+
+    <!-- Recon header -->
+    <div class="recon-header">
+      <div class="rh-item"><div class="rh-label">Statement Ending Date</div><div class="rh-value">03/31/2024</div></div>
+      <div class="rh-divider"></div>
+      <div class="rh-item"><div class="rh-label">Beginning Balance</div><div class="rh-value">$9,850.00</div></div>
+      <div class="rh-divider"></div>
+      <div class="rh-item"><div class="rh-label">Ending Balance</div><div class="rh-value">$34,390.00</div></div>
+      <div class="rh-divider"></div>
+      <div class="rh-item"><div class="rh-label">Cleared Balance</div><div class="rh-value" id="cleared-bal">$0.00</div></div>
+      <div class="diff-box nonzero" id="diff-box">
+        <div class="diff-label">Difference</div>
+        <div class="diff-amount" id="diff-amount">$34,390.00</div>
+      </div>
+    </div>
+
+    <!-- Transaction table -->
+    <table class="txn-table">
+      <thead>
+        <tr>
+          <th style="width:40px;">✓</th>
+          <th>Date</th>
+          <th>Description</th>
+          <th>Type</th>
+          <th style="text-align:right;">Amount</th>
+          <th>Match?</th>
+        </tr>
+      </thead>
+      <tbody id="txn-body">
+        <!-- Populated by JS -->
+      </tbody>
+    </table>
+
+    <div class="finish-row">
+      <button class="finish-btn fb-green" onclick="checkFinish()">Finish Now</button>
+      <span class="finish-note" id="finish-note">Check off all matching transactions — target difference is $0.00</span>
+    </div>
+  </div>
+
+  <!-- Success Banner -->
+  <div class="success-banner" id="success-banner">
+    <div class="sb-icon2">🎉</div>
+    <div class="sb-text">
+      <div class="sb-title">S01 Complete! Difference = $0.00</div>
+      <div class="sb-sub">Juan's March 2024 books are reconciled. Unlock the guided solution below.</div>
+    </div>
+    <div class="sb-action"><button class="card-btn cb-green" onclick="showSolution()">See Guided Solution ↓</button></div>
+  </div>
+
+  <!-- Solution Panel -->
+  <div class="solution-panel" id="solution-panel">
+    <div class="sol-header">
+      <div>
+        <div class="sol-title">📋 S01 Guided Solution — Coach Mic's Walkthrough</div>
+        <div class="sol-sub">The 3 discrepancies explained · What each fix does to the reports</div>
+      </div>
+    </div>
+    <div class="sol-body">
+      <div class="sol-step">
+        <div class="sol-num">1</div>
+        <div class="sol-content">
+          <div class="sol-action">Discrepancy 1 — Wrong Amount: VetMed Supplies</div>
+          <div class="sol-detail">QBO showed <strong>$420.00</strong> but the bank showed <strong>$240.00</strong>. Digits were transposed when the payment was entered. Fix: edit the QBO expense entry from $420 to $240. <strong>Impact:</strong> Expenses decrease by $180 → Net Income increases by $180 → Balance Sheet equity improves.</div>
+        </div>
+      </div>
+      <div class="sol-step">
+        <div class="sol-num">2</div>
+        <div class="sol-content">
+          <div class="sol-action">Discrepancy 2 — Missing Entry: Bank Fee $35</div>
+          <div class="sol-detail">The bank deducted a $35 monthly maintenance fee automatically — but nobody recorded it in QBO. Fix: + New → Expense → Payee: First National Bank → Category: Bank Charges & Fees → Amount: $35 → Date: 03/31/2024. <strong>Journal entry:</strong> DR Bank Charges $35 / CR Checking $35.</div>
+        </div>
+      </div>
+      <div class="sol-step">
+        <div class="sol-num">3</div>
+        <div class="sol-content">
+          <div class="sol-action">Discrepancy 3 — Missing Entry: Interest Income $45</div>
+          <div class="sol-detail">The bank credited $45 interest earned — but it was never recorded in QBO. Fix: + New → Bank Deposit → Account: Interest Income → Amount: $45 → Date: 03/31/2024. <strong>Journal entry:</strong> DR Checking $45 / CR Interest Income $45.</div>
+        </div>
+      </div>
+      <div class="sol-step">
+        <div class="sol-num">✓</div>
+        <div class="sol-content">
+          <div class="sol-action">Timing Item — Check #5503 GroomPro Tools $380 (Leave Unchecked)</div>
+          <div class="sol-detail">This check was written and recorded correctly in QBO on March 31 — but the bank hasn't processed it yet. This is an <strong>outstanding check — a timing difference, not an error.</strong> Leave it unchecked. It will appear on the April bank statement.</div>
+        </div>
+      </div>
+    </div>
+    <!-- Loom placeholder -->
+    <div style="padding:0 20px 20px;">
+      <div class="sol-loom">
+        <div class="sol-loom-icon">🎬</div>
+        <div class="sol-loom-title">Coach Mic's Video Walkthrough</div>
+        <div class="sol-loom-sub">Watch Ate Mic walk through the full S01 reconciliation in QBO step by step</div>
+        <button class="sol-loom-btn" onclick="window.open('https://www.loom.com/share/a1ec337d29ac46c18a18639213c60bfd','_blank')">▶ Watch Loom Walkthrough</button>
+        <div style="font-size:0.7rem;color:#64748b;margin-top:8px;">🎧 Audio also available in the COA section</div>
+      </div>
+    </div>
+    <div style="padding:0 20px 20px;text-align:center;">
+      <button class="card-btn cb-blue" style="padding:10px 28px;" onclick="showPanel('dashboard')">← Back to Dashboard</button>
+    </div>
+  </div>
+</div>
+
+<!-- ─────────── RESOURCES ─────────── -->
+<div class="panel" id="panel-resources">
+  <div class="page-header">
+    <div class="ph-icon ci-gold">📁</div>
+    <div><div class="ph-title">Resources</div><div class="ph-sub">Cheat sheets, templates, and tools</div></div>
+  </div>
+  <div class="res-grid">
+    <div class="res-card"><div class="res-icon">📊</div><div class="res-title">DEAD CLIC Cheat Sheet</div><div class="res-desc">The one-page debit and credit reference. Print it. Keep it beside you during the labs.</div><a class="res-btn" href="lesson0-phase1.html">Open →</a></div>
+    <div class="res-card"><div class="res-icon">🔄</div><div class="res-title">Accounting Cycle Map</div><div class="res-desc">All 8 steps. Where each lab lives. Your monthly roadmap as a bookkeeper.</div><a class="res-btn" href="lesson0-phase1.html">Open →</a></div>
+    <div class="res-card"><div class="res-icon">💻</div><div class="res-title">QBO Quick Navigation Map</div><div class="res-desc">Banking Center, Sales, Expenses, Reports — where everything is and when to use it.</div><a class="res-btn" href="lesson0-phase1.html">Open →</a></div>
+    <div class="res-card"><div class="res-icon">⚙️</div><div class="res-title">QBO Setup Guide</div><div class="res-desc">Full step-by-step guide to setting up Juan's Pet Paradise — company, bank, COA, vendors.</div><a class="res-btn" href="qbo-setup-guide.html">Open →</a></div>
+    <div class="res-card"><div class="res-icon">📋</div><div class="res-title">Chart of Accounts</div><div class="res-desc">All 28 accounts used across S01–S06 with account numbers, types, and which lab uses each.</div><button class="res-btn" onclick="showPanel('coa')">Open →</button></div>
+    <div class="res-card"><div class="res-icon">🎙️</div><div class="res-title">What Is Bookkeeping?</div><div class="res-desc">The WHY before the HOW. Watch this once before your first lab.</div><a class="res-btn" href="orientation-slide0-bookkeeping-why.html">Open →</a></div>
+  </div>
+</div>
+
+</div><!-- /main -->
+
+<script>
+// ── PANEL NAVIGATION ──
+function showPanel(id){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('panel-'+id).classList.add('active');
+}
+function setActive(el){
+  document.querySelectorAll('.sb-item').forEach(i=>i.classList.remove('active'));
+  if(!el.classList.contains('locked')) el.classList.add('active');
+}
+function setActiveById(id){}
+
+// ── EXPAND/COLLAPSE ──
+function toggleExpand(id){
+  const el=document.getElementById(id);
+  el.classList.toggle('show');
+}
+
+// ── HINTS ──
+function showHint(id){
+  const el=document.getElementById(id);
+  el.classList.toggle('show');
+}
+
+// ── TRANSACTIONS DATA ──
+const txns=[
+  {id:'T-01',date:'Mar 01',name:'Opening Balance',type:'Balance',amt:9850,dir:'cr',match:'✅ Match'},
+  {id:'T-02',date:'Mar 03',name:'PetCo Wholesale',type:'Expense',amt:-2100,dir:'db',match:'✅ Match'},
+  {id:'T-03',date:'Mar 05',name:'Paws & Claws Clinic',type:'Invoice',amt:3200,dir:'cr',match:'✅ Match'},
+  {id:'T-04',date:'Mar 10',name:'VetMed Supplies',type:'Expense',amt:-420,dir:'db',match:'❌ Wrong Amt',err:true},
+  {id:'T-05',date:'Mar 12',name:'Happy Tails Rescue',type:'Payment',amt:4200,dir:'cr',match:'✅ Match'},
+  {id:'T-06',date:'Mar 14',name:'Lease — 123 Commerce',type:'Expense',amt:-3500,dir:'db',match:'✅ Match'},
+  {id:'T-07',date:'Mar 15',name:'Walk & Wag LLC',type:'Payment',amt:2250,dir:'cr',match:'✅ Match'},
+  {id:'T-08',date:'Mar 18',name:'GroomPro Tools',type:'Expense',amt:-420,dir:'db',match:'✅ Match'},
+  {id:'T-09',date:'Mar 20',name:'Sunshine Pet Hotel',type:'Payment',amt:950,dir:'cr',match:'✅ Match'},
+  {id:'T-10',date:'Mar 22',name:'San Antonio Utilities',type:'Expense',amt:-4790,dir:'db',match:'✅ Match'},
+  {id:'T-11',date:'Mar 28',name:'Fur & Feathers Store',type:'Payment',amt:12500,dir:'cr',match:'✅ Match'},
+  {id:'T-12',date:'Mar 31',name:'Bank Maintenance Fee',type:'Expense',amt:-35,dir:'db',match:'❌ Missing',missing:true},
+  {id:'T-13',date:'Mar 31',name:'Interest Earned',type:'Income',amt:45,dir:'cr',match:'❌ Missing',missing:true},
+  {id:'T-14',date:'Mar 31',name:'Check #5503 GroomPro',type:'Check',amt:-380,dir:'db',match:'⏳ Timing',timing:true},
+];
+
+// ── RENDER TRANSACTIONS ──
+function renderTxns(){
+  const tbody=document.getElementById('txn-body');
+  tbody.innerHTML='';
+  txns.forEach((t,i)=>{
+    const tr=document.createElement('tr');
+    const matchClass=t.err?'txn-err':t.missing?'txn-err':t.timing?'txn-warn':'txn-ok';
+    const disabled=t.missing||t.timing?'disabled':'';
+    const title=t.timing?'Outstanding check — do not check off':t.missing?'Missing entry — add in QBO first':'';
+    tr.innerHTML=`
+      <td><input type="checkbox" class="txn-chk" data-idx="${i}" ${disabled} title="${title}" onchange="updateDiff()"></td>
+      <td class="txn-date">${t.date}</td>
+      <td class="txn-name">${t.name} ${t.err?'<span style="font-size:0.7rem;color:var(--qbo-red);background:#fff0f0;padding:1px 6px;border-radius:3px;margin-left:4px;">$420 → should be $240</span>':''} ${t.missing?'<span style="font-size:0.7rem;color:var(--qbo-red);background:#fff0f0;padding:1px 6px;border-radius:3px;margin-left:4px;">Not in QBO — add first</span>':''} ${t.timing?'<span style="font-size:0.7rem;color:var(--qbo-orange);background:#fff8e1;padding:1px 6px;border-radius:3px;margin-left:4px;">Outstanding — leave unchecked</span>':''}</td>
+      <td><span class="txn-type">${t.type}</span></td>
+      <td class="txn-amt ${t.dir==='cr'?'credit':'debit'}">${t.dir==='cr'?'+':'-'}$${Math.abs(t.amt).toLocaleString('en-US',{minimumFractionDigits:2})}</td>
+      <td class="txn-match ${matchClass}">${t.match}</td>
+    `;
+    if(t.id==='T-01') tr.style.background='#f8f9fa';
+    tbody.appendChild(tr);
+  });
+}
+
+// ── UPDATE DIFFERENCE ──
+function updateDiff(){
+  const checks=document.querySelectorAll('.txn-chk:checked');
+  let cleared=0;
+  checks.forEach(c=>{
+    const t=txns[c.dataset.idx];
+    cleared+=t.amt;
+  });
+  const ending=34390;
+  const diff=ending-cleared;
+  document.getElementById('cleared-bal').textContent='$'+cleared.toLocaleString('en-US',{minimumFractionDigits:2});
+  const diffBox=document.getElementById('diff-box');
+  const diffAmt=document.getElementById('diff-amount');
+  diffAmt.textContent='$'+Math.abs(diff).toLocaleString('en-US',{minimumFractionDigits:2});
+  if(Math.abs(diff)<0.01){
+    diffBox.className='diff-box zero';
+    document.getElementById('finish-note').textContent='✅ Difference is $0.00 — click Finish Now!';
+    document.getElementById('finish-note').style.color='var(--qbo-green)';
+  } else {
+    diffBox.className='diff-box nonzero';
+    document.getElementById('finish-note').textContent='Keep checking off transactions — target is $0.00';
+    document.getElementById('finish-note').style.color='';
+  }
+}
+
+// ── CHECK FINISH ──
+function checkFinish(){
+  const diff=parseFloat(document.getElementById('diff-amount').textContent.replace(/[$,]/g,''));
+  const box=document.getElementById('diff-box');
+  if(box.classList.contains('zero')){
+    document.getElementById('success-banner').classList.add('show');
+    document.getElementById('success-banner').scrollIntoView({behavior:'smooth'});
+    document.getElementById('coach-msg').textContent="🎉 Outstanding! You hit $0.00! Juan's March 2024 books are perfectly reconciled. You found all 3 discrepancies and correctly left the outstanding check alone. Scroll down to see the guided solution.";
+  } else {
+    document.getElementById('coach-msg').textContent="Not quite yet! The difference isn't $0.00. Use the hint buttons above to find what's missing. You're close — don't give up!";
+    document.getElementById('h3').classList.add('show');
+  }
+}
+
+// ── SHOW SOLUTION ──
+function showSolution(){
+  document.getElementById('solution-panel').classList.add('show');
+  document.getElementById('solution-panel').scrollIntoView({behavior:'smooth'});
+}
+
+// ── INIT ──
+renderTxns();
+updateDiff();
+</script>
+</body>
+</html>
