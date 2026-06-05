@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Orientation Video Script — US Track | The Practice HUB</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#080f17;--card:#0f1e2e;--border:rgba(255,255,255,0.08);--gold:#c9a84c;--gold-light:#e8c97a;--white:#ffffff;--dim:#6a85a0;--green:#4caf7a;--blue:#6499e9;--red:#e07070;--orange:#e8965a;--teal:#5eead4;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);font-family:'DM Sans',sans-serif;color:var(--white);padding-bottom:40px;}
+
+/* HEADER */
+.header{background:#0d1b2a;border-bottom:1px solid rgba(201,168,76,0.2);padding:16px 28px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+.header-brand{color:var(--gold);font-size:0.9rem;letter-spacing:1px;font-weight:600;}
+.header-right{display:flex;align-items:center;gap:12px;}
+.rec-badge{display:flex;align-items:center;gap:6px;background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.3);color:#f87171;font-size:0.72rem;font-weight:700;padding:5px 12px;border-radius:20px;letter-spacing:1px;}
+.rec-dot{width:8px;height:8px;border-radius:50%;background:#f87171;animation:blink 1.2s infinite;}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:0.2;}}
+.header-note{color:var(--dim);font-size:0.75rem;}
+
+/* PROGRESS */
+.progress-bar{height:2px;background:rgba(201,168,76,0.15);}
+.progress-fill{height:100%;background:var(--gold);width:0%;transition:width 0.3s;}
+
+/* SECTION TABS */
+.slide-nav{display:flex;gap:6px;padding:16px 28px 0;flex-wrap:wrap;}
+.slide-tab{padding:5px 14px;border-radius:6px;font-size:0.72rem;background:rgba(255,255,255,0.05);border:1px solid var(--border);color:var(--dim);cursor:pointer;transition:all 0.15s;font-family:'DM Sans';}
+.slide-tab:hover{background:rgba(201,168,76,0.1);color:var(--gold-light);border-color:rgba(201,168,76,0.3);}
+.slide-tab.active{background:rgba(201,168,76,0.15);color:var(--gold-light);border-color:var(--gold);}
+
+/* CONTENT */
+.content{padding:20px 28px 0;}
+.slide-block{display:none;flex-direction:column;gap:14px;}
+.slide-block.active{display:flex;}
+
+/* SLIDE HEADER */
+.slide-header{display:flex;align-items:center;gap:12px;padding-bottom:14px;border-bottom:1px solid var(--border);}
+.slide-num{font-family:'DM Mono',monospace;font-size:0.7rem;color:var(--dim);background:rgba(255,255,255,0.05);padding:3px 8px;border-radius:4px;}
+.slide-name{font-size:1.05rem;font-weight:600;color:var(--white);}
+.slide-time{margin-left:auto;font-size:0.72rem;color:var(--gold);background:rgba(201,168,76,0.1);border:1px solid rgba(201,168,76,0.2);padding:4px 12px;border-radius:12px;}
+.slide-total{font-size:0.7rem;color:var(--dim);margin-left:8px;}
+
+/* BLOCKS */
+.section{display:flex;flex-direction:column;gap:8px;}
+.section-label{font-size:0.62rem;letter-spacing:3px;text-transform:uppercase;font-weight:700;padding:4px 10px;border-radius:4px;width:fit-content;}
+.say .section-label{background:rgba(76,175,122,0.15);color:#6fcf97;}
+.show .section-label{background:rgba(100,153,233,0.15);color:#7baef0;}
+.pause .section-label{background:rgba(234,88,12,0.15);color:#fb923c;}
+.energy .section-label{background:rgba(201,168,76,0.15);color:var(--gold-light);}
+.tip .section-label{background:rgba(94,234,212,0.15);color:var(--teal);}
+
+.say-text{background:rgba(76,175,122,0.05);border:1px solid rgba(76,175,122,0.15);border-left:3px solid #4caf7a;border-radius:0 8px 8px 0;padding:16px 18px;color:#d4edd9;font-size:0.92rem;line-height:1.85;}
+.say-text strong{color:var(--white);}
+.say-text em{color:var(--gold-light);font-style:italic;}
+.say-text .ph{color:#94a3b8;font-size:0.85rem;font-style:italic;}
+
+.show-text{background:rgba(100,153,233,0.05);border:1px solid rgba(100,153,233,0.15);border-left:3px solid #6499e9;border-radius:0 8px 8px 0;padding:12px 16px;color:#b8d0f5;font-size:0.84rem;line-height:1.65;}
+.show-text strong{color:var(--white);}
+.show-text code{font-family:'DM Mono',monospace;background:rgba(255,255,255,0.08);padding:2px 6px;border-radius:3px;font-size:0.82rem;color:var(--gold-light);}
+
+.pause-text{background:rgba(234,88,12,0.05);border:1px solid rgba(234,88,12,0.15);border-left:3px solid #ea580c;border-radius:0 8px 8px 0;padding:12px 16px;color:#fed7aa;font-size:0.84rem;line-height:1.65;}
+.pause-text strong{color:var(--white);}
+
+.energy-text{background:rgba(201,168,76,0.05);border:1px solid rgba(201,168,76,0.15);border-left:3px solid var(--gold);border-radius:0 8px 8px 0;padding:12px 16px;color:#e8d9aa;font-size:0.84rem;line-height:1.65;}
+.energy-text strong{color:var(--white);}
+
+.tip-text{background:rgba(94,234,212,0.05);border:1px solid rgba(94,234,212,0.15);border-left:3px solid var(--teal);border-radius:0 8px 8px 0;padding:12px 16px;color:#99f6e4;font-size:0.84rem;line-height:1.65;}
+.tip-text strong{color:var(--white);}
+
+/* SCREEN CUES */
+.screen-cue{background:rgba(255,255,255,0.03);border:1px dashed rgba(255,255,255,0.15);border-radius:8px;padding:12px 16px;font-size:0.82rem;color:var(--dim);display:flex;gap:10px;align-items:flex-start;}
+.screen-cue .sc-icon{font-size:1rem;flex-shrink:0;}
+.screen-cue strong{color:var(--white);}
+
+/* NAV BUTTONS */
+.nav-btns{display:flex;gap:10px;padding:16px 28px 0;position:sticky;bottom:0;background:var(--bg);padding-top:14px;border-top:1px solid var(--border);margin-top:16px;}
+.nav-btn{flex:1;padding:11px;border-radius:8px;cursor:pointer;font-family:'DM Sans';font-size:0.88rem;font-weight:500;border:1px solid var(--border);background:rgba(255,255,255,0.04);color:var(--dim);transition:all 0.15s;}
+.nav-btn:hover{background:rgba(201,168,76,0.1);color:var(--gold-light);border-color:rgba(201,168,76,0.3);}
+.nav-btn.primary{background:rgba(201,168,76,0.15);color:var(--gold-light);border-color:var(--gold);}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-brand">🐾 ORIENTATION VIDEO SCRIPT — US TRACK</div>
+  <div class="header-right">
+    <div class="rec-badge"><div class="rec-dot"></div>RECORD</div>
+    <div class="header-note">Ate Mic · 2nd Monitor · ~20 min total</div>
+  </div>
+</div>
+<div class="progress-bar"><div class="progress-fill" id="pfill"></div></div>
+
+<div class="slide-nav">
+  <div class="slide-tab active" onclick="go(0,this)">Intro</div>
+  <div class="slide-tab" onclick="go(1,this)">About Ate Mic</div>
+  <div class="slide-tab" onclick="go(2,this)">The Journey</div>
+  <div class="slide-tab" onclick="go(3,this)">Pre-Orientation</div>
+  <div class="slide-tab" onclick="go(4,this)">Juan's Pet Paradise</div>
+  <div class="slide-tab" onclick="go(5,this)">The 6 Labs</div>
+  <div class="slide-tab" onclick="go(6,this)">Click Maps</div>
+  <div class="slide-tab" onclick="go(7,this)">Certificate</div>
+  <div class="slide-tab" onclick="go(8,this)">What's Next</div>
+  <div class="slide-tab" onclick="go(9,this)">Close + CTA</div>
+</div>
+
+<div class="content">
+
+<!-- ══ SLIDE 0 — INTRO ══ -->
+<div class="slide-block active" id="sb0">
+  <div class="slide-header">
+    <span class="slide-num">PART 1</span>
+    <span class="slide-name">Opening — Hook</span>
+    <span class="slide-time">2 min</span>
+    <span class="slide-total">0:00 – 2:00</span>
+  </div>
+  <div class="screen-cue"><span class="sc-icon">🎬</span><div><strong>Recording setup:</strong> Camera on. Good lighting. Clean background. You can screen share <code>pre-orientation.html</code> or just talk to camera — either works. Smile before you press record. 😊</div></div>
+  <div class="section say"><div class="section-label">Say</div>
+  <div class="say-text">Hi! Welcome to The Practice HUB. 🐾<br><br>
+If you're watching this, either you just paid for Phase 1 Personal Mastery — or you're thinking about it. Either way, I'm really glad you're here.<br><br>
+My name is Ate Mic, and in the next 20 minutes, I'm going to show you exactly what your Phase 1 journey looks like — what you'll learn, what you'll practice, what tools you'll have, and what you'll be able to do at the end of it.<br><br>
+<strong>No fluff. Just the real picture.</strong> So let's go. 💛</div></div>
+  <div class="section energy"><div class="section-label">Energy Note</div>
+  <div class="energy-text"><strong>Be warm and personal here — not corporate.</strong> This is the first time they're hearing your voice in the context of the course. They need to feel: "This person is real, she cares, and I can learn from her." Take a breath, smile, and just talk like you're talking to a friend.</div></div>
+</div>
+
+<!-- ══ SLIDE 1 — ABOUT ATE MIC ══ -->
+<div class="slide-block" id="sb1">
+  <div class="slide-header">
+    <span class="slide-num">PART 2</span>
+    <span class="slide-name">About Ate Mic — Why I Built This</span>
+    <span class="slide-time">2 min</span>
+    <span class="slide-total">2:00 – 4:00</span>
+  </div>
+  <div class="section say"><div class="section-label">Say</div>
+  <div class="say-text">Before we start, I want to tell you why I built this.<br><br>
+When I was starting out as a Filipino bookkeeper, I looked everywhere for training that would actually prepare me for US clients. And what I found was either — pure theory with no practice, or generic YouTube tutorials that had nothing to do with how real US bookkeeping works.<br><br>
+<strong>Nobody was simulating the actual work.</strong> Nobody was saying: "Here's a real US bank statement — now reconcile it." "Here's a messy set of books — now find the 14 errors." "Here's an angry client message — now what do you say?"<br><br>
+That's what I built. <strong>The Practice HUB is the training I wish I had.</strong> And now it's yours. 💛</div></div>
+  <div class="section tip"><div class="section-label">Personal Touch</div>
+  <div class="tip-text"><strong>Add your own story here.</strong> When did you start? What was your first US client experience like? What was the moment you realized Filipino bookkeepers needed better training? 1–2 sentences — authentic beats perfect every time.</div></div>
+</div>
+
+<!-- ══ SLIDE 2 — THE JOURNEY ══ -->
+<div class="slide-block" id="sb2">
+  <div class="slide-header">
+    <span class="slide-num">PART 3</span>
+    <span class="slide-name">The Full Journey — From Here to Certificate</span>
+    <span class="slide-time">2 min</span>
+    <span class="slide-total">4:00 – 6:00</span>
+  </div>
+  <div class="screen-cue"><span class="sc-icon">🖥️</span><div><strong>Optional screen share:</strong> Open <code>course-map.html</code> and show the student journey strip at the top. Point to each step as you talk.</div></div>
+  <div class="section say"><div class="section-label">Say</div>
+  <div class="say-text">Here's the complete journey for Phase 1.<br><br>
+<strong>Step 1 — Pre-Orientation.</strong> You read this before anything else. It's a self-paced page — 8 chapters covering the mental model behind US bookkeeping. Accounting equation, debit and credit logic, chart of accounts, how reports connect, and QBO navigation overview. 30–45 minutes. Students who read this first move much faster through the labs.<br><br>
+<strong>Step 2 — Lesson 0.</strong> A quick refresher right before you start your first lab. Interactive checklist — 6 items. All green before you enter S01.<br><br>
+<strong>Step 3 — 6 Labs.</strong> S01 through S06. One practice client throughout — Juan's Pet Paradise in San Antonio, Texas. Each lab has a simulator, a click map, and a full answer key.<br><br>
+<strong>Step 4 — Submit your labs.</strong> After each lab, you submit a screenshot of your QBO output. I review it.<br><br>
+<strong>Step 5 — Get your certificate.</strong> Complete all 6 labs, submit all outputs — you get your Phase 1 Personal Mastery certificate. PDF. Ready for your Upwork profile and LinkedIn. 🎓</div></div>
+</div>
+
+<!-- ══ SLIDE 3 — PRE-ORIENTATION ══ -->
+<div class="slide-block" id="sb3">
+  <div class="slide-header">
+    <span class="slide-num">PART 4</span>
+    <span class="slide-name">The Pre-Orientation Page</span>
+    <span class="slide-time">2 min</span>
+    <span class="slide-total">6:00 – 8:00</span>
+  </div>
+  <div class="screen-cue"><span class="sc-icon">🖥️</span><div><strong>Screen share:</strong> Open <code>pre-orientation.html</code>. Show Chapter 1 briefly, scroll to the DEAD CLIC debit/credit table, then scroll to the QBO overview section. Don't read it — just show it exists and looks good.</div></div>
+  <div class="section say"><div class="section-label">Say</div>
+  <div class="say-text">This is the Pre-Orientation page. I want to show you this because most bookkeeping courses just throw you into software without explaining the logic behind it first. And then students panic because they don't understand WHY they're doing what they're doing.<br><br>
+This page changes that. <strong>8 chapters. Self-paced. Read it at your own speed.</strong><br><br>
+Chapter 3 is my favorite — debit and credit logic. I use something called the DEAD CLIC method. Once you learn it, you never forget it. <em class="ph">[scroll to show the DEAD CLIC table]</em><br><br>
+Chapter 8 is the QBO overview — what each section of QBO does, and what your monthly workflow looks like. Read this and QBO will feel familiar before you even open it.<br><br>
+<strong>Please read this before you start Lesson 0.</strong> It makes everything else click.</div></div>
+</div>
+
+<!-- ══ SLIDE 4 — JUAN'S PET PARADISE ══ -->
+<div class="slide-block" id="sb4">
+  <div class="slide-header">
+    <span class="slide-num">PART 5</span>
+    <span class="slide-name">Meet Juan — Your Practice Client</span>
+    <span class="slide-time">2 min</span>
+    <span class="slide-total">8:00 – 10:00</span>
+  </div>
+  <div class="screen-cue"><span class="sc-icon">🖥️</span><div><strong>Optional:</strong> Open <code>s01-clickmap.html</code> and show the client strip at the top — Juan's Pet Paradise details.</div></div>
+  <div class="section say"><div class="section-label">Say</div>
+  <div class="say-text">Throughout all 6 labs, you'll work with one practice client — <strong>Juan's Pet Paradise in San Antonio, Texas.</strong><br><br>
+Juan runs a vet clinic, a grooming service, and a pet retail shop. He sells in-store and on Shopify. He has 3 W-2 employees and 2 contractors. And his books — let's just say — need a lot of attention. 😄<br><br>
+<strong>Why one client for all 6 labs?</strong> Because in real life, when you take on a bookkeeping client — you work with them for months. You get to know their business, their vendors, their customers, their patterns. Using the same client across all 6 labs gives you that real-world experience of building familiarity.<br><br>
+By S06 you'll know Juan's books better than he does. And that confidence — <strong>that's exactly what US clients are paying for.</strong></div></div>
+  <div class="section energy"><div class="section-label">Energy Note</div>
+  <div class="energy-text"><strong>Have fun with this part.</strong> Juan is a character students will spend a lot of time with. Make him feel real and relatable. The more they connect with the scenario, the more they stay engaged.</div></div>
+</div>
+
+<!-- ══ SLIDE 5 — THE 6 LABS ══ -->
+<div class="slide-block" id="sb5">
+  <div class="slide-header">
+    <span class="slide-num">PART 6</span>
+    <span class="slide-name">The 6 Labs — What You'll Practice</span>
+    <span class="slide-time">3 min</span>
+    <span class="slide-total">10:00 – 13:00</span>
+  </div>
+  <div class="screen-cue"><span class="sc-icon">🖥️</span><div><strong>Screen share:</strong> Briefly open each lab and show the hero section — just 5–10 seconds each. Don't go into the content — just show it exists and looks professional.</div></div>
+  <div class="section say"><div class="section-label">Say</div>
+  <div class="say-text"><strong>S01 — Bank Reconciliation.</strong> This is the #1 skill US clients test you on. Before they hire you, before they trust you — they will ask: "Can you reconcile my accounts?" After S01, your answer is yes. You'll work with Juan's real March 2024 bank statement, find three deliberate discrepancies, fix them, hit $0.00, and generate the reconciliation report.<br><br>
+<strong>S02 — AR/AP Mastery.</strong> Money coming in, money going out. 18 transactions — invoices, customer payments, vendor bills, three missing entries, aging reports. Juan calls you frustrated because his vendors are threatening to stop delivery. You fix it.<br><br>
+<strong>S03 — Inventory Basics.</strong> FIFO costing. Shopify plus in-store. What happens to COGS when one inventory layer runs out and you move to the next. Real stock adjustment for missing product.<br><br>
+<strong>S04 — US Payroll Simulator.</strong> The one everyone fears. W-2 employees. 1099 contractors. FICA, FUTA, Form 941. By the end of S04 — you can explain FICA to any US client in 30 seconds.<br><br>
+<strong>S05 — Cleanup Specialist.</strong> Someone else made the mess. You get paid to fix it. 14 real errors — personal expenses mixed with business, wrong categories, duplicates, missing entries. Before and after P&L showing $5,805 difference. This is one of the highest-paid bookkeeping services.<br><br>
+<strong>S06 — Client Crisis Mode.</strong> No numbers in this one — all judgment. IRS notice. Angry client at 10pm. Someone asks you to falsify a record. Scope creep. You find your own error. Five real scenarios. You'll know exactly what to say — and what never to say.</div></div>
+</div>
+
+<!-- ══ SLIDE 6 — CLICK MAPS ══ -->
+<div class="slide-block" id="sb6">
+  <div class="slide-header">
+    <span class="slide-num">PART 7</span>
+    <span class="slide-name">The Click Maps — Your QBO Guide</span>
+    <span class="slide-time">1 min</span>
+    <span class="slide-total">13:00 – 14:00</span>
+  </div>
+  <div class="screen-cue"><span class="sc-icon">🖥️</span><div><strong>Screen share:</strong> Open <code>s01-clickmap.html</code>. Show one click step — the numbered layout. Quick 20-second show.</div></div>
+  <div class="section say"><div class="section-label">Say</div>
+  <div class="say-text">With every lab comes a <strong>QBO Click Map.</strong> This is step-by-step — exactly where to click, in what order, what you should see after each click, and what the expected output is.<br><br>
+Most bookkeeping courses say "go reconcile" — and leave you staring at QBO not knowing where to start. <strong>Our click map tells you: click here, then here, then here. This is what you should see. If you see something different — here's why.</strong><br><br>
+You're not guessing. You're following a proven path. That's the Practice HUB difference.</div></div>
+</div>
+
+<!-- ══ SLIDE 7 — CERTIFICATE ══ -->
+<div class="slide-block" id="sb7">
+  <div class="slide-header">
+    <span class="slide-num">PART 8</span>
+    <span class="slide-name">The Certificate — Your Proof</span>
+    <span class="slide-time">1 min</span>
+    <span class="slide-total">14:00 – 15:00</span>
+  </div>
+  <div class="screen-cue"><span class="sc-icon">🖥️</span><div><strong>Screen share:</strong> Open <code>cert_phase1_personal_mastery.pdf</code>. Show it for 10–15 seconds. Let them see the finish line.</div></div>
+  <div class="section say"><div class="section-label">Say</div>
+  <div class="say-text">When you complete all 6 labs and submit all your outputs — you get this. <em class="ph">[show the certificate]</em><br><br>
+<strong>Phase 1 Personal Mastery — US Bookkeeping Foundation Certificate.</strong><br><br>
+This is not just a nice PDF. This is proof — to yourself and to your client — that you did the work. Put it on your Upwork profile. Put it on LinkedIn. When a US client asks "do you have any training?" — you have an answer.<br><br>
+<strong>This is your starting line for USD rates.</strong> 💛</div></div>
+</div>
+
+<!-- ══ SLIDE 8 — WHAT'S NEXT ══ -->
+<div class="slide-block" id="sb8">
+  <div class="slide-header">
+    <span class="slide-num">PART 9</span>
+    <span class="slide-name">What Comes After Phase 1</span>
+    <span class="slide-time">1 min</span>
+    <span class="slide-total">15:00 – 16:00</span>
+  </div>
+  <div class="section say"><div class="section-label">Say</div>
+  <div class="say-text">Phase 1 is your foundation. But it doesn't end there.<br><br>
+After Phase 1, you can go deeper with the <strong>Specialization Modules</strong> — where each topic gets the full advanced treatment. Or you can move straight to <strong>Phase 2 — Booked in USD</strong> — where you work on industry-specific US bookkeeping: e-commerce, Amazon FBA, service businesses, restaurants, and real estate.<br><br>
+Each phase builds on the last. <strong>By the time you finish Phase 2 — you are not a student anymore. You are a working US bookkeeper.</strong><br><br>
+But first — Phase 1. One step at a time. 💛</div></div>
+</div>
+
+<!-- ══ SLIDE 9 — CLOSE + CTA ══ -->
+<div class="slide-block" id="sb9">
+  <div class="slide-header">
+    <span class="slide-num">PART 10</span>
+    <span class="slide-name">Close — Your First Step Right Now</span>
+    <span class="slide-time">2 min</span>
+    <span class="slide-total">16:00 – 18:00</span>
+  </div>
+  <div class="section say"><div class="section-label">Say</div>
+  <div class="say-text">Okay — that's the full Phase 1 journey. 20 minutes and you now know exactly what you're getting into.<br><br>
+Here's what I want you to do right now — <strong>three things, in this order:</strong><br><br>
+<strong>One</strong> — Read the Pre-Orientation page. All 8 chapters. Don't skip it. The link is in your welcome message.<br><br>
+<strong>Two</strong> — Open Lesson 0. Do the ready checklist. All 6 items green before you start S01.<br><br>
+<strong>Three</strong> — Start S01. Your bank statement is waiting. Juan is waiting. 🐾<br><br>
+You have 30 days. That's enough time to finish all 6 labs comfortably — even if you only have 1–2 hours per week.<br><br>
+<strong>Mga estudyante na nagtapos ng Phase 1 — sila yung nakakakuha ng US clients.</strong> 'Yun lang ang difference. Tapusin mo ito.<br><br>
+I'll see you on the other side. 💛<br><br>
+— Ate Mic 🐾</div></div>
+  <div class="section pause"><div class="section-label">Closing Shot</div>
+  <div class="pause-text"><strong>After saying the last line — pause for 2 seconds, smile, then stop recording.</strong> Don't rush to click stop. Let there be a natural end. That pause makes the edit clean and the close feel warm.</div></div>
+  <div class="section tip"><div class="section-label">Post-Recording Checklist</div>
+  <div class="tip-text">
+    ✅ Watch back the first 30 seconds — does it sound natural?<br>
+    ✅ Can you hear yourself clearly? No echo?<br>
+    ✅ Upload to YouTube (Unlisted) or Google Drive<br>
+    ✅ Copy the link — this is what you send in the Day 0 welcome DM<br>
+    ✅ Add the link to <code>onboarding-sequence.html</code> Message 1
+  </div></div>
+</div>
+
+</div><!-- /content -->
+
+<div class="nav-btns">
+  <button class="nav-btn" onclick="prev()">← Previous</button>
+  <button class="nav-btn primary" onclick="next()">Next →</button>
+</div>
+
+<script>
+let cur=0;const total=10;
+function go(n,el){
+  document.querySelectorAll('.slide-block').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.slide-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('sb'+n).classList.add('active');
+  el.classList.add('active');
+  cur=n;
+  document.getElementById('pfill').style.width=((n/(total-1))*100)+'%';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function next(){if(cur<total-1){const tabs=document.querySelectorAll('.slide-tab');go(cur+1,tabs[cur+1]);}}
+function prev(){if(cur>0){const tabs=document.querySelectorAll('.slide-tab');go(cur-1,tabs[cur-1]);}}
+</script>
+</body>
+</html>
