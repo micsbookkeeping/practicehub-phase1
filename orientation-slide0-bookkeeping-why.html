@@ -89,6 +89,19 @@ body{
 .hero-divider span{color:var(--gold);font-size:1.2rem;opacity:0.5;}
 .hero-divider .line{height:1px;width:80px;background:linear-gradient(90deg,transparent,rgba(201,168,76,0.3),transparent);}
 
+/* ── AUDIO PLAYER ── */
+.audio-player{
+  background:var(--navy-mid);border:1px solid rgba(201,168,76,0.2);
+  border-radius:12px;padding:14px 18px;margin:0 auto 0;
+  display:flex;align-items:center;gap:14px;
+  max-width:700px;
+}
+.ap-icon{font-size:1.2rem;flex-shrink:0;}
+.ap-body{flex:1;min-width:0;}
+.ap-label{font-size:0.65rem;font-weight:700;letter-spacing:1.8px;text-transform:uppercase;color:var(--gold);margin-bottom:6px;}
+.ap-label span{color:var(--dim);font-weight:400;text-transform:none;letter-spacing:0;}
+audio.hero-audio{width:100%;height:32px;accent-color:var(--gold);}
+
 /* ── SECTION WRAPPER ── */
 .wrap{max-width:900px;margin:0 auto;padding:0 32px;}
 
@@ -297,6 +310,19 @@ body{
     <div class="line"></div>
     <span>🐾</span>
     <div class="line"></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════ -->
+<!-- AUDIO PLAYER -->
+<!-- ══════════════════════════════════════════ -->
+<div style="padding:32px 32px 0;max-width:900px;margin:0 auto;">
+  <div class="audio-player">
+    <div class="ap-icon">🎙️</div>
+    <div class="ap-body">
+      <div class="ap-label">Coach Mic — Before the Labs <span>· Listen first before reading through</span></div>
+      <audio class="hero-audio" controls src="Slide 0 — Before the Labs.mp3"></audio>
+    </div>
   </div>
 </div>
 
