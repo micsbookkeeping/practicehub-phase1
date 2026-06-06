@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>What Is Bookkeeping, Really? — Slide 0 | The Practice HUB Orientation</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#0d1b2a;--navy-mid:#1a2e45;--navy-light:#243b55;
+  --gold:#c9a84c;--gold-light:#e8c97a;--gold-pale:#f5e6b8;--gold-dim:rgba(201,168,76,0.15);
+  --white:#ffffff;--dim:#8ca0b8;--cream:#fdf8ee;
+  --green:#4caf7a;--green-lt:rgba(76,175,122,0.12);
+  --teal:#0d9488;--teal-lt:rgba(13,148,136,0.12);
+  --red:#e05555;--orange:#e8965a;
+  --border:rgba(255,255,255,0.07);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{
+  background:var(--navy);
+  font-family:'DM Sans',sans-serif;
+  color:var(--white);
+  min-height:100vh;
+  overflow-x:hidden;
+}
+
+/* ── PROGRESS BAR ── */
+#prog{position:fixed;top:0;left:0;height:3px;background:linear-gradient(90deg,var(--gold),var(--gold-light));z-index:999;transition:width 0.2s;}
+
+/* ── TOP BAR ── */
+.topbar{
+  position:sticky;top:3px;z-index:100;
+  background:rgba(13,27,42,0.95);
+  backdrop-filter:blur(16px);
+  border-bottom:1px solid var(--border);
+  padding:12px 32px;
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+}
+.tb-brand{font-family:'Playfair Display',serif;color:var(--gold);font-size:0.9rem;letter-spacing:1px;}
+.tb-label{font-size:0.7rem;letter-spacing:2px;text-transform:uppercase;color:var(--dim);}
+.tb-badge{
+  font-size:0.7rem;font-weight:600;padding:3px 12px;border-radius:20px;
+  background:var(--gold-dim);border:1px solid rgba(201,168,76,0.25);color:var(--gold-light);
+  letter-spacing:1px;text-transform:uppercase;
+}
+
+/* ── HERO ── */
+.hero{
+  background:var(--navy);
+  background-image:
+    radial-gradient(ellipse at 85% 10%,rgba(201,168,76,0.1) 0%,transparent 55%),
+    radial-gradient(ellipse at 15% 85%,rgba(13,148,136,0.08) 0%,transparent 55%),
+    radial-gradient(ellipse at 50% 50%,rgba(26,46,69,0.6) 0%,transparent 80%);
+  padding:72px 32px 56px;
+  text-align:center;
+  position:relative;
+  overflow:hidden;
+}
+.hero::before{
+  content:'';position:absolute;inset:0;
+  background-image:
+    repeating-linear-gradient(0deg,transparent,transparent 59px,rgba(255,255,255,0.015) 60px),
+    repeating-linear-gradient(90deg,transparent,transparent 59px,rgba(255,255,255,0.015) 60px);
+  pointer-events:none;
+}
+.hero-pill{
+  display:inline-flex;align-items:center;gap:8px;
+  background:rgba(201,168,76,0.08);border:1px solid rgba(201,168,76,0.2);
+  color:var(--gold-light);font-size:0.7rem;font-weight:600;
+  padding:5px 16px;border-radius:20px;letter-spacing:2px;text-transform:uppercase;
+  margin-bottom:24px;
+}
+.hero h1{
+  font-family:'Playfair Display',serif;
+  font-size:clamp(2rem,5vw,3.2rem);
+  font-weight:900;line-height:1.1;
+  color:var(--white);
+  margin-bottom:12px;
+}
+.hero h1 em{color:var(--gold);font-style:italic;}
+.hero-sub{
+  font-size:1rem;color:var(--dim);max-width:560px;margin:0 auto 32px;line-height:1.7;
+}
+.hero-sub strong{color:var(--white);}
+.hero-divider{
+  display:flex;align-items:center;gap:16px;justify-content:center;margin-bottom:0;
+}
+.hero-divider span{color:var(--gold);font-size:1.2rem;opacity:0.5;}
+.hero-divider .line{height:1px;width:80px;background:linear-gradient(90deg,transparent,rgba(201,168,76,0.3),transparent);}
+
+/* ── AUDIO PLAYER ── */
+.audio-player{
+  background:var(--navy-mid);border:1px solid rgba(201,168,76,0.2);
+  border-radius:12px;padding:14px 18px;margin:0 auto 0;
+  display:flex;align-items:center;gap:14px;
+  max-width:700px;
+}
+.ap-icon{font-size:1.2rem;flex-shrink:0;}
+.ap-body{flex:1;min-width:0;}
+.ap-label{font-size:0.65rem;font-weight:700;letter-spacing:1.8px;text-transform:uppercase;color:var(--gold);margin-bottom:6px;}
+.ap-label span{color:var(--dim);font-weight:400;text-transform:none;letter-spacing:0;}
+audio.hero-audio{width:100%;height:32px;accent-color:var(--gold);}
+
+/* ── SECTION WRAPPER ── */
+.wrap{max-width:900px;margin:0 auto;padding:0 32px;}
+
+/* ── SECTION LABELS ── */
+.sec-label{
+  display:flex;align-items:center;gap:10px;
+  margin:56px 0 24px;
+}
+.sec-label .line{flex:1;height:1px;background:var(--border);}
+.sec-label span{
+  font-size:0.65rem;letter-spacing:3px;text-transform:uppercase;font-weight:600;
+  color:var(--gold);padding:4px 14px;border-radius:20px;
+  background:var(--gold-dim);border:1px solid rgba(201,168,76,0.2);
+  white-space:nowrap;
+}
+
+/* ── DEFINITION CARD ── */
+.def-card{
+  background:var(--navy-mid);
+  border:1px solid var(--border);
+  border-top:3px solid var(--gold);
+  border-radius:16px;
+  padding:36px 40px;
+  position:relative;
+  overflow:hidden;
+}
+.def-card::after{
+  content:'"';
+  position:absolute;right:32px;top:-10px;
+  font-family:'Playfair Display',serif;
+  font-size:10rem;color:rgba(201,168,76,0.06);
+  line-height:1;pointer-events:none;
+}
+.def-card p{
+  font-size:1.15rem;line-height:1.85;color:#c5d5e8;
+  position:relative;z-index:1;
+}
+.def-card p strong{color:var(--white);}
+.def-card p em{color:var(--gold-light);font-style:normal;font-weight:600;}
+
+/* ── 3-COLUMN NOT GRID ── */
+.not-grid{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:16px;
+}
+.not-card{
+  background:var(--navy-mid);border:1px solid var(--border);border-radius:12px;
+  padding:24px;text-align:center;
+  position:relative;overflow:hidden;
+  transition:border-color 0.2s;
+}
+.not-card:hover{border-color:rgba(201,168,76,0.2);}
+.not-icon{font-size:2rem;margin-bottom:12px;display:block;filter:grayscale(0.3);}
+.not-title{
+  font-family:'Playfair Display',serif;font-size:1.05rem;font-weight:700;
+  color:var(--white);margin-bottom:8px;
+}
+.not-desc{font-size:0.82rem;color:var(--dim);line-height:1.65;}
+.not-cross{
+  position:absolute;top:12px;right:14px;
+  font-size:0.85rem;color:var(--red);font-weight:700;opacity:0.7;
+}
+.not-why{
+  font-size:0.75rem;color:rgba(224,85,85,0.8);
+  margin-top:10px;font-style:italic;line-height:1.5;
+}
+
+/* ── REAL ANSWER ── */
+.real-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.real-card{
+  background:var(--navy-mid);border:1px solid var(--border);
+  border-radius:14px;padding:28px;
+  display:flex;flex-direction:column;gap:10px;
+}
+.real-card.accent{
+  border-color:rgba(201,168,76,0.3);
+  background:linear-gradient(135deg,var(--navy-mid),rgba(201,168,76,0.04));
+}
+.rc-eyebrow{
+  font-size:0.65rem;letter-spacing:2px;text-transform:uppercase;
+  font-weight:700;color:var(--gold);
+}
+.rc-heading{
+  font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:700;
+  color:var(--white);line-height:1.3;
+}
+.rc-body{font-size:0.85rem;color:var(--dim);line-height:1.7;}
+.rc-body strong{color:var(--white);}
+
+/* ── ANALOGY STRIP ── */
+.analogy{
+  background:var(--navy-mid);border:1px solid rgba(201,168,76,0.2);
+  border-left:4px solid var(--gold);border-radius:0 12px 12px 0;
+  padding:24px 28px;
+  display:flex;align-items:flex-start;gap:16px;
+  margin:0;
+}
+.analogy-icon{font-size:2rem;flex-shrink:0;margin-top:2px;}
+.analogy-body{}
+.analogy-label{
+  font-size:0.65rem;letter-spacing:2px;text-transform:uppercase;
+  font-weight:700;color:var(--gold);margin-bottom:6px;
+}
+.analogy-text{font-size:0.92rem;color:#c5d5e8;line-height:1.75;}
+.analogy-text strong{color:var(--white);}
+.analogy-text em{color:var(--gold-light);font-style:normal;}
+
+/* ── 4-PILLAR GRID ── */
+.pillar-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
+.pillar{
+  background:var(--navy-mid);border:1px solid var(--border);
+  border-radius:12px;padding:20px 16px;text-align:center;
+  transition:transform 0.2s,border-color 0.2s;
+}
+.pillar:hover{transform:translateY(-3px);border-color:rgba(201,168,76,0.25);}
+.pillar-num{
+  font-family:'DM Mono',monospace;font-size:0.65rem;
+  color:var(--gold);letter-spacing:2px;margin-bottom:8px;
+}
+.pillar-icon{font-size:1.6rem;margin-bottom:8px;display:block;}
+.pillar-name{font-size:0.85rem;font-weight:600;color:var(--white);margin-bottom:6px;}
+.pillar-desc{font-size:0.75rem;color:var(--dim);line-height:1.55;}
+
+/* ── THE PROMISE BOX ── */
+.promise{
+  background:linear-gradient(135deg,var(--navy-mid),rgba(201,168,76,0.06));
+  border:1px solid rgba(201,168,76,0.25);border-radius:16px;
+  padding:40px;text-align:center;
+  position:relative;overflow:hidden;
+  margin-bottom:56px;
+}
+.promise::before{
+  content:'🐾';
+  position:absolute;right:28px;bottom:20px;
+  font-size:5rem;opacity:0.06;line-height:1;
+}
+.promise h3{
+  font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:700;
+  color:var(--gold-light);margin-bottom:14px;
+}
+.promise p{font-size:0.9rem;color:var(--dim);line-height:1.8;max-width:600px;margin:0 auto 20px;}
+.promise p strong{color:var(--white);}
+.promise-cta{
+  display:inline-flex;align-items:center;gap:8px;
+  background:var(--gold);color:var(--navy);
+  font-family:'DM Sans';font-weight:700;font-size:0.85rem;
+  padding:12px 28px;border-radius:10px;text-decoration:none;
+  border:none;cursor:pointer;transition:background 0.2s;
+}
+.promise-cta:hover{background:var(--gold-light);}
+
+/* ── TIMELINE STRIP ── */
+.timeline{
+  display:flex;align-items:stretch;gap:0;
+  background:var(--navy-mid);border:1px solid var(--border);border-radius:14px;
+  overflow:hidden;
+}
+.tl-item{
+  flex:1;padding:20px 18px;border-right:1px solid var(--border);
+  display:flex;flex-direction:column;gap:6px;
+}
+.tl-item:last-child{border-right:none;}
+.tl-step{
+  font-family:'DM Mono',monospace;font-size:0.65rem;
+  color:var(--gold);letter-spacing:2px;
+}
+.tl-name{font-size:0.82rem;font-weight:600;color:var(--white);}
+.tl-tag{
+  font-size:0.7rem;padding:2px 8px;border-radius:8px;width:fit-content;
+  background:rgba(201,168,76,0.1);color:var(--gold-light);
+}
+.tl-tag.active{background:rgba(76,175,122,0.15);color:#6fcf97;}
+
+/* ── FADE IN ── */
+.fi{opacity:0;transform:translateY(20px);transition:opacity 0.5s ease,transform 0.5s ease;}
+.fi.vis{opacity:1;transform:none;}
+
+@media(max-width:700px){
+  .not-grid{grid-template-columns:1fr;}
+  .real-grid{grid-template-columns:1fr;}
+  .pillar-grid{grid-template-columns:repeat(2,1fr);}
+  .timeline{flex-direction:column;}
+  .tl-item{border-right:none;border-bottom:1px solid var(--border);}
+  .tl-item:last-child{border-bottom:none;}
+}
+</style>
+</head>
+<body>
+
+<div id="prog"></div>
+
+<div class="topbar">
+  <div class="tb-brand">🐾 The Practice HUB</div>
+  <div class="tb-label">Orientation · Slide 0</div>
+  <div class="tb-badge">Before We Begin</div>
+</div>
+
+<!-- ══════════════════════════════════════════ -->
+<!-- HERO -->
+<!-- ══════════════════════════════════════════ -->
+<div class="hero">
+  <div class="hero-pill">Slide 0 — Before the Labs</div>
+  <h1>What Is Bookkeeping,<br><em>Really?</em></h1>
+  <p class="hero-sub">Not QBO. Not reconciliation. Not AI.<br>
+  <strong>Once you understand the WHY — every lab you'll do here becomes easier.</strong></p>
+  <div class="hero-divider">
+    <div class="line"></div>
+    <span>🐾</span>
+    <div class="line"></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════ -->
+<!-- AUDIO PLAYER -->
+<!-- ══════════════════════════════════════════ -->
+<div style="padding:32px 32px 0;max-width:900px;margin:0 auto;">
+  <div class="audio-player">
+    <div class="ap-icon">🎙️</div>
+    <div class="ap-body">
+      <div class="ap-label">Coach Mic — Before the Labs <span>· Listen first before reading through</span></div>
+      <audio class="hero-audio" controls src="Slide 0 — Before the Labs.mp3"></audio>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════ -->
+<!-- BODY -->
+<!-- ══════════════════════════════════════════ -->
+<div class="wrap">
+
+  <!-- DEFINITION -->
+  <div class="sec-label fi">
+    <div class="line"></div><span>The Real Definition</span><div class="line"></div>
+  </div>
+  <div class="def-card fi">
+    <p>Bookkeeping is <strong>the systematic recording of every financial event in a business</strong> — so that at any moment, the owner and their accountant can answer three questions: <em>How much did we make?</em> <em>How much do we owe?</em> <em>How much do we have?</em><br><br>
+    That's it. Everything else — QBO, reconciliation, journal entries, FIFO, payroll — those are all just <strong>tools and methods for answering those three questions accurately.</strong></p>
+  </div>
+
+  <!-- WHAT IT IS NOT -->
+  <div class="sec-label fi">
+    <div class="line"></div><span>What It Is Not</span><div class="line"></div>
+  </div>
+  <div class="not-grid fi">
+    <div class="not-card">
+      <div class="not-cross">✗</div>
+      <span class="not-icon">💻</span>
+      <div class="not-title">QBO</div>
+      <div class="not-desc">QuickBooks Online is a tool. A very good one. But bookkeeping existed for 500 years before any software was invented.</div>
+      <div class="not-why">Knowing where to click is not the same as knowing what you're doing.</div>
+    </div>
+    <div class="not-card">
+      <div class="not-cross">✗</div>
+      <span class="not-icon">🔁</span>
+      <div class="not-title">Reconciliation</div>
+      <div class="not-desc">Reconciling is one step in the accounting cycle — Step 7 of 8. It's a verification method, not the whole picture.</div>
+      <div class="not-why">It's how you prove accuracy. Not how you create it.</div>
+    </div>
+    <div class="not-card">
+      <div class="not-cross">✗</div>
+      <span class="not-icon">🤖</span>
+      <div class="not-title">AI</div>
+      <div class="not-desc">AI can help you write faster, classify smarter, and spot patterns. But AI cannot judge whether a transaction is correct without you understanding it first.</div>
+      <div class="not-why">Smart not lazy — AI assists the bookkeeper, it doesn't replace the judgment.</div>
+    </div>
+  </div>
+
+  <!-- WHAT IT ACTUALLY IS -->
+  <div class="sec-label fi">
+    <div class="line"></div><span>What It Actually Is</span><div class="line"></div>
+  </div>
+  <div class="real-grid fi">
+    <div class="real-card accent">
+      <div class="rc-eyebrow">At its core</div>
+      <div class="rc-heading">Bookkeeping is translation.</div>
+      <div class="rc-body">A business owner lives in the real world — sales happen, bills arrive, employees get paid, suppliers deliver. <strong>Your job is to translate those real-world events into a language that financial reports can read.</strong><br><br>Every receipt is a sentence. Every journal entry is a paragraph. The financial statements — P&L, Balance Sheet, Cash Flow — those are the complete story. You write that story. Accurately.</div>
+    </div>
+    <div class="real-card">
+      <div class="rc-eyebrow">In practice</div>
+      <div class="rc-heading">Bookkeeping is trust.</div>
+      <div class="rc-body">When a US client hands you their QBO login, they are trusting you with the financial truth of their business. Their tax returns depend on your accuracy. Their business decisions depend on your reports. Their relationship with their CPA depends on the quality of your work.<br><br><strong>That's not a small thing. That's a professional responsibility.</strong> The labs in this HUB are designed to train that responsibility — not just the clicks.</div>
+    </div>
+  </div>
+
+  <!-- ANALOGY -->
+  <div class="sec-label fi">
+    <div class="line"></div><span>The Analogy That Makes It Click</span><div class="line"></div>
+  </div>
+  <div class="analogy fi">
+    <div class="analogy-icon">✈️</div>
+    <div class="analogy-body">
+      <div class="analogy-label">Think of it this way</div>
+      <div class="analogy-text">A pilot doesn't say <em>"I know how to fly because I know what all the buttons do."</em> A pilot says <em>"I know how to fly because I understand what the plane is doing and why — and the instruments help me see it."</em><br><br>
+      <strong>You are the pilot. The accounting equation is the physics of flight. QBO is your instrument panel.</strong> The labs in The Practice HUB are your flight simulator — real scenarios, real consequences, no actual crashes.<br><br>
+      Every flight sim session makes the real thing less scary. That's exactly what we're building here.</div>
+    </div>
+  </div>
+
+  <!-- 4 PILLARS -->
+  <div class="sec-label fi">
+    <div class="line"></div><span>The 4 Things a Bookkeeper Actually Does</span><div class="line"></div>
+  </div>
+  <div class="pillar-grid fi">
+    <div class="pillar">
+      <div class="pillar-num">01</div>
+      <span class="pillar-icon">📥</span>
+      <div class="pillar-name">Record</div>
+      <div class="pillar-desc">Every transaction that happens in the business gets captured — sales, expenses, payroll, payments.</div>
+    </div>
+    <div class="pillar">
+      <div class="pillar-num">02</div>
+      <span class="pillar-icon">🗂️</span>
+      <div class="pillar-name">Classify</div>
+      <div class="pillar-desc">Put each transaction in the right bucket — the right account, the right category, the right period.</div>
+    </div>
+    <div class="pillar">
+      <div class="pillar-num">03</div>
+      <span class="pillar-icon">✅</span>
+      <div class="pillar-name">Verify</div>
+      <div class="pillar-desc">Prove that what's in QBO matches reality — the bank statement, the invoices, the receipts.</div>
+    </div>
+    <div class="pillar">
+      <div class="pillar-num">04</div>
+      <span class="pillar-icon">📊</span>
+      <div class="pillar-name">Report</div>
+      <div class="pillar-desc">Produce financial statements that tell the business owner and their CPA the true financial story.</div>
+    </div>
+  </div>
+
+  <!-- WHERE YOU'LL PRACTICE EACH -->
+  <div class="sec-label fi">
+    <div class="line"></div><span>Where You Practice Each One</span><div class="line"></div>
+  </div>
+  <div class="timeline fi">
+    <div class="tl-item">
+      <div class="tl-step">S01</div>
+      <div class="tl-name">Bank Reconciliation</div>
+      <div class="tl-tag active">Verify</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-step">S02</div>
+      <div class="tl-name">AR / AP Mastery</div>
+      <div class="tl-tag active">Record + Classify</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-step">S03</div>
+      <div class="tl-name">Inventory & FIFO</div>
+      <div class="tl-tag active">Classify + Verify</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-step">S04</div>
+      <div class="tl-name">US Payroll</div>
+      <div class="tl-tag active">Record + Report</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-step">S05</div>
+      <div class="tl-name">Cleanup Specialist</div>
+      <div class="tl-tag active">All Four</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-step">S06</div>
+      <div class="tl-name">Client Crisis Mode</div>
+      <div class="tl-tag" style="background:rgba(232,150,90,0.15);color:#f0b080;">Professional Judgment</div>
+    </div>
+  </div>
+
+  <!-- PROMISE BOX -->
+  <div class="sec-label fi">
+    <div class="line"></div><span>The Promise of This Program</span><div class="line"></div>
+  </div>
+  <div class="promise fi">
+    <h3>By the end of Phase 1, you won't just know how to click through QBO.</h3>
+    <p>You'll understand <strong>why every entry exists, what it affects, and what it proves.</strong> When a US client sends you a confusing Stripe payout, you'll know what account it belongs to. When your reconciliation doesn't hit zero, you'll know how to find the gap — not panic.<br><br>
+    That's the difference between someone who took a QBO tutorial and <strong>a bookkeeper a US client trusts with their business.</strong></p>
+    <button class="promise-cta" onclick="window.location.href='lesson0-phase1.html'">Continue to Lesson 0 → Quick Recall →</button>
+  </div>
+
+</div><!-- /wrap -->
+
+<script>
+// Progress bar
+window.addEventListener('scroll',()=>{
+  const p=(window.scrollY/(document.documentElement.scrollHeight-window.innerHeight))*100;
+  document.getElementById('prog').style.width=p+'%';
+});
+// Fade in on scroll
+const obs=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('vis');});
+},{threshold:0.08});
+document.querySelectorAll('.fi').forEach(el=>obs.observe(el));
+</script>
+</body>
+</html>
