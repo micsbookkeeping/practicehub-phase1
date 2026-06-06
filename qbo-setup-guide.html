@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QBO Setup Guide — Juan's Pet Paradise | Phase 1 · The Practice HUB</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#0f172a;--navy-mid:#1e293b;--gold:#fbbf24;--gold-dark:#d97706;--gold-pale:#fef9ee;
+  --teal:#0d9488;--teal-lt:#ccfbf1;--teal-mid:#0f766e;
+  --soft-bg:#f8fafc;--white:#ffffff;--text-main:#1e293b;--text-mid:#475569;--text-muted:#64748b;--border:#e2e8f0;
+  --green:#16a34a;--green-lt:#dcfce7;--red:#ef4444;--red-lt:#fee2e2;
+  --blue:#3b82f6;--blue-lt:#dbeafe;--orange:#ea580c;--orange-lt:#ffedd5;
+  --purple:#7c3aed;--purple-lt:#ede9fe;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{font-family:'Plus Jakarta Sans',sans-serif;color:var(--text-main);background:var(--soft-bg);line-height:1.65;}
+#prog{position:fixed;top:0;left:0;height:3px;width:0;background:linear-gradient(90deg,var(--teal),var(--gold));z-index:999;transition:width 0.1s;}
+
+header{background:rgba(255,255,255,0.97);border-bottom:1px solid var(--border);padding:14px 0;position:sticky;top:3px;z-index:100;backdrop-filter:blur(12px);}
+.hdr{max-width:960px;margin:0 auto;padding:0 28px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;}
+.logo{font-family:'Sora';font-weight:800;color:var(--navy);font-size:1rem;text-decoration:none;}
+.logo span{color:var(--gold);}
+.hdr-badge{background:var(--teal-lt);border:1px solid rgba(13,148,136,0.25);color:var(--teal-mid);font-size:0.72rem;font-weight:700;padding:4px 12px;border-radius:20px;}
+
+.hero{background:var(--navy);padding:52px 28px 44px;text-align:center;}
+.hero-inner{max-width:720px;margin:0 auto;}
+.hero-pill{display:inline-flex;align-items:center;gap:8px;background:rgba(13,148,136,0.15);border:1px solid rgba(13,148,136,0.3);color:#5eead4;font-size:0.72rem;font-weight:700;padding:5px 14px;border-radius:20px;letter-spacing:1px;text-transform:uppercase;margin-bottom:18px;}
+.hero h1{font-family:'Sora';font-weight:800;font-size:clamp(1.6rem,4vw,2.4rem);color:var(--white);margin-bottom:10px;line-height:1.15;}
+.hero h1 .accent{color:var(--gold);}
+.hero-sub{font-size:0.88rem;color:#94a3b8;max-width:560px;margin:0 auto 24px;line-height:1.75;}
+.hero-sub strong{color:var(--white);}
+.hero-stats{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;}
+.h-stat{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:10px 18px;font-size:0.78rem;color:#94a3b8;}
+.h-stat strong{color:var(--gold);display:block;font-size:0.95rem;font-family:'Sora';}
+
+.how-strip{background:var(--gold-pale);border-bottom:1px solid rgba(251,191,36,0.25);padding:14px 28px;}
+.how-inner{max-width:960px;margin:0 auto;display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
+.how-text{font-size:0.83rem;color:var(--text-mid);line-height:1.6;}
+.how-text strong{color:var(--navy);}
+
+.main{max-width:960px;margin:0 auto;padding:40px 28px 80px;}
+
+/* PARTS */
+.part{margin-bottom:44px;}
+.part-header{display:flex;align-items:center;gap:14px;margin-bottom:20px;padding-bottom:14px;border-bottom:2px solid var(--border);}
+.part-num{width:42px;height:42px;border-radius:12px;font-family:'Sora';font-size:1rem;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.pn-teal{background:var(--teal-lt);color:var(--teal-mid);}
+.pn-blue{background:var(--blue-lt);color:var(--blue);}
+.pn-green{background:var(--green-lt);color:var(--green);}
+.pn-orange{background:var(--orange-lt);color:var(--orange);}
+.pn-purple{background:var(--purple-lt);color:var(--purple);}
+.pn-gold{background:var(--gold-pale);color:var(--gold-dark);}
+.part-title{font-family:'Sora';font-size:1.05rem;font-weight:800;color:var(--navy);}
+.part-sub{font-size:0.8rem;color:var(--text-muted);margin-top:2px;}
+.part-badge{margin-left:auto;font-size:0.72rem;font-weight:700;padding:4px 12px;border-radius:20px;white-space:nowrap;}
+
+/* STEPS */
+.steps{display:flex;flex-direction:column;gap:10px;}
+.step{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:16px 20px;display:flex;align-items:flex-start;gap:16px;}
+.step.key{border-left:3px solid var(--gold-dark);background:var(--gold-pale);}
+.step.warn{border-left:3px solid var(--orange);}
+.step.note{border-left:3px solid var(--blue);}
+.step-num{min-width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'DM Mono';font-size:0.78rem;font-weight:500;flex-shrink:0;margin-top:1px;}
+.sn-teal{background:var(--teal-lt);color:var(--teal-mid);}
+.sn-blue{background:var(--blue-lt);color:var(--blue);}
+.sn-green{background:var(--green-lt);color:var(--green);}
+.sn-orange{background:var(--orange-lt);color:var(--orange);}
+.sn-purple{background:var(--purple-lt);color:var(--purple);}
+.sn-gold{background:var(--gold-pale);color:var(--gold-dark);}
+.step-body{flex:1;}
+.step-action{font-size:0.9rem;font-weight:600;color:var(--navy);margin-bottom:4px;}
+.step-detail{font-size:0.82rem;color:var(--text-mid);line-height:1.6;}
+.step-detail strong{color:var(--navy);}
+.step-tag{display:inline-block;font-size:0.68rem;font-weight:700;padding:2px 8px;border-radius:10px;margin-top:6px;}
+.st-click{background:var(--blue-lt);color:var(--blue);}
+.st-type{background:var(--teal-lt);color:var(--teal-mid);}
+.st-note{background:var(--gold-pale);color:var(--gold-dark);}
+.st-check{background:var(--green-lt);color:var(--green);}
+
+/* QBO PATH */
+.qbo-path{background:var(--navy-mid);border-radius:10px;padding:14px 18px;margin-top:10px;font-family:'DM Mono';font-size:0.8rem;color:#e2e8f0;line-height:2;}
+.qbo-path .arrow{color:var(--gold);margin:0 6px;}
+.qbo-path .click{color:#93c5fd;background:rgba(59,130,246,0.15);padding:2px 8px;border-radius:4px;}
+.qbo-path .type{color:#86efac;background:rgba(22,163,74,0.15);padding:2px 8px;border-radius:4px;}
+
+/* INFO BOX */
+.info-box{background:var(--white);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin:12px 0;}
+.info-head{padding:10px 16px;font-size:0.72rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;}
+.ib-gold{background:var(--gold-pale);color:var(--gold-dark);}
+.ib-teal{background:var(--teal-lt);color:var(--teal-mid);}
+.ib-blue{background:var(--blue-lt);color:var(--blue);}
+.ib-green{background:var(--green-lt);color:var(--green);}
+.info-body{padding:14px 16px;}
+.info-row{display:flex;justify-content:space-between;align-items:flex-start;padding:7px 0;border-bottom:1px solid var(--border);font-size:0.82rem;gap:16px;}
+.info-row:last-child{border:none;}
+.ir-label{color:var(--text-muted);font-weight:500;flex-shrink:0;min-width:160px;}
+.ir-value{color:var(--navy);font-weight:600;font-family:'DM Mono';font-size:0.8rem;text-align:right;}
+.ir-value.mono{font-family:'DM Mono';}
+
+/* COA TABLE */
+.coa-table{width:100%;border-collapse:collapse;font-size:0.8rem;background:var(--white);border-radius:12px;overflow:hidden;border:1px solid var(--border);}
+.coa-table th{padding:9px 12px;text-align:left;font-size:0.68rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--white);}
+.coa-table td{padding:8px 12px;border-bottom:1px solid var(--border);vertical-align:middle;}
+.coa-table tr:last-child td{border:none;}
+.coa-table tr:hover td{background:var(--soft-bg);}
+.section-row td{font-family:'Sora';font-size:0.7rem;font-weight:800;letter-spacing:2px;text-transform:uppercase;padding:10px 12px 6px;}
+.at-asset .section-row td{color:var(--blue);background:rgba(59,130,246,0.04);}
+.at-liability .section-row td{color:var(--red);background:rgba(239,68,68,0.04);}
+.at-equity .section-row td{color:var(--purple);background:rgba(124,58,237,0.04);}
+.at-income .section-row td{color:var(--green);background:rgba(22,163,74,0.04);}
+.at-expense .section-row td{color:var(--orange);background:rgba(234,88,12,0.04);}
+.acc-num{font-family:'DM Mono';color:var(--text-muted);font-size:0.75rem;}
+.acc-name{font-weight:600;color:var(--navy);}
+.acc-type{font-size:0.72rem;padding:2px 8px;border-radius:8px;font-weight:600;}
+.at-bank{background:var(--blue-lt);color:var(--blue);}
+.at-ar{background:var(--green-lt);color:var(--green);}
+.at-inv{background:rgba(245,158,11,0.1);color:#b45309;}
+.at-fix{background:var(--purple-lt);color:var(--purple);}
+.at-ap{background:var(--red-lt);color:var(--red);}
+.at-cc{background:rgba(239,68,68,0.08);color:var(--red);}
+.at-tax{background:rgba(234,88,12,0.1);color:var(--orange);}
+.at-eq{background:var(--purple-lt);color:var(--purple);}
+.at-rev{background:var(--green-lt);color:var(--green);}
+.at-cogs{background:rgba(245,158,11,0.1);color:#b45309;}
+.at-exp{background:var(--orange-lt);color:var(--orange);}
+.at-other{background:var(--teal-lt);color:var(--teal-mid);}
+
+/* NOTE BOX */
+.note-box{border-radius:10px;padding:14px 18px;font-size:0.83rem;display:flex;gap:10px;margin:10px 0;line-height:1.65;}
+.nb-gold{background:var(--gold-pale);border:1px solid rgba(251,191,36,0.3);}
+.nb-blue{background:var(--blue-lt);border:1px solid rgba(59,130,246,0.2);}
+.nb-green{background:var(--green-lt);border:1px solid rgba(22,163,74,0.2);}
+.nb-orange{background:var(--orange-lt);border:1px solid rgba(234,88,12,0.2);}
+.note-icon{font-size:1.1rem;flex-shrink:0;}
+.note-text{color:var(--text-mid);}
+.note-text strong{color:var(--navy);}
+
+/* CTA */
+.cta-block{background:var(--navy);border-radius:16px;padding:32px 36px;margin-top:44px;text-align:center;}
+.cta-block h2{font-family:'Sora';font-size:1.2rem;font-weight:800;color:var(--white);margin-bottom:8px;}
+.cta-block h2 span{color:var(--gold);}
+.cta-block p{font-size:0.88rem;color:#94a3b8;margin-bottom:20px;}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:12px 24px;border-radius:10px;font-family:'Sora';font-size:0.85rem;font-weight:700;text-decoration:none;cursor:pointer;border:none;}
+.btn-gold{background:var(--gold);color:var(--navy);}
+.btn-gold:hover{background:var(--gold-dark);color:var(--white);}
+
+.fi{opacity:0;transform:translateY(18px);transition:opacity 0.45s ease,transform 0.45s ease;}
+.fi.vis{opacity:1;transform:none;}
+
+/* ── FOLLOW ALONG BANNER ── */
+.follow-banner{background:var(--navy);border-bottom:3px solid var(--gold);padding:10px 28px;display:flex;align-items:center;gap:12px;}
+.fb-text{font-size:0.8rem;color:#e2e8f0;line-height:1.5;flex:1;}
+.fb-text strong{color:var(--gold);}
+.fb-badge{background:rgba(251,191,36,0.15);border:1px solid rgba(251,191,36,0.3);color:var(--gold);font-size:0.7rem;font-weight:700;padding:4px 10px;border-radius:20px;white-space:nowrap;}
+
+/* ── AUDIO PLAYER ── */
+.audio-player{background:var(--navy);border-radius:10px;padding:12px 16px;margin-bottom:16px;display:flex;align-items:center;gap:12px;}
+.ap-body{flex:1;}
+.ap-label{font-size:0.68rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--gold);margin-bottom:6px;}
+.ap-label span{color:rgba(255,255,255,0.5);font-weight:400;text-transform:none;letter-spacing:0;}
+audio.guide-audio{width:100%;height:32px;accent-color:var(--gold);}
+</style>
+</head>
+<body>
+<div id="prog"></div>
+
+<header>
+  <div class="hdr">
+    <a class="logo" href="#">The Practice <span>HUB</span></a>
+    <div style="font-size:0.78rem;color:var(--text-muted);">Phase 1 › <strong style="color:var(--text-main)">QBO Setup — Before S01</strong></div>
+    <div class="hdr-badge">⚙️ Setup Guide</div>
+  </div>
+</header>
+
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-pill">⚙️ Do This Before S01</div>
+    <h1>Set Up <span class="accent">Juan's Pet Paradise</span><br>in QBO</h1>
+    <p class="hero-sub">Complete company setup + Chart of Accounts. <strong>Every lab — S01 through S06 — runs inside this one QBO file.</strong> Set it up once, use it for all six modules.</p>
+    <div class="hero-stats">
+      <div class="h-stat"><strong>2 Parts</strong>Company + COA</div>
+      <div class="h-stat"><strong>~20 min</strong>Setup Time</div>
+      <div class="h-stat"><strong>1 QBO File</strong>Used for S01–S06</div>
+      <div class="h-stat"><strong>Do Once</strong>Never Again</div>
+    </div>
+  </div>
+</div>
+
+<div class="how-strip">
+  <div class="how-inner">
+    <div style="font-size:1.4rem;flex-shrink:0;">⚠️</div>
+    <div class="how-text"><strong>Do this before opening any lab.</strong> S01–S06 all assume Juan's Pet Paradise is already set up in QBO with the correct Chart of Accounts. If you skip this step, transactions will have nowhere to go and reconciliation will not work.</div>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- FOLLOW ALONG BANNER -->
+  <div class="follow-banner" style="border-radius:10px;margin-bottom:20px;">
+    <div style="font-size:1.2rem;flex-shrink:0;">🖥️</div>
+    <div class="fb-text"><strong>Follow Along:</strong> Open your QBO beside this window. Do each step in YOUR QBO as you listen. Learn bookkeeping by doing bookkeeping. 💛</div>
+    <div class="fb-badge">QBO Open → Follow Along</div>
+  </div>
+
+<!-- ============================================================ -->
+<!-- PART 1 — COMPANY INFO -->
+<!-- ============================================================ -->
+<div class="part fi">
+  <div class="audio-player">
+    <div style="font-size:1.1rem;flex-shrink:0;">🎙️</div>
+    <div class="ap-body">
+      <div class="ap-label">Coach Mic — Create the QBO Company <span>· Listen first, then follow the steps below</span></div>
+      <audio class="guide-audio" controls src="QBO-SET-Up-Create-the-QBO-Company.mp3"></audio>
+    </div>
+  </div>
+  <div class="part-header">
+    <div class="part-num pn-teal">1</div>
+    <div>
+      <div class="part-title">Create the QBO Company</div>
+      <div class="part-sub">Enter exactly as shown — all labs reference these details</div>
+    </div>
+    <div class="part-badge" style="background:var(--teal-lt);color:var(--teal-mid);">~5 min</div>
+  </div>
+
+  <!-- ALL COMPANY DETAILS -->
+  <div class="info-box fi">
+    <div class="info-head ib-teal">📋 Company Details — Enter Exactly As Shown</div>
+    <div class="info-body">
+      <div class="info-row"><span class="ir-label">Company Name</span><span class="ir-value">Juan's Pet Paradise</span></div>
+      <div class="info-row"><span class="ir-label">Industry</span><span class="ir-value">Pet Care Services</span></div>
+      <div class="info-row"><span class="ir-label">Business Type</span><span class="ir-value">Sole Proprietorship</span></div>
+      <div class="info-row"><span class="ir-label">Tax Form</span><span class="ir-value">Schedule C (Form 1040)</span></div>
+      <div class="info-row"><span class="ir-label">Accounting Method</span><span class="ir-value">Accrual</span></div>
+      <div class="info-row"><span class="ir-label">Fiscal Year Start</span><span class="ir-value">January</span></div>
+      <div class="info-row"><span class="ir-label">First Month of Income Tax Year</span><span class="ir-value">January</span></div>
+      <div class="info-row"><span class="ir-label">Address</span><span class="ir-value">123 Commerce Blvd, San Antonio, TX 78201</span></div>
+      <div class="info-row"><span class="ir-label">Phone</span><span class="ir-value">(210) 555-0147</span></div>
+      <div class="info-row"><span class="ir-label">Email</span><span class="ir-value">juan@juanspetparadise.com</span></div>
+      <div class="info-row"><span class="ir-label">EIN (Practice Only)</span><span class="ir-value">47-1234567</span></div>
+      <div class="info-row"><span class="ir-label">State</span><span class="ir-value">Texas</span></div>
+      <div class="info-row"><span class="ir-label">Currency</span><span class="ir-value">USD — US Dollar</span></div>
+    </div>
+  </div>
+
+  <div class="steps">
+    <div class="step fi">
+      <div class="step-num sn-teal">1</div>
+      <div class="step-body">
+        <div class="step-action">Go to quickbooks.intuit.com → Start Free Trial (or sign in)</div>
+        <div class="step-detail">Use your existing QBO account or create a new trial. Select <strong>QuickBooks Online Simple Start or Essentials</strong> — either works for all Phase 1 labs.</div>
+        <span class="step-tag st-click">🖱️ Click</span>
+      </div>
+    </div>
+    <div class="step fi">
+      <div class="step-num sn-teal">2</div>
+      <div class="step-body">
+        <div class="step-action">Create a new company → "Juan's Pet Paradise"</div>
+        <div class="step-detail">From the QBO dashboard: <strong>Settings ⚙️ → New Company</strong> (or use the company switcher top-left). Enter all details from the table above exactly as shown.</div>
+        <div class="qbo-path">
+          <span class="click">Settings ⚙️</span> <span class="arrow">→</span>
+          <span class="click">New Company</span> <span class="arrow">→</span>
+          Enter company name: <span class="type">Juan's Pet Paradise</span> <span class="arrow">→</span>
+          Industry: <span class="type">Pet Care Services</span> <span class="arrow">→</span>
+          Business type: <span class="type">Sole Proprietorship</span> <span class="arrow">→</span>
+          <span class="click">Next</span>
+        </div>
+        <span class="step-tag st-click">🖱️ Click</span>
+      </div>
+    </div>
+    <div class="step fi">
+      <div class="step-num sn-teal">3</div>
+      <div class="step-body">
+        <div class="step-action">Set Accounting Method to Accrual</div>
+        <div class="step-detail">During setup QBO will ask. Select <strong>Accrual.</strong> This is critical — all labs are designed around accrual basis. If you accidentally set Cash, reports will not match the answer keys.</div>
+        <span class="step-tag st-note">📌 Critical</span>
+      </div>
+    </div>
+    <div class="step fi">
+      <div class="step-num sn-teal">4</div>
+      <div class="step-body">
+        <div class="step-action">Add company address and contact details</div>
+        <div class="step-detail">Go to <strong>Settings ⚙️ → Company Information</strong> and fill in all fields from the table above. These appear on invoices and reports — keep them consistent with the labs.</div>
+        <div class="qbo-path">
+          <span class="click">Settings ⚙️</span> <span class="arrow">→</span>
+          <span class="click">Company Information</span> <span class="arrow">→</span>
+          Address: <span class="type">123 Commerce Blvd, San Antonio, TX 78201</span> <span class="arrow">→</span>
+          Phone: <span class="type">(210) 555-0147</span> <span class="arrow">→</span>
+          Email: <span class="type">juan@juanspetparadise.com</span> <span class="arrow">→</span>
+          EIN: <span class="type">47-1234567</span> <span class="arrow">→</span>
+          <span class="click">Save</span>
+        </div>
+        <span class="step-tag st-type">⌨️ Type</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- PART 2 — BANK ACCOUNT -->
+<!-- ============================================================ -->
+<div class="part fi">
+  <div class="audio-player">
+    <div style="font-size:1.1rem;flex-shrink:0;">🎙️</div>
+    <div class="ap-body">
+      <div class="ap-label">Coach Mic — Set Up the Bank Account <span>· $9,850 opening balance · March 1, 2024</span></div>
+      <audio class="guide-audio" controls src="QBO-Set-Up-Bank-Account.mp3"></audio>
+    </div>
+  </div>
+  <div class="part-header">
+    <div class="part-num pn-blue">2</div>
+    <div>
+      <div class="part-title">Set Up the Bank Account</div>
+      <div class="part-sub">This is the checking account used in all reconciliation labs</div>
+    </div>
+    <div class="part-badge" style="background:var(--blue-lt);color:var(--blue);">~3 min</div>
+  </div>
+
+  <div class="info-box fi">
+    <div class="info-head ib-blue">🏦 Bank Account Details</div>
+    <div class="info-body">
+      <div class="info-row"><span class="ir-label">Bank Name</span><span class="ir-value">First National Bank of San Antonio</span></div>
+      <div class="info-row"><span class="ir-label">Account Type</span><span class="ir-value">Checking</span></div>
+      <div class="info-row"><span class="ir-label">Account Name in QBO</span><span class="ir-value">Checking</span></div>
+      <div class="info-row"><span class="ir-label">Account Number (Practice)</span><span class="ir-value">****4421</span></div>
+      <div class="info-row"><span class="ir-label">Routing Number (Practice)</span><span class="ir-value">114900164</span></div>
+      <div class="info-row"><span class="ir-label">Opening Balance</span><span class="ir-value">$9,850.00</span></div>
+      <div class="info-row"><span class="ir-label">Opening Balance Date</span><span class="ir-value">March 1, 2024</span></div>
+      <div class="info-row"><span class="ir-label">Utility Auto-debit Account #</span><span class="ir-value">SA-4421 (San Antonio Utilities)</span></div>
+    </div>
+  </div>
+
+  <div class="steps">
+    <div class="step fi">
+      <div class="step-num sn-blue">5</div>
+      <div class="step-body">
+        <div class="step-action">Add the Checking account in QBO</div>
+        <div class="step-detail">Do NOT connect a real bank. This is a practice file — add it manually.</div>
+        <div class="qbo-path">
+          <span class="click">Accounting</span> <span class="arrow">→</span>
+          <span class="click">Chart of Accounts</span> <span class="arrow">→</span>
+          <span class="click">New</span> <span class="arrow">→</span>
+          Account Type: <span class="type">Bank</span> <span class="arrow">→</span>
+          Detail Type: <span class="type">Checking</span> <span class="arrow">→</span>
+          Name: <span class="type">Checking</span> <span class="arrow">→</span>
+          Opening Balance: <span class="type">$9,850.00</span> <span class="arrow">→</span>
+          As of: <span class="type">03/01/2024</span> <span class="arrow">→</span>
+          <span class="click">Save and Close</span>
+        </div>
+        <span class="step-tag st-click">🖱️ Click</span>
+      </div>
+    </div>
+    <div class="step key fi">
+      <div class="step-num sn-gold">💡</div>
+      <div class="step-body">
+        <div class="step-action">Why $9,850 and not $16,890?</div>
+        <div class="step-detail">The S01 scenario mentions $16,890 as the opening balance shown on the Scenario tab — that's Juan's balance as of a different reference point. The <strong>March 1, 2024 bank statement opening balance is $9,850.00</strong> — that's what you enter here. This is what the First National Bank statement shows.</div>
+        <span class="step-tag st-note">📌 Important</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- PART 3 — VENDORS & CUSTOMERS -->
+<!-- ============================================================ -->
+<div class="part fi">
+  <div class="audio-player">
+    <div style="font-size:1.1rem;flex-shrink:0;">🎙️</div>
+    <div class="ap-body">
+      <div class="ap-label">Coach Mic — Vendors & Customers <span>· Add them now so transactions go faster</span></div>
+      <audio class="guide-audio" controls src="vendors-and-customers.mp3"></audio>
+    </div>
+  </div>
+  <div class="part-header">
+    <div class="part-num pn-orange">3</div>
+    <div>
+      <div class="part-title">Add Vendors & Customers</div>
+      <div class="part-sub">All names used across S01–S06 — add them now so they're ready</div>
+    </div>
+    <div class="part-badge" style="background:var(--orange-lt);color:var(--orange);">~5 min</div>
+  </div>
+
+  <div class="info-box fi">
+    <div class="info-head ib-gold">🏪 Vendors (Money Out)</div>
+    <div class="info-body">
+      <div class="info-row"><span class="ir-label">PetCo Wholesale</span><span class="ir-value">Inventory / Pet food & supplies supplier</span></div>
+      <div class="info-row"><span class="ir-label">VetMed Supplies</span><span class="ir-value">Medical supplies — syringes, medications</span></div>
+      <div class="info-row"><span class="ir-label">GroomPro Tools</span><span class="ir-value">Grooming equipment — clippers, dryers</span></div>
+      <div class="info-row"><span class="ir-label">Fetch Media Agency</span><span class="ir-value">Social media advertising (also 1099 contractor in S04)</span></div>
+      <div class="info-row"><span class="ir-label">San Antonio Utilities</span><span class="ir-value">Electricity & water · Auto-debit · Acct #SA-4421</span></div>
+      <div class="info-row"><span class="ir-label">First National Bank of San Antonio</span><span class="ir-value">Bank fees (used in S01)</span></div>
+      <div class="info-row"><span class="ir-label">Lease — 123 Commerce Blvd</span><span class="ir-value">Monthly store rent · Due 18th monthly</span></div>
+      <div class="info-row"><span class="ir-label">Bark & Beyond Co.</span><span class="ir-value">Pet accessories supplier (S03 — Inventory)</span></div>
+      <div class="info-row"><span class="ir-label">VetCare Products</span><span class="ir-value">Flea & tick treatments (S03 — Inventory)</span></div>
+    </div>
+  </div>
+
+  <div class="info-box fi">
+    <div class="info-head ib-green">👥 Customers (Money In)</div>
+    <div class="info-body">
+      <div class="info-row"><span class="ir-label">Paws & Claws Clinic</span><span class="ir-value">B2B · Vet services · Net 30</span></div>
+      <div class="info-row"><span class="ir-label">Happy Tails Rescue</span><span class="ir-value">B2B · Bulk food & supplies · Net 15</span></div>
+      <div class="info-row"><span class="ir-label">Sunshine Pet Hotel</span><span class="ir-value">B2B · Grooming services · Monthly contract</span></div>
+      <div class="info-row"><span class="ir-label">Walk & Wag LLC</span><span class="ir-value">B2B · Dog walking referrals · Net 30</span></div>
+      <div class="info-row"><span class="ir-label">Fur & Feathers Store</span><span class="ir-value">B2B · Wholesale pet accessories · Net 30</span></div>
+      <div class="info-row"><span class="ir-label">General Retail / Walk-in</span><span class="ir-value">B2C · POS cash & card sales · No invoice</span></div>
+    </div>
+  </div>
+
+  <div class="info-box fi">
+    <div class="info-head" style="background:var(--purple-lt);color:var(--purple);">👔 Employees & Contractors (S04 — Payroll)</div>
+    <div class="info-body">
+      <div class="info-row"><span class="ir-label">Maria Santos</span><span class="ir-value">W-2 · Veterinary Technician · $2,800 bi-weekly · 15% FIT</span></div>
+      <div class="info-row"><span class="ir-label">Jake Thompson</span><span class="ir-value">W-2 · Groomer · $2,200 bi-weekly · 12% FIT</span></div>
+      <div class="info-row"><span class="ir-label">Lily Chen</span><span class="ir-value">W-2 · Cashier / Retail · $1,040 bi-weekly · 10% FIT</span></div>
+      <div class="info-row"><span class="ir-label">Fetch Media Agency</span><span class="ir-value">1099 Contractor · Social media · $850/month · W-9 required</span></div>
+      <div class="info-row"><span class="ir-label">CleanRight Services</span><span class="ir-value">1099 Contractor · Cleaning · $400/month · W-9 required</span></div>
+    </div>
+  </div>
+
+  <div class="steps">
+    <div class="step fi">
+      <div class="step-num sn-orange">6</div>
+      <div class="step-body">
+        <div class="step-action">Add all vendors in QBO</div>
+        <div class="qbo-path">
+          <span class="click">Expenses</span> <span class="arrow">→</span>
+          <span class="click">Vendors</span> <span class="arrow">→</span>
+          <span class="click">New Vendor</span> <span class="arrow">→</span>
+          Enter name and details <span class="arrow">→</span>
+          <span class="click">Save</span> <span class="arrow">→</span>
+          Repeat for all 9 vendors
+        </div>
+        <span class="step-tag st-click">🖱️ Click</span>
+      </div>
+    </div>
+    <div class="step fi">
+      <div class="step-num sn-orange">7</div>
+      <div class="step-body">
+        <div class="step-action">Add all customers in QBO</div>
+        <div class="qbo-path">
+          <span class="click">Sales</span> <span class="arrow">→</span>
+          <span class="click">Customers</span> <span class="arrow">→</span>
+          <span class="click">New Customer</span> <span class="arrow">→</span>
+          Enter name <span class="arrow">→</span>
+          Set payment terms (Net 30 or Net 15 per table) <span class="arrow">→</span>
+          <span class="click">Save</span> <span class="arrow">→</span>
+          Repeat for all 5 customers
+        </div>
+        <span class="step-tag st-click">🖱️ Click</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- PART 4 — CHART OF ACCOUNTS -->
+<!-- ============================================================ -->
+<div class="part fi">
+  <div class="audio-player">
+    <div style="font-size:1.1rem;flex-shrink:0;">🎙️</div>
+    <div class="ap-body">
+      <div class="ap-label">Coach Mic — COA Opening <span>· What the Chart of Accounts is and why it matters</span></div>
+      <audio class="guide-audio" controls src="QBO-SETUP-Creating-COA-Opening.mp3"></audio>
+    </div>
+  </div>
+  <div class="audio-player" style="margin-top:-8px;">
+    <div style="font-size:1.1rem;flex-shrink:0;">🎙️</div>
+    <div class="ap-body">
+      <div class="ap-label">Coach Mic — Build the Chart of Accounts <span>· Follow along in your QBO</span></div>
+      <audio class="guide-audio" controls src="Build-the-Chart-of-Accounts.mp3"></audio>
+    </div>
+  </div>
+  <div class="part-header">
+    <div class="part-num pn-green">4</div>
+    <div>
+      <div class="part-title">Build the Chart of Accounts</div>
+      <div class="part-sub">Every account used across all 6 labs — add these exactly</div>
+    </div>
+    <div class="part-badge" style="background:var(--green-lt);color:var(--green);">~10 min</div>
+  </div>
+
+  <div class="note-box nb-blue fi">
+    <div class="note-icon">ℹ️</div>
+    <div class="note-text"><strong>QBO creates some default accounts automatically</strong> (like Accounts Receivable, Accounts Payable, and some income/expense accounts). Check if they already exist before adding. If they do — just rename them to match the names below. Don't create duplicates.</div>
+  </div>
+
+  <div class="steps fi">
+    <div class="step">
+      <div class="step-num sn-green">8</div>
+      <div class="step-body">
+        <div class="step-action">Open Chart of Accounts</div>
+        <div class="qbo-path">
+          <span class="click">Accounting</span> <span class="arrow">→</span>
+          <span class="click">Chart of Accounts</span> <span class="arrow">→</span>
+          <span class="click">New</span> to add each account below
+        </div>
+        <span class="step-tag st-click">🖱️ Click</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ASSETS -->
+  <div class="fi" style="margin-top:16px;">
+  <table class="coa-table">
+    <thead><tr style="background:#1e40af;"><th>Account #</th><th>Account Name</th><th>Type</th><th>Detail Type</th><th>Used In</th></tr></thead>
+    <tbody>
+      <tr class="section-row at-asset"><td colspan="5">ASSETS</td></tr>
+      <tr><td class="acc-num">1000</td><td class="acc-name">Checking</td><td><span class="acc-type at-bank">Bank</span></td><td>Checking</td><td>S01–S06</td></tr>
+      <tr><td class="acc-num">1100</td><td class="acc-name">Accounts Receivable (AR)</td><td><span class="acc-type at-ar">A/R</span></td><td>Accounts Receivable</td><td>S02</td></tr>
+      <tr><td class="acc-num">1200</td><td class="acc-name">Inventory Asset</td><td><span class="acc-type at-inv">Other Current Asset</span></td><td>Inventory</td><td>S03</td></tr>
+      <tr><td class="acc-num">1300</td><td class="acc-name">Prepaid Expenses</td><td><span class="acc-type at-inv">Other Current Asset</span></td><td>Prepaid Expenses</td><td>S05</td></tr>
+      <tr><td class="acc-num">1500</td><td class="acc-name">Equipment</td><td><span class="acc-type at-fix">Fixed Asset</span></td><td>Machinery & Equipment</td><td>S05</td></tr>
+      <tr><td class="acc-num">1510</td><td class="acc-name">Accumulated Depreciation</td><td><span class="acc-type at-fix">Fixed Asset</span></td><td>Accumulated Depreciation</td><td>S05</td></tr>
+
+      <!-- LIABILITIES -->
+      <tr class="section-row at-liability"><td colspan="5">LIABILITIES</td></tr>
+      <tr><td class="acc-num">2000</td><td class="acc-name">Accounts Payable (AP)</td><td><span class="acc-type at-ap">A/P</span></td><td>Accounts Payable</td><td>S02–S05</td></tr>
+      <tr><td class="acc-num">2100</td><td class="acc-name">SS Tax Payable</td><td><span class="acc-type at-tax">Other Current Liability</span></td><td>Payroll Tax Payable</td><td>S04</td></tr>
+      <tr><td class="acc-num">2110</td><td class="acc-name">Medicare Tax Payable</td><td><span class="acc-type at-tax">Other Current Liability</span></td><td>Payroll Tax Payable</td><td>S04</td></tr>
+      <tr><td class="acc-num">2120</td><td class="acc-name">Federal Income Tax Payable</td><td><span class="acc-type at-tax">Other Current Liability</span></td><td>Payroll Tax Payable</td><td>S04</td></tr>
+      <tr><td class="acc-num">2130</td><td class="acc-name">FUTA Payable</td><td><span class="acc-type at-tax">Other Current Liability</span></td><td>Payroll Tax Payable</td><td>S04</td></tr>
+      <tr><td class="acc-num">2200</td><td class="acc-name">Sales Tax Payable</td><td><span class="acc-type at-tax">Other Current Liability</span></td><td>Sales Tax Payable</td><td>S05</td></tr>
+
+      <!-- EQUITY -->
+      <tr class="section-row at-equity"><td colspan="5">EQUITY</td></tr>
+      <tr><td class="acc-num">3000</td><td class="acc-name">Owner's Capital</td><td><span class="acc-type at-eq">Equity</span></td><td>Owner's Equity</td><td>S05–S06</td></tr>
+      <tr><td class="acc-num">3100</td><td class="acc-name">Owner's Draw</td><td><span class="acc-type at-eq">Equity</span></td><td>Owner's Equity</td><td>S05</td></tr>
+      <tr><td class="acc-num">3200</td><td class="acc-name">Retained Earnings</td><td><span class="acc-type at-eq">Equity</span></td><td>Retained Earnings</td><td>All</td></tr>
+
+      <!-- INCOME -->
+      <tr class="section-row at-income"><td colspan="5">INCOME</td></tr>
+      <tr><td class="acc-num">4000</td><td class="acc-name">Sales of Product Income</td><td><span class="acc-type at-rev">Income</span></td><td>Sales of Product Income</td><td>S01–S03</td></tr>
+      <tr><td class="acc-num">4100</td><td class="acc-name">Service Revenue</td><td><span class="acc-type at-rev">Income</span></td><td>Service / Fee Income</td><td>S01–S02</td></tr>
+      <tr><td class="acc-num">4200</td><td class="acc-name">Grooming Revenue</td><td><span class="acc-type at-rev">Income</span></td><td>Service / Fee Income</td><td>S02–S03</td></tr>
+      <tr><td class="acc-num">4300</td><td class="acc-name">Interest Income</td><td><span class="acc-type at-other">Other Income</span></td><td>Interest Earned</td><td>S01</td></tr>
+
+      <!-- COGS -->
+      <tr class="section-row at-expense"><td colspan="5">COST OF GOODS SOLD</td></tr>
+      <tr><td class="acc-num">5000</td><td class="acc-name">Cost of Goods Sold (COGS)</td><td><span class="acc-type at-cogs">Cost of Goods Sold</span></td><td>Supplies & Materials - COGS</td><td>S03</td></tr>
+      <tr><td class="acc-num">5100</td><td class="acc-name">Inventory Shrinkage Expense</td><td><span class="acc-type at-cogs">Cost of Goods Sold</span></td><td>Supplies & Materials - COGS</td><td>S03</td></tr>
+
+      <!-- EXPENSES -->
+      <tr class="section-row at-expense"><td colspan="5">EXPENSES</td></tr>
+      <tr><td class="acc-num">6000</td><td class="acc-name">Payroll Expense</td><td><span class="acc-type at-exp">Expense</span></td><td>Wages & Salaries</td><td>S01, S04</td></tr>
+      <tr><td class="acc-num">6010</td><td class="acc-name">Payroll Tax Expense</td><td><span class="acc-type at-exp">Expense</span></td><td>Payroll Expenses</td><td>S04</td></tr>
+      <tr><td class="acc-num">6100</td><td class="acc-name">Rent Expense</td><td><span class="acc-type at-exp">Expense</span></td><td>Rent or Lease</td><td>S02, S05</td></tr>
+      <tr><td class="acc-num">6200</td><td class="acc-name">Utilities Expense</td><td><span class="acc-type at-exp">Expense</span></td><td>Utilities</td><td>S02</td></tr>
+      <tr><td class="acc-num">6300</td><td class="acc-name">Advertising &amp; Marketing</td><td><span class="acc-type at-exp">Expense</span></td><td>Advertising/Promotional</td><td>S02, S04, S05</td></tr>
+      <tr><td class="acc-num">6400</td><td class="acc-name">Medical Supplies Expense</td><td><span class="acc-type at-exp">Expense</span></td><td>Supplies</td><td>S02, S05</td></tr>
+      <tr><td class="acc-num">6500</td><td class="acc-name">Equipment Expense</td><td><span class="acc-type at-exp">Expense</span></td><td>Equipment Rental</td><td>S02, S05</td></tr>
+      <tr><td class="acc-num">6600</td><td class="acc-name">Bank Charges &amp; Fees</td><td><span class="acc-type at-exp">Expense</span></td><td>Bank Charges</td><td>S01</td></tr>
+      <tr><td class="acc-num">6700</td><td class="acc-name">Contractor Expense</td><td><span class="acc-type at-exp">Expense</span></td><td>Outside Services</td><td>S04</td></tr>
+      <tr><td class="acc-num">6800</td><td class="acc-name">Meals &amp; Entertainment</td><td><span class="acc-type at-exp">Expense</span></td><td>Entertainment</td><td>S05</td></tr>
+      <tr><td class="acc-num">6900</td><td class="acc-name">Vehicle Expense</td><td><span class="acc-type at-exp">Expense</span></td><td>Auto</td><td>S05</td></tr>
+      <tr><td class="acc-num">6950</td><td class="acc-name">Miscellaneous Expense</td><td><span class="acc-type at-exp">Expense</span></td><td>Other Business Expenses</td><td>S05 (error)</td></tr>
+    </tbody>
+  </table>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- PART 5 — VERIFY -->
+<!-- ============================================================ -->
+<div class="part fi">
+  <div class="audio-player">
+    <div style="font-size:1.1rem;flex-shrink:0;">🎙️</div>
+    <div class="ap-body">
+      <div class="ap-label">Coach Mic — Verify Setup & Send-Off to S01 <span>· Run your Trial Balance then head to Lesson 0</span></div>
+      <audio class="guide-audio" controls src="Verify-Setup-Send-Off-to-S01.mp3"></audio>
+    </div>
+  </div>
+  <div class="part-header">
+    <div class="part-num pn-purple">5</div>
+    <div>
+      <div class="part-title">Verify Setup is Complete</div>
+      <div class="part-sub">Quick checklist before you open S01</div>
+    </div>
+    <div class="part-badge" style="background:var(--purple-lt);color:var(--purple);">~2 min</div>
+  </div>
+
+  <div class="steps">
+    <div class="step fi">
+      <div class="step-num sn-purple">9</div>
+      <div class="step-body">
+        <div class="step-action">Run a Trial Balance — it should show only the Checking account with $9,850</div>
+        <div class="qbo-path">
+          <span class="click">Reports</span> <span class="arrow">→</span>
+          Search: <span class="type">Trial Balance</span> <span class="arrow">→</span>
+          Date: <span class="type">March 1, 2024</span> <span class="arrow">→</span>
+          Should show: Checking DR $9,850.00 / Opening Balance Equity CR $9,850.00
+        </div>
+        <span class="step-tag st-check">✅ Verify</span>
+      </div>
+    </div>
+    <div class="step fi">
+      <div class="step-num sn-purple">10</div>
+      <div class="step-body">
+        <div class="step-action">Confirm Chart of Accounts shows all accounts in the table above</div>
+        <div class="qbo-path">
+          <span class="click">Accounting</span> <span class="arrow">→</span>
+          <span class="click">Chart of Accounts</span> <span class="arrow">→</span>
+          Scroll through — verify all account names match exactly
+        </div>
+        <span class="step-tag st-check">✅ Verify</span>
+      </div>
+    </div>
+    <div class="step key fi">
+      <div class="step-num sn-gold">✅</div>
+      <div class="step-body">
+        <div class="step-action">Setup complete — you are ready for S01</div>
+        <div class="step-detail">Company created · Bank account set up with $9,850 opening balance · All vendors and customers added · Chart of Accounts complete. <strong>You will use this same QBO file for all six labs — S01 through S06.</strong> Do not create a new company for each lab.</div>
+        <span class="step-tag st-note">📌 Remember</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CTA -->
+<div class="cta-block fi">
+  <h2>Setup Done! <span>Start S01 →</span></h2>
+  <p>Juan's Pet Paradise is live in QBO. Chart of Accounts is ready. Now go reconcile March 2024 — 14 transactions, 3 discrepancies, target $0.00.</p>
+  <a href="s01-lab.html" class="btn btn-gold">Start S01 — Bank Reconciliation →</a>
+</div>
+
+</div><!-- /main -->
+
+<script>
+window.addEventListener('scroll',()=>{
+  const p=(window.scrollY/(document.documentElement.scrollHeight-window.innerHeight))*100;
+  document.getElementById('prog').style.width=p+'%';
+});
+const obs=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('vis');});
+},{threshold:0.08});
+document.querySelectorAll('.fi').forEach(el=>obs.observe(el));
+</script>
+</body>
+</html>
