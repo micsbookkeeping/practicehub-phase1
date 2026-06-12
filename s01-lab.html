@@ -1,3 +1,178 @@
+<script>
+// ============================================================
+// PRACTICE HUB — PROGRESS TRACKER v1.0
+// localStorage-based. No backend. No login required.
+// ============================================================
+
+const HUB = {
+
+  // ── READ / WRITE ──────────────────────────────────────────
+  get(key){ try{ return JSON.parse(localStorage.getItem('ph_'+key)); }catch(e){ return null; } },
+  set(key,val){ localStorage.setItem('ph_'+key, JSON.stringify(val)); },
+
+  // ── STREAK ───────────────────────────────────────────────
+  updateStreak(){
+    const today = new Date().toISOString().slice(0,10);
+    const data = this.get('streak') || { lastDate: null, count: 0 };
+    if(data.lastDate === today) return;
+    const yesterday = new Date(Date.now()-86400000).toISOString().slice(0,10);
+    data.count = (data.lastDate === yesterday) ? data.count + 1 : 1;
+    data.lastDate = today;
+    this.set('streak', data);
+  },
+
+  getStreak(){
+    const today = new Date().toISOString().slice(0,10);
+    const yesterday = new Date(Date.now()-86400000).toISOString().slice(0,10);
+    const data = this.get('streak') || { lastDate: null, count: 0 };
+    if(data.lastDate !== today && data.lastDate !== yesterday) return 0;
+    return data.count || 0;
+  },
+
+  // ── ACTIVITY LOG ─────────────────────────────────────────
+  logActivity(action, detail){
+    const log = this.get('activity') || [];
+    log.unshift({ action, detail, ts: Date.now() });
+    this.set('activity', log.slice(0,20));
+  },
+
+  getActivity(){ return this.get('activity') || []; },
+
+  // ── PAGE VISITS ──────────────────────────────────────────
+  markVisited(page){
+    const v = this.get('visited') || {};
+    if(!v[page]){ v[page] = Date.now(); this.set('visited', v); }
+  },
+
+  markCompleted(page){
+    const c = this.get('completed') || {};
+    c[page] = Date.now();
+    this.set('completed', c);
+  },
+
+  isCompleted(page){ const c = this.get('completed') || {}; return !!c[page]; },
+  isVisited(page){ const v = this.get('visited') || {}; return !!v[page]; },
+
+  // ── S01 TAB TRACKING ─────────────────────────────────────
+  saveTab(tab){
+    this.set('s01_last_tab', tab);
+    // Track tabs visited
+    const tabs = this.get('s01_tabs') || {};
+    tabs[tab] = Date.now();
+    this.set('s01_tabs', tabs);
+    // If answer key reached = sim done
+    if(tab === 'answers'){
+      this.markCompleted('s01');
+      this.logActivity('Completed S01 Bank Reconciliation', 'Reached Answer Key');
+    }
+  },
+
+  getLastTab(){ return this.get('s01_last_tab') || 'scenario'; },
+
+  getS01TabsVisited(){
+    const tabs = this.get('s01_tabs') || {};
+    return Object.keys(tabs).length;
+  },
+
+  // ── LESSON TRACKING ──────────────────────────────────────
+  markLessonPlayed(lessonKey){
+    const lessons = this.get('lessons') || {};
+    if(!lessons[lessonKey]){
+      lessons[lessonKey] = Date.now();
+      this.set('lessons', lessons);
+      this.logActivity('Listened to lesson', lessonKey);
+    }
+  },
+
+  getLessonsCompleted(){
+    const lessons = this.get('lessons') || {};
+    return Object.keys(lessons).length;
+  },
+
+  // ── METRICS ──────────────────────────────────────────────
+  getMetrics(){
+    const completed = this.get('completed') || {};
+    const lessons = this.get('lessons') || {};
+    const s01tabs = this.get('s01_tabs') || {};
+
+    // Lessons done = foundation lessons played
+    const lessonsDone = Object.keys(lessons).length;
+
+    // Transactions = tabs visited in s01 × avg transactions per tab
+    const tabWeights = { scenario:0, statement:4, transactions:6, discrepancies:3, answers:1 };
+    let transactions = 0;
+    Object.keys(s01tabs).forEach(t => { transactions += (tabWeights[t]||0); });
+
+    // Sims done
+    const simsDone = ['s01','s02','s03','s04','s05','s06'].filter(s => completed[s]).length;
+
+    // Streak
+    const streak = this.getStreak();
+
+    // Job readiness weights
+    const weights = {
+      'slide0': 5,
+      'qbo-setup': 10,
+      'lesson0': 10,
+      'lesson-welcome':2,'lesson-equation':2,'lesson-debit':2,
+      'lesson-cycle':2,'lesson-flow':2,'lesson-qbo':2,'lesson-mindset':2,
+      's01': 15, 's02':15, 's03':15, 's04':15, 's05':5, 's06':5
+    };
+    let readiness = 0;
+    Object.keys(weights).forEach(k => {
+      if(completed[k] || lessons[k]) readiness += weights[k];
+    });
+    readiness = Math.min(100, Math.round(readiness));
+
+    // S01 progress (tabs visited / 5)
+    const s01Progress = Math.round((Object.keys(s01tabs).length / 5) * 100);
+
+    return { lessonsDone, transactions, simsDone, streak, readiness, s01Progress };
+  },
+
+  // ── JOURNEY STATES ───────────────────────────────────────
+  getJourneyStates(){
+    const completed = this.get('completed') || {};
+    const visited = this.get('visited') || {};
+
+    const state = (key, unlockedIf) => {
+      if(completed[key]) return 'complete';
+      if(visited[key] || completed[key]) return 'inprogress';
+      if(unlockedIf) return 'unlocked';
+      return 'locked';
+    };
+
+    return {
+      foundation: visited['slide0'] || Object.keys(this.get('lessons')||{}).length > 0 ? (this.getLessonsCompleted()>=7?'complete':'inprogress') : 'unlocked',
+      qboSetup:   state('qbo-setup', true),
+      lesson0:    state('lesson0', true),
+      s01:        state('s01', true),
+      s02:        state('s02', completed['s01']),
+      s03:        state('s03', completed['s02']),
+      s04s06:     state('s04', completed['s03']),
+    };
+  },
+
+  // ── ACHIEVEMENTS ─────────────────────────────────────────
+  getAchievements(){
+    const completed = this.get('completed') || {};
+    const lessons = this.get('lessons') || {};
+    const s01tabs = this.get('s01_tabs') || {};
+    return [
+      { id:'first_lesson',    label:'First Lesson Completed',        earned: Object.keys(lessons).length >= 1 },
+      { id:'foundation_done', label:'Foundation Knowledge Complete',  earned: Object.keys(lessons).length >= 7 },
+      { id:'qbo_setup',       label:'QBO Company Set Up',             earned: !!completed['qbo-setup'] },
+      { id:'first_recon',     label:'First Bank Reconciliation',      earned: !!completed['s01'] },
+      { id:'s01_explorer',    label:'S01 Explorer',                   earned: Object.keys(s01tabs).length >= 3 },
+      { id:'all_tabs',        label:'Full Lab Walkthrough',           earned: Object.keys(s01tabs).length >= 5 },
+    ];
+  }
+};
+
+// Always update streak on load
+HUB.updateStreak();
+
+</script>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -156,6 +331,71 @@ audio.lab-audio{width:100%;height:32px;accent-color:#F59E0B;}
 /* ── FOLLOW ALONG ── */
 .follow-strip{background:var(--navy);border-radius:8px;padding:8px 16px;margin-bottom:14px;display:flex;align-items:center;gap:10px;font-size:0.78rem;color:#e2e8f0;}
 .follow-strip strong{color:#F59E0B;}
+
+/* ── INTERACTIVE SIMULATOR ── */
+.sim-header{background:var(--navy);border-radius:10px;padding:14px 18px;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;}
+.sim-header-title{color:#fff;font-size:0.82rem;font-weight:700;}
+.sim-balance-row{display:flex;gap:16px;align-items:center;flex-wrap:wrap;}
+.sim-balance-box{background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);border-radius:8px;padding:8px 14px;text-align:center;}
+.sim-balance-label{font-size:0.6rem;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:1px;}
+.sim-balance-val{font-size:1rem;font-weight:800;color:#fff;font-family:'DM Mono',monospace;}
+.sim-balance-val.green{color:#4ade80;}
+.sim-balance-val.red{color:#f87171;}
+.sim-balance-val.gold{color:var(--gold);}
+
+/* Checkable transaction rows */
+.txn-row-interactive{cursor:pointer;transition:all 0.2s;border-bottom:1px solid var(--border);}
+.txn-row-interactive:hover{background:rgba(59,130,246,0.05);}
+.txn-row-interactive.checked{background:rgba(34,197,94,0.08);}
+.txn-row-interactive.checked td{opacity:0.7;}
+.txn-checkbox{width:28px;height:28px;border:2px solid var(--border);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:1rem;transition:all 0.2s;flex-shrink:0;}
+.txn-row-interactive.checked .txn-checkbox{background:var(--green);border-color:var(--green);}
+.txn-row-interactive.timing-item{cursor:default;}
+.txn-row-interactive.timing-item .txn-checkbox{background:rgba(59,130,246,0.1);border-color:var(--blue);color:var(--blue);}
+
+/* Submit button */
+.sim-submit-btn{width:100%;padding:14px;background:linear-gradient(135deg,var(--teal),#0d9488);color:#fff;border:none;border-radius:10px;font-family:'Sora';font-size:1rem;font-weight:700;cursor:pointer;margin-top:16px;transition:all 0.2s;}
+.sim-submit-btn:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(13,148,136,0.3);}
+.sim-submit-btn:disabled{opacity:0.5;cursor:not-allowed;transform:none;}
+
+/* Discrepancy inputs */
+.disc-input-card{background:#fff;border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:16px;}
+.disc-input-label{font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);margin-bottom:10px;}
+.disc-input-title{font-size:0.92rem;font-weight:700;color:var(--navy);margin-bottom:14px;}
+.disc-select{width:100%;padding:10px 14px;border:2px solid var(--border);border-radius:8px;font-family:'Inter';font-size:0.88rem;background:#fff;color:var(--navy);outline:none;cursor:pointer;}
+.disc-select:focus{border-color:var(--teal);}
+.disc-select.correct{border-color:var(--green);background:var(--green-lt);}
+.disc-select.incorrect{border-color:var(--red);background:rgba(239,68,68,0.05);}
+.disc-feedback{font-size:0.78rem;margin-top:6px;padding:6px 10px;border-radius:6px;display:none;}
+.disc-feedback.show{display:block;}
+.disc-feedback.ok{background:var(--green-lt);color:var(--green);}
+.disc-feedback.bad{background:rgba(239,68,68,0.08);color:var(--red);}
+
+/* Mission Complete Modal */
+.mission-modal{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.7);z-index:1000;align-items:center;justify-content:center;padding:20px;}
+.mission-modal.show{display:flex;}
+.mission-card{background:#fff;border-radius:20px;padding:36px;max-width:520px;width:100%;text-align:center;animation:popIn 0.4s cubic-bezier(0.175,0.885,0.32,1.275);}
+@keyframes popIn{from{transform:scale(0.8);opacity:0;}to{transform:scale(1);opacity:1;}}
+.mission-stars{font-size:2rem;margin-bottom:12px;}
+.mission-title{font-family:'Sora';font-size:1.6rem;font-weight:800;color:var(--navy);margin-bottom:4px;}
+.mission-subtitle{font-size:0.88rem;color:var(--muted);margin-bottom:24px;}
+.mission-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:24px;}
+.mission-stat{background:var(--soft-bg);border-radius:10px;padding:12px;}
+.mission-stat-val{font-size:1.3rem;font-weight:800;color:var(--navy);}
+.mission-stat-label{font-size:0.68rem;color:var(--muted);margin-top:2px;}
+.mission-coach{background:var(--navy);border-radius:12px;padding:16px;margin-bottom:20px;text-align:left;display:flex;gap:12px;}
+.mission-coach-avatar{background:var(--gold);color:#fff;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;flex-shrink:0;}
+.mission-coach-text{font-size:0.82rem;color:#e2e8f0;line-height:1.6;}
+.mission-btns{display:flex;gap:10px;}
+.mission-btn-primary{flex:2;padding:12px;background:linear-gradient(135deg,var(--teal),#0d9488);color:#fff;border:none;border-radius:10px;font-family:'Sora';font-weight:700;font-size:0.92rem;cursor:pointer;}
+.mission-btn-secondary{flex:1;padding:12px;background:var(--soft-bg);color:var(--navy);border:none;border-radius:10px;font-family:'Sora';font-weight:700;font-size:0.88rem;cursor:pointer;}
+
+/* Validation feedback */
+.validation-box{border-radius:10px;padding:14px 18px;margin-top:12px;font-size:0.84rem;line-height:1.6;display:none;}
+.validation-box.show{display:block;}
+.validation-box.pass{background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.3);color:var(--green);}
+.validation-box.fail{background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);color:var(--red);}
+.running-diff{font-size:1.1rem;font-weight:800;font-family:'DM Mono',monospace;}
 </style>
 </head>
 <body>
@@ -290,7 +530,7 @@ audio.lab-audio{width:100%;height:32px;accent-color:#F59E0B;}
     </div>
   </div>
 
-  <!-- QBO TRANSACTIONS -->
+  <!-- QBO TRANSACTIONS — INTERACTIVE -->
   <div id="tab-transactions" class="tab-pane fi">
     <div class="audio-player">
       <div style="font-size:1.1rem;flex-shrink:0;">🎙️</div>
@@ -301,35 +541,49 @@ audio.lab-audio{width:100%;height:32px;accent-color:#F59E0B;}
     </div>
     <div class="info-box note" style="margin-bottom:20px;">
       <span class="ib-i">📝</span>
-      <div class="ib-t"><strong>These are the transactions currently in QBO.</strong> Compare each one to the bank statement. Most will match — but 3 won't. Your job: find those 3 and understand WHY they don't match.</div>
+      <div class="ib-t"><strong>Check off each transaction</strong> as you verify it against the bank statement. Watch the running balance update. Find the 3 discrepancies — they won't match!</div>
     </div>
-    <div class="section-title"><span class="badge" style="background:var(--teal-lt);color:var(--teal-mid);">QBO Transactions — March 2024 · Checking Account</span></div>
-    <table class="txn-table">
-      <thead><tr><th>#</th><th>Date</th><th>Description</th><th>Amount</th><th>Bank Statement</th><th>Match?</th></tr></thead>
-      <tbody>
-        <tr><td class="txn-num">T-01</td><td>Mar 3</td><td class="txn-desc">POS Sales — Walk-in retail<div class="txn-sub">Sales Receipt batch · Cash + card</div></td><td class="txn-amt amt-in">+$3,200.00</td><td class="txn-amt">$3,200.00 ✓</td><td><span class="match-pill match-yes">✅ Match</span></td></tr>
-        <tr><td class="txn-num">T-02</td><td>Mar 5</td><td class="txn-desc">PetCo Wholesale<div class="txn-sub">Check #5501 · Inventory purchase</div></td><td class="txn-amt amt-out">−$2,100.00</td><td class="txn-amt">$2,100.00 ✓</td><td><span class="match-pill match-yes">✅ Match</span></td></tr>
-        <tr><td class="txn-num">T-03</td><td>Mar 8</td><td class="txn-desc">Shopify Payout — Mar 1–7<div class="txn-sub">Net deposit from Shopify</div></td><td class="txn-amt amt-in">+$4,200.00</td><td class="txn-amt">$4,200.00 ✓</td><td><span class="match-pill match-yes">✅ Match</span></td></tr>
-        <tr style="background:rgba(234,88,12,0.04);"><td class="txn-num">T-04</td><td>Mar 10</td><td class="txn-desc">VetMed Supplies<div class="txn-sub">⚠️ Check #5502 · Medical supplies</div></td><td class="txn-amt amt-out">−$420.00</td><td class="txn-amt" style="color:var(--red);">$240.00 ✗</td><td><span class="match-pill match-no">❌ Mismatch</span></td></tr>
-        <tr><td class="txn-num">T-05</td><td>Mar 15</td><td class="txn-desc">Happy Tails Rescue — ACH<div class="txn-sub">Customer payment received</div></td><td class="txn-amt amt-in">+$2,250.00</td><td class="txn-amt">$2,250.00 ✓</td><td><span class="match-pill match-yes">✅ Match</span></td></tr>
-        <tr><td class="txn-num">T-06</td><td>Mar 18</td><td class="txn-desc">Rent — 123 Commerce Blvd<div class="txn-sub">Monthly rent payment</div></td><td class="txn-amt amt-out">−$3,500.00</td><td class="txn-amt">$3,500.00 ✓</td><td><span class="match-pill match-yes">✅ Match</span></td></tr>
-        <tr><td class="txn-num">T-07</td><td>Mar 22</td><td class="txn-desc">Sunshine Pet Hotel<div class="txn-sub">Customer payment — online</div></td><td class="txn-amt amt-in">+$950.00</td><td class="txn-amt">$950.00 ✓</td><td><span class="match-pill match-yes">✅ Match</span></td></tr>
-        <tr><td class="txn-num">T-08</td><td>Mar 25</td><td class="txn-desc">San Antonio Utilities<div class="txn-sub">Auto-debit · Monthly utilities</div></td><td class="txn-amt amt-out">−$420.00</td><td class="txn-amt">$420.00 ✓</td><td><span class="match-pill match-yes">✅ Match</span></td></tr>
-        <tr><td class="txn-num">T-09</td><td>Mar 28</td><td class="txn-desc">POS Sales — Walk-in retail<div class="txn-sub">Sales Receipt batch · Cash + card</div></td><td class="txn-amt amt-in">+$12,500.00</td><td class="txn-amt">$12,500.00 ✓</td><td><span class="match-pill match-yes">✅ Match</span></div></td></tr>
-        <tr><td class="txn-num">T-10</td><td>Mar 29</td><td class="txn-desc">Payroll Direct Deposit<div class="txn-sub">Staff payroll · Period Mar 15–28</div></td><td class="txn-amt amt-out">−$4,790.00</td><td class="txn-amt">$4,790.00 ✓</td><td><span class="match-pill match-yes">✅ Match</span></td></tr>
-        <tr><td class="txn-num">T-11</td><td>Mar 30</td><td class="txn-desc">Shopify Payout — Mar 8–28<div class="txn-sub">Net deposit from Shopify</div></td><td class="txn-amt amt-in">+$12,480.00</td><td class="txn-amt">$12,480.00 ✓</td><td><span class="match-pill match-yes">✅ Match</span></td></tr>
-        <tr style="background:rgba(239,68,68,0.04);"><td class="txn-num">T-12</td><td>Mar 31</td><td class="txn-desc">Bank Maintenance Fee<div class="txn-sub">⚠️ NOT IN QBO — Missing entry</div></td><td class="txn-amt" style="color:var(--muted);">Not recorded</td><td class="txn-amt" style="color:var(--red);">$35.00 ✗</td><td><span class="match-pill match-no">❌ Missing</span></td></tr>
-        <tr style="background:rgba(239,68,68,0.04);"><td class="txn-num">T-13</td><td>Mar 31</td><td class="txn-desc">Interest Earned<div class="txn-sub">⚠️ NOT IN QBO — Missing entry</div></td><td class="txn-amt" style="color:var(--muted);">Not recorded</td><td class="txn-amt" style="color:var(--red);">$45.00 ✗</td><td><span class="match-pill match-no">❌ Missing</span></td></tr>
-        <tr style="background:rgba(59,130,246,0.04);"><td class="txn-num">T-14</td><td>Mar 31</td><td class="txn-desc">Check #5503 — GroomPro Tools<div class="txn-sub">⏳ Written Mar 31 · Not yet cleared bank</div></td><td class="txn-amt amt-out">−$380.00</td><td class="txn-amt" style="color:var(--blue);">Not on statement</td><td><span class="match-pill match-timing">⏳ Timing</span></td></tr>
-      </tbody>
+
+    <!-- LIVE RECONCILIATION HEADER -->
+    <div class="sim-header">
+      <div>
+        <div class="sim-balance-label" style="color:rgba(255,255,255,0.5);font-size:0.6rem;letter-spacing:1px;text-transform:uppercase;">LIVE RECONCILIATION</div>
+        <div class="sim-header-title">Juan's Pet Paradise · Checking · March 2024</div>
+      </div>
+      <div class="sim-balance-row">
+        <div class="sim-balance-box">
+          <div class="sim-balance-label">Bank Balance</div>
+          <div class="sim-balance-val green">$34,390.00</div>
+        </div>
+        <div class="sim-balance-box">
+          <div class="sim-balance-label">QBO Balance</div>
+          <div id="qbo-balance" class="sim-balance-val gold">$9,850.00</div>
+        </div>
+        <div class="sim-balance-box">
+          <div class="sim-balance-label">Difference</div>
+          <div id="running-diff" class="sim-balance-val red">−$24,540.00</div>
+        </div>
+        <div class="sim-balance-box">
+          <div class="sim-balance-label">Checked</div>
+          <div id="checked-count" class="sim-balance-val" style="color:#fff;">0/13</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- INTERACTIVE TRANSACTION TABLE -->
+    <table class="txn-table" id="sim-txn-table">
+      <thead><tr><th>✓</th><th>#</th><th>Date</th><th>Description</th><th>QBO Amount</th><th>Bank Amount</th><th>Status</th></tr></thead>
+      <tbody id="sim-txn-body"></tbody>
     </table>
-    <div class="info-box tip">
-      <span class="ib-i">💡</span>
-      <div class="ib-t"><strong>Can you spot the pattern?</strong> T-04 has a wrong amount. T-12 and T-13 are missing from QBO. T-14 is in QBO but not on the bank statement (outstanding check). Those are your 3 discrepancies to resolve. Open the next tab to fix them! 😊</div>
-    </div>
+
+    <div id="sim-validation" class="validation-box"></div>
+
+    <button class="sim-submit-btn" id="sim-submit" onclick="submitReconciliation()">
+      🔍 Submit Reconciliation — Check My Work
+    </button>
   </div>
 
-  <!-- DISCREPANCIES -->
+  <!-- DISCREPANCIES — INTERACTIVE -->
   <div id="tab-discrepancies" class="tab-pane fi">
     <div class="audio-player">
       <div style="font-size:1.1rem;flex-shrink:0;">🎙️</div>
@@ -340,88 +594,103 @@ audio.lab-audio{width:100%;height:32px;accent-color:#F59E0B;}
     </div>
     <div class="info-box warn" style="margin-bottom:20px;">
       <span class="ib-i">🔍</span>
-      <div class="ib-t"><strong>3 discrepancies. 3 different types. 3 different fixes.</strong> Read each one carefully before touching QBO. Understand WHAT it is and WHY before you fix it.</div>
+      <div class="ib-t"><strong>Identify all 3 discrepancies.</strong> For each one, select what type it is and what the fix is. Get all 3 right to unlock the Answer Key.</div>
     </div>
 
-    <div class="disc-card">
-      <div class="disc-head">
-        <div class="disc-num error">⚠️</div>
-        <div class="disc-info">
-          <h3>Discrepancy 1 — Wrong Amount (Recording Error)</h3>
-          <p>T-04 · VetMed Supplies · Mar 10 · Fix this → update QBO</p>
-        </div>
-      </div>
-      <div class="disc-body">
-        <div class="disc-grid">
-          <div class="disc-box wrong"><h4>❌ What QBO Shows</h4><p>VetMed Supplies payment recorded as <strong>$420.00</strong></p></div>
-          <div class="disc-box fix"><h4>✅ What Bank Shows</h4><p>VetMed Supplies payment cleared for <strong>$240.00</strong></p></div>
-        </div>
-        <div class="info-box tip" style="margin-bottom:0;">
-          <span class="ib-i">🔧</span>
-          <div class="ib-t"><strong>What happened:</strong> Digits were transposed — $420 entered instead of $240. <strong>Fix:</strong> Expenses → find VetMed Mar 10 → open → change amount from $420 to $240 → add memo "Corrected — transposed digits" → Save → return to reconciliation → check it off. <strong>Impact:</strong> Expenses decrease $180 → Net Income increases $180.</div>
-        </div>
-      </div>
-    </div>
-
-    <div class="disc-card">
-      <div class="disc-head">
-        <div class="disc-num missing">❌</div>
-        <div class="disc-info">
-          <h3>Discrepancy 2 — Missing Entry (Bank Fee $35)</h3>
-          <p>T-12 · Bank Maintenance Fee · Mar 31 · Add to QBO</p>
-        </div>
-      </div>
-      <div class="disc-body">
-        <div class="disc-grid">
-          <div class="disc-box wrong"><h4>❌ What QBO Shows</h4><p><strong>Nothing</strong> — bank fee was never recorded</p></div>
-          <div class="disc-box fix"><h4>✅ What Bank Shows</h4><p>Monthly maintenance fee <strong>$35.00</strong> deducted Mar 31</p></div>
-        </div>
-        <div class="info-box tip" style="margin-bottom:0;">
-          <span class="ib-i">🔧</span>
-          <div class="ib-t"><strong>Fix:</strong> +New → Expense → Date: 03/31/2024 → Payee: First National Bank → Category: Bank Charges & Fees → Amount: $35.00 → Payment account: Checking → Save → return to reconciliation → check it off. <strong>Journal entry:</strong> DR Bank Charges $35 / CR Checking $35.</div>
-        </div>
+    <!-- DISCREPANCY 1 -->
+    <div class="disc-input-card">
+      <div class="disc-input-label">Discrepancy 1 of 3</div>
+      <div class="disc-input-title">⚠️ T-04 · VetMed Supplies · Mar 10 · QBO shows $420.00 · Bank shows $240.00</div>
+      <label style="font-size:0.8rem;color:var(--muted);margin-bottom:6px;display:block;">What type of discrepancy is this?</label>
+      <select class="disc-select" id="d1-type" onchange="checkDisc(1)">
+        <option value="">— Select the discrepancy type —</option>
+        <option value="recording_error">Recording Error — wrong amount entered in QBO</option>
+        <option value="timing">Timing Difference — will clear next month</option>
+        <option value="missing">Missing Entry — not recorded in QBO at all</option>
+        <option value="duplicate">Duplicate Entry — recorded twice in QBO</option>
+      </select>
+      <div id="d1-feedback" class="disc-feedback"></div>
+      <div id="d1-fix" style="display:none;margin-top:12px;">
+        <label style="font-size:0.8rem;color:var(--muted);margin-bottom:6px;display:block;">What is the correct fix?</label>
+        <select class="disc-select" id="d1-fix-select" onchange="checkDiscFix(1)">
+          <option value="">— Select the fix —</option>
+          <option value="correct">Find VetMed expense in QBO → change amount from $420 to $240 → save</option>
+          <option value="wrong1">Delete the VetMed entry and re-enter it</option>
+          <option value="wrong2">Add a new $180 credit entry to offset the difference</option>
+          <option value="wrong3">Leave it — the bank statement must be wrong</option>
+        </select>
+        <div id="d1-fix-feedback" class="disc-feedback"></div>
       </div>
     </div>
 
-    <div class="disc-card">
-      <div class="disc-head">
-        <div class="disc-num missing">❌</div>
-        <div class="disc-info">
-          <h3>Discrepancy 3 — Missing Entry (Interest Income $45)</h3>
-          <p>T-13 · Interest Earned · Mar 31 · Add to QBO</p>
-        </div>
-      </div>
-      <div class="disc-body">
-        <div class="disc-grid">
-          <div class="disc-box wrong"><h4>❌ What QBO Shows</h4><p><strong>Nothing</strong> — interest income was never recorded</p></div>
-          <div class="disc-box fix"><h4>✅ What Bank Shows</h4><p>Interest earned <strong>$45.00</strong> credited Mar 31</p></div>
-        </div>
-        <div class="info-box tip" style="margin-bottom:0;">
-          <span class="ib-i">🔧</span>
-          <div class="ib-t"><strong>Fix:</strong> +New → Bank Deposit → Date: 03/31/2024 → Account: Interest Income → Amount: $45.00 → Deposit to: Checking → Save → return to reconciliation → check it off. <strong>Journal entry:</strong> DR Checking $45 / CR Interest Income $45.</div>
-        </div>
+    <!-- DISCREPANCY 2 -->
+    <div class="disc-input-card">
+      <div class="disc-input-label">Discrepancy 2 of 3</div>
+      <div class="disc-input-title">❌ T-12 · Bank Maintenance Fee · Mar 31 · $35.00 on bank · Not in QBO</div>
+      <label style="font-size:0.8rem;color:var(--muted);margin-bottom:6px;display:block;">What type of discrepancy is this?</label>
+      <select class="disc-select" id="d2-type" onchange="checkDisc(2)">
+        <option value="">— Select the discrepancy type —</option>
+        <option value="recording_error">Recording Error — wrong amount entered in QBO</option>
+        <option value="timing">Timing Difference — will clear next month</option>
+        <option value="missing">Missing Entry — not recorded in QBO at all</option>
+        <option value="duplicate">Duplicate Entry — recorded twice in QBO</option>
+      </select>
+      <div id="d2-feedback" class="disc-feedback"></div>
+      <div id="d2-fix" style="display:none;margin-top:12px;">
+        <label style="font-size:0.8rem;color:var(--muted);margin-bottom:6px;display:block;">What is the correct fix?</label>
+        <select class="disc-select" id="d2-fix-select" onchange="checkDiscFix(2)">
+          <option value="">— Select the fix —</option>
+          <option value="correct">+New → Expense → Date 03/31/2024 → Payee: First National Bank → Category: Bank Charges → Amount: $35 → Save</option>
+          <option value="wrong1">Add a journal entry: DR Cash $35 / CR Bank Fee $35</option>
+          <option value="wrong2">Wait for next month's statement to confirm</option>
+          <option value="wrong3">Contact the bank to reverse the fee</option>
+        </select>
+        <div id="d2-fix-feedback" class="disc-feedback"></div>
       </div>
     </div>
 
-    <div class="disc-card">
-      <div class="disc-head">
-        <div class="disc-num timing">⏳</div>
-        <div class="disc-info">
-          <h3>Timing Item — Outstanding Check (Leave Unchecked)</h3>
-          <p>T-14 · Check #5503 GroomPro Tools · $380 · DO NOT fix</p>
-        </div>
-      </div>
-      <div class="disc-body">
-        <div class="disc-grid">
-          <div class="disc-box" style="background:var(--blue-lt);border:1px solid rgba(59,130,246,0.2);"><h4 style="color:var(--blue);">⏳ In QBO</h4><p>Check #5503 written Mar 31 → recorded in QBO → <strong>$380.00</strong></p></div>
-          <div class="disc-box" style="background:var(--soft-bg);"><h4 style="color:var(--muted);">📅 Not on Bank Yet</h4><p>Check hasn't cleared the bank yet → will appear on <strong>April statement</strong></p></div>
-        </div>
-        <div class="info-box note" style="margin-bottom:0;">
-          <span class="ib-i">✅</span>
-          <div class="ib-t"><strong>DO NOT fix this.</strong> This is a timing difference — completely normal. The check was written and recorded in QBO on Mar 31, but the bank processes it in April. Leave it unchecked in the reconciliation. QBO accounts for it automatically as an "Outstanding Check." It will clear next month.</div>
-        </div>
+    <!-- DISCREPANCY 3 -->
+    <div class="disc-input-card">
+      <div class="disc-input-label">Discrepancy 3 of 3</div>
+      <div class="disc-input-title">❌ T-13 · Interest Earned · Mar 31 · $45.00 on bank · Not in QBO</div>
+      <label style="font-size:0.8rem;color:var(--muted);margin-bottom:6px;display:block;">What type of discrepancy is this?</label>
+      <select class="disc-select" id="d3-type" onchange="checkDisc(3)">
+        <option value="">— Select the discrepancy type —</option>
+        <option value="recording_error">Recording Error — wrong amount entered in QBO</option>
+        <option value="timing">Timing Difference — will clear next month</option>
+        <option value="missing">Missing Entry — not recorded in QBO at all</option>
+        <option value="duplicate">Duplicate Entry — recorded twice in QBO</option>
+      </select>
+      <div id="d3-feedback" class="disc-feedback"></div>
+      <div id="d3-fix" style="display:none;margin-top:12px;">
+        <label style="font-size:0.8rem;color:var(--muted);margin-bottom:6px;display:block;">What is the correct fix?</label>
+        <select class="disc-select" id="d3-fix-select" onchange="checkDiscFix(3)">
+          <option value="">— Select the fix —</option>
+          <option value="correct">+New → Bank Deposit → Date 03/31/2024 → Account: Interest Income → Amount: $45 → Deposit to: Checking → Save</option>
+          <option value="wrong1">Add a journal entry: DR Interest Expense $45 / CR Cash $45</option>
+          <option value="wrong2">Record it as a Sales Receipt instead</option>
+          <option value="wrong3">Ignore it — interest income is not a real transaction</option>
+        </select>
+        <div id="d3-fix-feedback" class="disc-feedback"></div>
       </div>
     </div>
+
+    <!-- TIMING ITEM -->
+    <div class="disc-input-card" style="background:rgba(59,130,246,0.04);border-color:rgba(59,130,246,0.2);">
+      <div class="disc-input-label" style="color:var(--blue);">Bonus — Identify the Timing Item</div>
+      <div class="disc-input-title" style="color:var(--blue);">⏳ T-14 · Check #5503 GroomPro Tools · $380 · In QBO but NOT on bank statement</div>
+      <label style="font-size:0.8rem;color:var(--muted);margin-bottom:6px;display:block;">What should you do with this item?</label>
+      <select class="disc-select" id="d4-type" onchange="checkTiming()">
+        <option value="">— Select your answer —</option>
+        <option value="correct">Leave it unchecked — it's an outstanding check that will clear in April</option>
+        <option value="wrong1">Delete it from QBO — it hasn't cleared so it shouldn't be there</option>
+        <option value="wrong2">Add a reversing entry to remove it from reconciliation</option>
+        <option value="wrong3">Check it off — QBO recorded it so it must be correct</option>
+      </select>
+      <div id="d4-feedback" class="disc-feedback"></div>
+    </div>
+
+    <div id="disc-progress" style="text-align:center;padding:12px;font-size:0.82rem;color:var(--muted);margin-top:4px;">Complete all 3 discrepancies to unlock the Answer Key</div>
   </div>
 
   <!-- ANSWER KEY -->
@@ -483,12 +752,340 @@ audio.lab-audio{width:100%;height:32px;accent-color:#F59E0B;}
     </div>
   </div>
 </div>
+<!-- MISSION COMPLETE MODAL -->
+<div class="mission-modal" id="mission-modal">
+  <div class="mission-card">
+    <div class="mission-stars">⭐⭐⭐⭐⭐</div>
+    <div class="mission-title">Mission Complete!</div>
+    <div class="mission-subtitle">S01 — Bank Reconciliation · Juan's Pet Paradise</div>
+    <div class="mission-stats">
+      <div class="mission-stat">
+        <div class="mission-stat-val" id="mc-time">—</div>
+        <div class="mission-stat-label">Minutes</div>
+      </div>
+      <div class="mission-stat">
+        <div class="mission-stat-val">13/13</div>
+        <div class="mission-stat-label">Matched</div>
+      </div>
+      <div class="mission-stat">
+        <div class="mission-stat-val" style="color:#4ade80;">$0.00</div>
+        <div class="mission-stat-label">Difference</div>
+      </div>
+    </div>
+    <div class="mission-coach">
+      <div class="mission-coach-avatar">M</div>
+      <div class="mission-coach-text">"You just proved Juan's books are correct. Every $0.00 difference is you telling a US client: <strong style="color:var(--gold);">I can be trusted with your money.</strong> That's the job. S02 is unlocked — AR/AP awaits."</div>
+    </div>
+    <div class="mission-btns">
+      <button class="mission-btn-secondary" onclick="document.getElementById('mission-modal').classList.remove('show');switchTab('answers')">View Answer Key</button>
+      <button class="mission-btn-primary" onclick="window.location.href='practicehub-dashboard.html'">🏠 Back to Dashboard</button>
+    </div>
+  </div>
+</div>
+
 
 <script>
 window.addEventListener('scroll',()=>{const p=(window.scrollY/(document.documentElement.scrollHeight-window.innerHeight))*100;document.getElementById('prog').style.width=p+'%';});
 const obs=new IntersectionObserver(e=>{e.forEach(x=>{if(x.isIntersecting)x.target.classList.add('vis');});},{threshold:0.08});
 document.querySelectorAll('.fi').forEach(el=>obs.observe(el));
 function switchTab(id){document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('active'));document.getElementById('tab-'+id).classList.add('active');event.target.classList.add('active');window.scrollTo({top:200,behavior:'smooth'});}
+
+// ── TRACKING ──
+HUB.markVisited('s01');
+HUB.logActivity('Opened S01 Lab', 'Bank Reconciliation');
+
+// Tab tracking — wrap switchTab
+const _origSwitch = switchTab;
+function switchTab(id){
+  _origSwitch(id);
+  HUB.saveTab(id);
+}
+
+// Restore last tab on load
+(function(){
+  const hash = window.location.hash.replace('#','');
+  const validTabs = ['scenario','statement','transactions','discrepancies','answers'];
+  const target = validTabs.includes(hash) ? hash : HUB.getLastTab();
+  if(target && target !== 'scenario'){
+    setTimeout(()=>{
+      document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+      document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('active'));
+      document.getElementById('tab-'+target).classList.add('active');
+      const btn = document.querySelector('.tab[onclick="switchTab(\'' + target + '\')"]');
+      if(btn) btn.classList.add('active');
+    }, 100);
+  }
+})();
+
+
+// ════════════════════════════════════════════════
+// S01 INTERACTIVE SIMULATOR
+// ════════════════════════════════════════════════
+
+// Transaction data
+const TRANSACTIONS = [
+  { id:'T-01', date:'Mar 3',  desc:'POS Sales — Walk-in retail',      qbo:3200,   bank:3200,  type:'match',   dir:'in'  },
+  { id:'T-02', date:'Mar 5',  desc:'PetCo Wholesale (Check #5501)',    qbo:-2100,  bank:-2100, type:'match',   dir:'out' },
+  { id:'T-03', date:'Mar 8',  desc:'Shopify Payout — Mar 1–7',        qbo:4200,   bank:4200,  type:'match',   dir:'in'  },
+  { id:'T-04', date:'Mar 10', desc:'VetMed Supplies (Check #5502)',    qbo:-420,   bank:-240,  type:'error',   dir:'out' },
+  { id:'T-05', date:'Mar 15', desc:'Happy Tails Rescue — ACH',        qbo:2250,   bank:2250,  type:'match',   dir:'in'  },
+  { id:'T-06', date:'Mar 18', desc:'Rent — 123 Commerce Blvd',        qbo:-3500,  bank:-3500, type:'match',   dir:'out' },
+  { id:'T-07', date:'Mar 22', desc:'Sunshine Pet Hotel',              qbo:950,    bank:950,   type:'match',   dir:'in'  },
+  { id:'T-08', date:'Mar 25', desc:'San Antonio Utilities',           qbo:-420,   bank:-420,  type:'match',   dir:'out' },
+  { id:'T-09', date:'Mar 28', desc:'POS Sales — Walk-in retail',      qbo:12500,  bank:12500, type:'match',   dir:'in'  },
+  { id:'T-10', date:'Mar 29', desc:'Payroll Direct Deposit',          qbo:-4790,  bank:-4790, type:'match',   dir:'out' },
+  { id:'T-11', date:'Mar 30', desc:'Shopify Payout — Mar 8–28',       qbo:12480,  bank:12480, type:'match',   dir:'in'  },
+  { id:'T-12', date:'Mar 31', desc:'Bank Maintenance Fee',            qbo:0,      bank:-35,   type:'missing', dir:'out' },
+  { id:'T-13', date:'Mar 31', desc:'Interest Earned',                 qbo:0,      bank:45,    type:'missing', dir:'in'  },
+  { id:'T-14', date:'Mar 31', desc:'Check #5503 — GroomPro Tools',    qbo:-380,   bank:0,     type:'timing',  dir:'out' },
+];
+
+const BANK_CLOSE = 34390;
+const OPEN_BAL   = 9850;
+let checked = {};
+let startTime = Date.now();
+
+function fmt(n){
+  const abs = Math.abs(n);
+  const str = abs.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+  return (n < 0 ? '−$' : '$') + str;
+}
+
+function buildTable(){
+  const tbody = document.getElementById('sim-txn-body');
+  if(!tbody) return;
+  tbody.innerHTML = TRANSACTIONS.map((t,i) => {
+    const isTiming = t.type === 'timing';
+    const isMissing = t.type === 'missing';
+    const statusBadge = isTiming
+      ? '<span class="match-pill match-timing">⏳ Timing</span>'
+      : isMissing
+        ? '<span class="match-pill match-no">❌ Missing in QBO</span>'
+        : t.type === 'error'
+          ? '<span class="match-pill match-no">⚠️ Amount differs</span>'
+          : '<span class="match-pill match-yes" style="opacity:0.4;">✅ Match</span>';
+
+    const qboAmt = t.qbo === 0
+      ? '<span style="color:var(--muted);font-style:italic;">Not recorded</span>'
+      : `<span class="txn-amt ${t.dir==='in'?'amt-in':'amt-out'}">${fmt(t.qbo)}</span>`;
+
+    const bankAmt = t.bank === 0
+      ? '<span style="color:var(--muted);font-style:italic;">Not on statement</span>'
+      : `<span class="txn-amt">${fmt(t.bank)}</span>`;
+
+    const timingNote = isTiming ? '<div style="font-size:0.68rem;color:var(--blue);margin-top:2px;">Outstanding check — leave unchecked</div>' : '';
+    const missingNote = isMissing ? '<div style="font-size:0.68rem;color:var(--red);margin-top:2px;">Not yet recorded in QBO</div>' : '';
+
+    return `<tr class="txn-row-interactive${isTiming?' timing-item':''}" id="row-${i}" onclick="${isTiming?'':'toggleTxn('+i+')'}">
+      <td><div class="txn-checkbox" id="chk-${i}">${isTiming?'⏳':''}</div></td>
+      <td class="txn-num">${t.id}</td>
+      <td>${t.date}</td>
+      <td class="txn-desc">${t.desc}${timingNote}${missingNote}</td>
+      <td>${qboAmt}</td>
+      <td>${bankAmt}</td>
+      <td>${statusBadge}</td>
+    </tr>`;
+  }).join('');
+  updateBalance();
+}
+
+function toggleTxn(i){
+  const t = TRANSACTIONS[i];
+  if(t.type === 'timing') return;
+  checked[i] = !checked[i];
+  const row = document.getElementById('row-'+i);
+  const chk = document.getElementById('chk-'+i);
+  if(checked[i]){
+    row.classList.add('checked');
+    chk.innerHTML = '✓';
+  } else {
+    row.classList.remove('checked');
+    chk.innerHTML = '';
+  }
+  updateBalance();
+}
+
+function updateBalance(){
+  // QBO balance = opening + all checked QBO amounts
+  let qboRunning = OPEN_BAL;
+  let checkedCount = 0;
+  TRANSACTIONS.forEach((t,i) => {
+    if(t.type === 'timing') return; // timing never counted
+    if(checked[i]) {
+      qboRunning += t.qbo;
+      checkedCount++;
+    }
+  });
+
+  // Count checkable transactions (not timing, not missing with 0)
+  const checkable = TRANSACTIONS.filter(t => t.type !== 'timing').length;
+
+  const diff = qboRunning - BANK_CLOSE;
+  const diffEl = document.getElementById('running-diff');
+  const qboEl = document.getElementById('qbo-balance');
+  const cntEl = document.getElementById('checked-count');
+
+  if(qboEl) qboEl.textContent = fmt(qboRunning);
+  if(diffEl){
+    diffEl.textContent = fmt(diff);
+    diffEl.className = 'sim-balance-val ' + (diff === 0 ? 'green' : diff > 0 ? 'gold' : 'red');
+  }
+  if(cntEl) cntEl.textContent = checkedCount + '/' + checkable;
+}
+
+function submitReconciliation(){
+  // Check how many of the 13 checkable transactions were checked
+  const checkable = TRANSACTIONS.filter(t => t.type !== 'timing');
+  const checkedIds = checkable.map((t,i) => {
+    const origIdx = TRANSACTIONS.indexOf(t);
+    return checked[origIdx];
+  });
+  const totalChecked = checkedIds.filter(Boolean).length;
+
+  // Calculate actual QBO balance with corrections applied
+  let qboRunning = OPEN_BAL;
+  TRANSACTIONS.forEach((t,i) => {
+    if(t.type !== 'timing') qboRunning += (checked[i] ? t.qbo : 0);
+  });
+  const diff = qboRunning - BANK_CLOSE;
+
+  const vBox = document.getElementById('sim-validation');
+  vBox.classList.add('show');
+
+  if(totalChecked < 13){
+    vBox.className = 'validation-box show fail';
+    vBox.innerHTML = `⚠️ <strong>Not done yet.</strong> You've checked ${totalChecked} of 13 transactions. Review every line on the bank statement — make sure each one is either matched or identified as missing/error.`;
+    return;
+  }
+
+  // All 13 reviewed — show what the books currently say (this IS the finding, not a failure)
+  if(diff === 0){
+    vBox.className = 'validation-box show pass';
+    vBox.innerHTML = '✅ <strong>Difference = $0.00!</strong> Everything already matches. Head to the Discrepancies tab to confirm what you found.';
+  } else {
+    vBox.className = 'validation-box show pass';
+    vBox.innerHTML = `🔍 <strong>All 13 transactions reviewed!</strong> Your reconciliation shows a difference of <span class="running-diff">${fmt(diff)}</span> — that's the clue. Something doesn't match yet. Head to the <strong>Find the 3 Errors</strong> tab to investigate and fix it.`;
+  }
+
+  // Save progress
+  if(typeof HUB !== 'undefined'){
+    HUB.logActivity('Reviewed all S01 transactions', 'Found difference of ' + fmt(diff));
+    HUB.set('s01_matched', true);
+  }
+
+  // Unlock discrepancies tab highlight
+  document.querySelector(".tab[onclick=\"switchTab('discrepancies')\"]").style.background = 'rgba(251,191,36,0.2)';
+}
+
+// ── DISCREPANCY CHECKING ──────────────────────────────────────
+const discAnswers = {
+  1: { type: 'recording_error', fix: 'correct' },
+  2: { type: 'missing',        fix: 'correct' },
+  3: { type: 'missing',        fix: 'correct' },
+};
+let discCorrect = { 1:false, 2:false, 3:false, timing:false };
+
+function checkDisc(n){
+  const sel = document.getElementById('d'+n+'-type');
+  const fb  = document.getElementById('d'+n+'-feedback');
+  const fixDiv = document.getElementById('d'+n+'-fix');
+  const val = sel.value;
+  if(!val) return;
+
+  if(val === discAnswers[n].type){
+    sel.className = 'disc-select correct';
+    fb.className = 'disc-feedback show ok';
+    fb.innerHTML = '✅ Correct! Now select the fix.';
+    fixDiv.style.display = 'block';
+  } else {
+    sel.className = 'disc-select incorrect';
+    fb.className = 'disc-feedback show bad';
+    const hints = {
+      recording_error: 'A recording error means the wrong amount was entered in QBO.',
+      missing: 'A missing entry means the transaction appears on the bank statement but has no matching entry in QBO.',
+      timing: 'A timing difference means the transaction is in QBO but hasn\'t cleared the bank yet.',
+      duplicate: 'A duplicate entry means the same transaction was entered in QBO twice.'
+    };
+    fb.innerHTML = '❌ Not quite. ' + (hints[discAnswers[n].type] || '');
+    fixDiv.style.display = 'none';
+  }
+  checkAllDisc();
+}
+
+function checkDiscFix(n){
+  const sel = document.getElementById('d'+n+'-fix-select');
+  const fb  = document.getElementById('d'+n+'-fix-feedback');
+  const val = sel.value;
+  if(!val) return;
+
+  if(val === 'correct'){
+    sel.className = 'disc-select correct';
+    fb.className = 'disc-feedback show ok';
+    fb.innerHTML = '✅ Perfect fix! That\'s exactly what you\'d do in QBO.';
+    discCorrect[n] = true;
+  } else {
+    sel.className = 'disc-select incorrect';
+    fb.className = 'disc-feedback show bad';
+    fb.innerHTML = '❌ Not the best approach. Review the guidance above and try again.';
+    discCorrect[n] = false;
+  }
+  checkAllDisc();
+}
+
+function checkTiming(){
+  const sel = document.getElementById('d4-type');
+  const fb  = document.getElementById('d4-feedback');
+  if(sel.value === 'correct'){
+    sel.className = 'disc-select correct';
+    fb.className = 'disc-feedback show ok';
+    fb.innerHTML = '✅ Exactly right! Outstanding checks are normal — they\'ll clear next month.';
+    discCorrect.timing = true;
+  } else {
+    sel.className = 'disc-select incorrect';
+    fb.className = 'disc-feedback show bad';
+    fb.innerHTML = '❌ Remember: the check was correctly recorded in QBO. It just hasn\'t cleared the bank yet. Never delete valid entries.';
+    discCorrect.timing = false;
+  }
+  checkAllDisc();
+}
+
+function checkAllDisc(){
+  const allDone = discCorrect[1] && discCorrect[2] && discCorrect[3];
+  const prog = document.getElementById('disc-progress');
+  const count = [discCorrect[1],discCorrect[2],discCorrect[3]].filter(Boolean).length;
+
+  if(allDone){
+    prog.innerHTML = '🎉 All 3 discrepancies identified! Answer Key is now unlocked.';
+    prog.style.color = 'var(--green)';
+    prog.style.fontWeight = '700';
+    // Unlock answer key tab
+    document.querySelector(".tab[onclick=\"switchTab('answers')\"]").style.background = 'rgba(34,197,94,0.2)';
+    document.querySelector(".tab[onclick=\"switchTab('answers')\"]").style.color = 'var(--green)';
+    // Save progress + trigger mission complete
+    if(typeof HUB !== 'undefined'){
+      HUB.saveTab('answers');
+      HUB.markCompleted('s01');
+      HUB.logActivity('Completed S01 Bank Reconciliation', 'All discrepancies found');
+    }
+    // Show mission complete after short delay
+    setTimeout(showMissionComplete, 800);
+  } else {
+    prog.innerHTML = count + '/3 discrepancies identified correctly — keep going!';
+    prog.style.color = count > 0 ? 'var(--gold)' : 'var(--muted)';
+  }
+}
+
+function showMissionComplete(){
+  const elapsed = Math.round((Date.now() - startTime) / 60000);
+  document.getElementById('mc-time').textContent = elapsed < 1 ? '< 1' : elapsed;
+  document.getElementById('mission-modal').classList.add('show');
+  // Fire confetti if available
+  if(typeof launchConfetti !== 'undefined') launchConfetti();
+}
+
+// Build table on DOM ready
+document.addEventListener('DOMContentLoaded', buildTable);
+
 </script>
 </body>
 </html>

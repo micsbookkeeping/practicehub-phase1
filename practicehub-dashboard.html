@@ -1,3 +1,178 @@
+<script>
+// ============================================================
+// PRACTICE HUB — PROGRESS TRACKER v1.0
+// localStorage-based. No backend. No login required.
+// ============================================================
+
+const HUB = {
+
+  // ── READ / WRITE ──────────────────────────────────────────
+  get(key){ try{ return JSON.parse(localStorage.getItem('ph_'+key)); }catch(e){ return null; } },
+  set(key,val){ localStorage.setItem('ph_'+key, JSON.stringify(val)); },
+
+  // ── STREAK ───────────────────────────────────────────────
+  updateStreak(){
+    const today = new Date().toISOString().slice(0,10);
+    const data = this.get('streak') || { lastDate: null, count: 0 };
+    if(data.lastDate === today) return;
+    const yesterday = new Date(Date.now()-86400000).toISOString().slice(0,10);
+    data.count = (data.lastDate === yesterday) ? data.count + 1 : 1;
+    data.lastDate = today;
+    this.set('streak', data);
+  },
+
+  getStreak(){
+    const today = new Date().toISOString().slice(0,10);
+    const yesterday = new Date(Date.now()-86400000).toISOString().slice(0,10);
+    const data = this.get('streak') || { lastDate: null, count: 0 };
+    if(data.lastDate !== today && data.lastDate !== yesterday) return 0;
+    return data.count || 0;
+  },
+
+  // ── ACTIVITY LOG ─────────────────────────────────────────
+  logActivity(action, detail){
+    const log = this.get('activity') || [];
+    log.unshift({ action, detail, ts: Date.now() });
+    this.set('activity', log.slice(0,20));
+  },
+
+  getActivity(){ return this.get('activity') || []; },
+
+  // ── PAGE VISITS ──────────────────────────────────────────
+  markVisited(page){
+    const v = this.get('visited') || {};
+    if(!v[page]){ v[page] = Date.now(); this.set('visited', v); }
+  },
+
+  markCompleted(page){
+    const c = this.get('completed') || {};
+    c[page] = Date.now();
+    this.set('completed', c);
+  },
+
+  isCompleted(page){ const c = this.get('completed') || {}; return !!c[page]; },
+  isVisited(page){ const v = this.get('visited') || {}; return !!v[page]; },
+
+  // ── S01 TAB TRACKING ─────────────────────────────────────
+  saveTab(tab){
+    this.set('s01_last_tab', tab);
+    // Track tabs visited
+    const tabs = this.get('s01_tabs') || {};
+    tabs[tab] = Date.now();
+    this.set('s01_tabs', tabs);
+    // If answer key reached = sim done
+    if(tab === 'answers'){
+      this.markCompleted('s01');
+      this.logActivity('Completed S01 Bank Reconciliation', 'Reached Answer Key');
+    }
+  },
+
+  getLastTab(){ return this.get('s01_last_tab') || 'scenario'; },
+
+  getS01TabsVisited(){
+    const tabs = this.get('s01_tabs') || {};
+    return Object.keys(tabs).length;
+  },
+
+  // ── LESSON TRACKING ──────────────────────────────────────
+  markLessonPlayed(lessonKey){
+    const lessons = this.get('lessons') || {};
+    if(!lessons[lessonKey]){
+      lessons[lessonKey] = Date.now();
+      this.set('lessons', lessons);
+      this.logActivity('Listened to lesson', lessonKey);
+    }
+  },
+
+  getLessonsCompleted(){
+    const lessons = this.get('lessons') || {};
+    return Object.keys(lessons).length;
+  },
+
+  // ── METRICS ──────────────────────────────────────────────
+  getMetrics(){
+    const completed = this.get('completed') || {};
+    const lessons = this.get('lessons') || {};
+    const s01tabs = this.get('s01_tabs') || {};
+
+    // Lessons done = foundation lessons played
+    const lessonsDone = Object.keys(lessons).length;
+
+    // Transactions = tabs visited in s01 × avg transactions per tab
+    const tabWeights = { scenario:0, statement:4, transactions:6, discrepancies:3, answers:1 };
+    let transactions = 0;
+    Object.keys(s01tabs).forEach(t => { transactions += (tabWeights[t]||0); });
+
+    // Sims done
+    const simsDone = ['s01','s02','s03','s04','s05','s06'].filter(s => completed[s]).length;
+
+    // Streak
+    const streak = this.getStreak();
+
+    // Job readiness weights
+    const weights = {
+      'slide0': 5,
+      'qbo-setup': 10,
+      'lesson0': 10,
+      'lesson-welcome':2,'lesson-equation':2,'lesson-debit':2,
+      'lesson-cycle':2,'lesson-flow':2,'lesson-qbo':2,'lesson-mindset':2,
+      's01': 15, 's02':15, 's03':15, 's04':15, 's05':5, 's06':5
+    };
+    let readiness = 0;
+    Object.keys(weights).forEach(k => {
+      if(completed[k] || lessons[k]) readiness += weights[k];
+    });
+    readiness = Math.min(100, Math.round(readiness));
+
+    // S01 progress (tabs visited / 5)
+    const s01Progress = Math.round((Object.keys(s01tabs).length / 5) * 100);
+
+    return { lessonsDone, transactions, simsDone, streak, readiness, s01Progress };
+  },
+
+  // ── JOURNEY STATES ───────────────────────────────────────
+  getJourneyStates(){
+    const completed = this.get('completed') || {};
+    const visited = this.get('visited') || {};
+
+    const state = (key, unlockedIf) => {
+      if(completed[key]) return 'complete';
+      if(visited[key] || completed[key]) return 'inprogress';
+      if(unlockedIf) return 'unlocked';
+      return 'locked';
+    };
+
+    return {
+      foundation: visited['slide0'] || Object.keys(this.get('lessons')||{}).length > 0 ? (this.getLessonsCompleted()>=7?'complete':'inprogress') : 'unlocked',
+      qboSetup:   state('qbo-setup', true),
+      lesson0:    state('lesson0', true),
+      s01:        state('s01', true),
+      s02:        state('s02', completed['s01']),
+      s03:        state('s03', completed['s02']),
+      s04s06:     state('s04', completed['s03']),
+    };
+  },
+
+  // ── ACHIEVEMENTS ─────────────────────────────────────────
+  getAchievements(){
+    const completed = this.get('completed') || {};
+    const lessons = this.get('lessons') || {};
+    const s01tabs = this.get('s01_tabs') || {};
+    return [
+      { id:'first_lesson',    label:'First Lesson Completed',        earned: Object.keys(lessons).length >= 1 },
+      { id:'foundation_done', label:'Foundation Knowledge Complete',  earned: Object.keys(lessons).length >= 7 },
+      { id:'qbo_setup',       label:'QBO Company Set Up',             earned: !!completed['qbo-setup'] },
+      { id:'first_recon',     label:'First Bank Reconciliation',      earned: !!completed['s01'] },
+      { id:'s01_explorer',    label:'S01 Explorer',                   earned: Object.keys(s01tabs).length >= 3 },
+      { id:'all_tabs',        label:'Full Lab Walkthrough',           earned: Object.keys(s01tabs).length >= 5 },
+    ];
+  }
+};
+
+// Always update streak on load
+HUB.updateStreak();
+
+</script>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -396,20 +571,20 @@ html,body{height:100%;font-family:'Inter',sans-serif;color:var(--qbo-text);backg
     <div style="font-size:0.72rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.5);margin-bottom:4px;">WELCOME BACK</div>
     <div style="font-size:1.3rem;font-weight:800;margin-bottom:2px;">Student 🐾</div>
     <div style="font-size:0.82rem;color:rgba(255,255,255,0.6);margin-bottom:20px;">Phase 1 · Personal Mastery · Juan's Pet Paradise</div>
-
-    <!-- Current Mission -->
     <div style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.12);border-radius:10px;padding:16px;margin-bottom:16px;">
       <div style="font-size:0.65rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--gold);margin-bottom:8px;">🎯 CURRENT MISSION</div>
       <div style="font-size:1rem;font-weight:700;margin-bottom:4px;">S01 — Bank Reconciliation</div>
       <div style="font-size:0.78rem;color:rgba(255,255,255,0.6);margin-bottom:12px;">Match QBO to the bank statement · Find 3 discrepancies · Hit $0.00</div>
-      <div style="font-size:0.7rem;color:rgba(255,255,255,0.5);margin-bottom:6px;">Last activity: Matching Bank Feed Transactions</div>
-      <!-- Progress bar -->
+      <div id="db-last-activity" style="font-size:0.7rem;color:rgba(255,255,255,0.5);margin-bottom:6px;">Start your first activity</div>
       <div style="background:rgba(255,255,255,0.1);border-radius:20px;height:8px;margin-bottom:8px;overflow:hidden;">
-        <div style="background:var(--gold);width:42%;height:100%;border-radius:20px;"></div>
+        <div id="db-progress-bar" style="background:var(--gold);width:0%;height:100%;border-radius:20px;transition:width 0.8s ease;"></div>
       </div>
       <div style="display:flex;justify-content:space-between;align-items:center;">
-        <span style="font-size:0.72rem;color:rgba(255,255,255,0.5);">42% complete</span>
-        <button onclick="showPreview('s01')" style="background:var(--gold);color:#fff;border:none;padding:8px 20px;border-radius:6px;font-size:0.82rem;font-weight:700;cursor:pointer;">Resume Mission →</button>
+        <span id="db-progress-pct" style="font-size:0.72rem;color:rgba(255,255,255,0.5);">0% complete</span>
+        <div style="display:flex;gap:8px;">
+          <button onclick="launchSimulator()" style="background:rgba(255,255,255,0.15);color:#fff;border:1px solid rgba(255,255,255,0.3);padding:8px 14px;border-radius:6px;font-size:0.78rem;cursor:pointer;">Open Simulator ↗</button>
+          <button onclick="showPreview('s01')" style="background:var(--gold);color:#fff;border:none;padding:8px 20px;border-radius:6px;font-size:0.82rem;font-weight:700;cursor:pointer;">Continue Lab →</button>
+        </div>
       </div>
     </div>
   </div>
@@ -417,23 +592,23 @@ html,body{height:100%;font-family:'Inter',sans-serif;color:var(--qbo-text);backg
   <!-- STATS ROW -->
   <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:20px;">
     <div style="background:#fff;border:1px solid var(--qbo-border);border-radius:10px;padding:14px;text-align:center;">
-      <div style="font-size:1.4rem;font-weight:800;color:var(--qbo-green);">12</div>
+      <div id="db-lessons" style="font-size:1.4rem;font-weight:800;color:var(--qbo-green);">0</div>
       <div style="font-size:0.65rem;color:var(--qbo-muted);margin-top:2px;">Lessons Done</div>
     </div>
     <div style="background:#fff;border:1px solid var(--qbo-border);border-radius:10px;padding:14px;text-align:center;">
-      <div style="font-size:1.4rem;font-weight:800;color:var(--qbo-blue);">87</div>
+      <div id="db-transactions" style="font-size:1.4rem;font-weight:800;color:var(--qbo-blue);">0</div>
       <div style="font-size:0.65rem;color:var(--qbo-muted);margin-top:2px;">Transactions</div>
     </div>
     <div style="background:#fff;border:1px solid var(--qbo-border);border-radius:10px;padding:14px;text-align:center;">
-      <div style="font-size:1.4rem;font-weight:800;color:var(--gold);">4</div>
+      <div id="db-sims" style="font-size:1.4rem;font-weight:800;color:var(--gold);">0</div>
       <div style="font-size:0.65rem;color:var(--qbo-muted);margin-top:2px;">Sims Done</div>
     </div>
     <div style="background:#fff;border:1px solid var(--qbo-border);border-radius:10px;padding:14px;text-align:center;">
-      <div style="font-size:1.4rem;font-weight:800;color:var(--qbo-green);">94%</div>
+      <div id="db-accuracy" style="font-size:1.1rem;font-weight:800;color:var(--qbo-muted);">N/A</div>
       <div style="font-size:0.65rem;color:var(--qbo-muted);margin-top:2px;">Accuracy</div>
     </div>
     <div style="background:#fff;border:1px solid var(--qbo-border);border-radius:10px;padding:14px;text-align:center;">
-      <div style="font-size:1.4rem;font-weight:800;color:var(--qbo-blue);">5🔥</div>
+      <div id="db-streak" style="font-size:1.4rem;font-weight:800;color:var(--qbo-blue);">0🔥</div>
       <div style="font-size:0.65rem;color:var(--qbo-muted);margin-top:2px;">Day Streak</div>
     </div>
   </div>
@@ -444,29 +619,7 @@ html,body{height:100%;font-family:'Inter',sans-serif;color:var(--qbo-text);backg
     <!-- JOURNEY MAP -->
     <div style="background:#fff;border:1px solid var(--qbo-border);border-radius:12px;padding:18px;">
       <div style="font-size:0.7rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--qbo-muted);margin-bottom:14px;">YOUR JOURNEY</div>
-      <div style="display:flex;flex-direction:column;gap:8px;">
-        <div style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--qbo-green-lt);border-radius:8px;border-left:3px solid var(--qbo-green);">
-          <span>✅</span><div><div style="font-size:0.82rem;font-weight:600;color:var(--qbo-green);">Foundation Lessons</div><div style="font-size:0.7rem;color:var(--qbo-muted);">Complete</div></div>
-        </div>
-        <div style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--qbo-green-lt);border-radius:8px;border-left:3px solid var(--qbo-green);">
-          <span>✅</span><div><div style="font-size:0.82rem;font-weight:600;color:var(--qbo-green);">QBO Setup</div><div style="font-size:0.7rem;color:var(--qbo-muted);">Complete</div></div>
-        </div>
-        <div style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--qbo-green-lt);border-radius:8px;border-left:3px solid var(--qbo-green);">
-          <span>✅</span><div><div style="font-size:0.82rem;font-weight:600;color:var(--qbo-green);">Lesson 0</div><div style="font-size:0.7rem;color:var(--qbo-muted);">Complete</div></div>
-        </div>
-        <div onclick="showPreview('s01')" style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--qbo-blue-lt);border-radius:8px;border-left:3px solid var(--qbo-blue);cursor:pointer;">
-          <span>▶️</span><div><div style="font-size:0.82rem;font-weight:700;color:var(--qbo-blue);">S01 Bank Reconciliation</div><div style="font-size:0.7rem;color:var(--qbo-blue);">In Progress — click to enter</div></div>
-        </div>
-        <div style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--qbo-bg);border-radius:8px;border-left:3px solid var(--qbo-border);opacity:0.6;">
-          <span>🔒</span><div><div style="font-size:0.82rem;font-weight:600;color:var(--qbo-muted);">S02 AR/AP</div><div style="font-size:0.7rem;color:var(--qbo-muted);">Locked</div></div>
-        </div>
-        <div style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--qbo-bg);border-radius:8px;border-left:3px solid var(--qbo-border);opacity:0.6;">
-          <span>🔒</span><div><div style="font-size:0.82rem;font-weight:600;color:var(--qbo-muted);">S03 Inventory</div><div style="font-size:0.7rem;color:var(--qbo-muted);">Locked</div></div>
-        </div>
-        <div style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--qbo-bg);border-radius:8px;border-left:3px solid var(--qbo-border);opacity:0.6;">
-          <span>🔒</span><div><div style="font-size:0.82rem;font-weight:600;color:var(--qbo-muted);">S04–S06</div><div style="font-size:0.7rem;color:var(--qbo-muted);">Locked</div></div>
-        </div>
-      </div>
+      <div id="db-journey" style="display:flex;flex-direction:column;gap:8px;"></div>
     </div>
 
     <!-- RECENT ACTIVITY + ACHIEVEMENTS -->
@@ -474,22 +627,12 @@ html,body{height:100%;font-family:'Inter',sans-serif;color:var(--qbo-text);backg
       <!-- Recent Activity -->
       <div style="background:#fff;border:1px solid var(--qbo-border);border-radius:12px;padding:18px;">
         <div style="font-size:0.7rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--qbo-muted);margin-bottom:12px;">RECENT ACTIVITY</div>
-        <div style="display:flex;flex-direction:column;gap:8px;">
-          <div style="display:flex;align-items:center;gap:8px;font-size:0.78rem;"><span style="color:var(--qbo-green);">✓</span><span>Completed Accounting Equation</span></div>
-          <div style="display:flex;align-items:center;gap:8px;font-size:0.78rem;"><span style="color:var(--qbo-green);">✓</span><span>Finished Chart of Accounts</span></div>
-          <div style="display:flex;align-items:center;gap:8px;font-size:0.78rem;"><span style="color:var(--qbo-green);">✓</span><span>Started S01 Bank Recon</span></div>
-          <div onclick="showPreview('s01')" style="display:flex;align-items:center;gap:8px;font-size:0.78rem;font-weight:600;color:var(--qbo-blue);cursor:pointer;padding:6px 10px;background:var(--qbo-blue-lt);border-radius:6px;">→ Continue S01 Step 4</div>
-        </div>
+        <div id="db-activity" style="display:flex;flex-direction:column;gap:8px;"></div>
       </div>
       <!-- Achievements -->
       <div style="background:#fff;border:1px solid var(--qbo-border);border-radius:12px;padding:18px;">
         <div style="font-size:0.7rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--qbo-muted);margin-bottom:12px;">ACHIEVEMENTS</div>
-        <div style="display:flex;flex-direction:column;gap:6px;">
-          <div style="display:flex;align-items:center;gap:8px;font-size:0.78rem;"><span>🏆</span><span>First Chart of Accounts Created</span></div>
-          <div style="display:flex;align-items:center;gap:8px;font-size:0.78rem;"><span>🏆</span><span>First Customer Invoice Recorded</span></div>
-          <div style="display:flex;align-items:center;gap:8px;font-size:0.78rem;color:var(--qbo-muted);"><span>⬜</span><span>First Bank Reconciliation</span></div>
-          <div style="display:flex;align-items:center;gap:8px;font-size:0.78rem;color:var(--qbo-muted);"><span>⬜</span><span>Payroll Specialist</span></div>
-        </div>
+        <div id="db-achievements" style="display:flex;flex-direction:column;gap:6px;"></div>
       </div>
     </div>
   </div>
@@ -497,32 +640,7 @@ html,body{height:100%;font-family:'Inter',sans-serif;color:var(--qbo-text);backg
   <!-- JOB READINESS METER -->
   <div style="background:#fff;border:1px solid var(--qbo-border);border-radius:12px;padding:20px;margin-bottom:20px;">
     <div style="font-size:0.7rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--qbo-muted);margin-bottom:16px;">💼 JOB READINESS METER</div>
-    <div style="display:flex;flex-direction:column;gap:10px;">
-      <div>
-        <div style="display:flex;justify-content:space-between;font-size:0.78rem;margin-bottom:4px;"><span style="font-weight:600;">Foundation Knowledge</span><span style="color:var(--qbo-green);font-weight:700;">80%</span></div>
-        <div style="background:var(--qbo-border);border-radius:20px;height:7px;overflow:hidden;"><div style="background:var(--qbo-green);width:80%;height:100%;border-radius:20px;"></div></div>
-      </div>
-      <div>
-        <div style="display:flex;justify-content:space-between;font-size:0.78rem;margin-bottom:4px;"><span style="font-weight:600;">QBO Navigation</span><span style="color:var(--qbo-green);font-weight:700;">60%</span></div>
-        <div style="background:var(--qbo-border);border-radius:20px;height:7px;overflow:hidden;"><div style="background:var(--qbo-green);width:60%;height:100%;border-radius:20px;"></div></div>
-      </div>
-      <div>
-        <div style="display:flex;justify-content:space-between;font-size:0.78rem;margin-bottom:4px;"><span style="font-weight:600;">Bank Reconciliation</span><span style="color:var(--gold);font-weight:700;">40%</span></div>
-        <div style="background:var(--qbo-border);border-radius:20px;height:7px;overflow:hidden;"><div style="background:var(--gold);width:40%;height:100%;border-radius:20px;"></div></div>
-      </div>
-      <div>
-        <div style="display:flex;justify-content:space-between;font-size:0.78rem;margin-bottom:4px;"><span style="font-weight:600;color:var(--qbo-muted);">AR/AP</span><span style="color:var(--qbo-muted);font-weight:700;">0%</span></div>
-        <div style="background:var(--qbo-border);border-radius:20px;height:7px;overflow:hidden;"><div style="background:var(--qbo-border);width:0%;height:100%;border-radius:20px;"></div></div>
-      </div>
-      <div>
-        <div style="display:flex;justify-content:space-between;font-size:0.78rem;margin-bottom:4px;"><span style="font-weight:600;color:var(--qbo-muted);">Payroll</span><span style="color:var(--qbo-muted);font-weight:700;">0%</span></div>
-        <div style="background:var(--qbo-border);border-radius:20px;height:7px;overflow:hidden;"><div style="background:var(--qbo-border);width:0%;height:100%;border-radius:20px;"></div></div>
-      </div>
-      <div style="margin-top:8px;padding-top:12px;border-top:1px solid var(--qbo-border);display:flex;justify-content:space-between;align-items:center;">
-        <span style="font-size:0.82rem;font-weight:700;">Overall Job Readiness</span>
-        <span style="font-size:1.1rem;font-weight:800;color:var(--qbo-green);">32%</span>
-      </div>
-    </div>
+    <div id="db-readiness" style="display:flex;flex-direction:column;gap:10px;"></div>
   </div>
 
   <!-- COACH MIC WIDGET -->
@@ -1189,6 +1307,140 @@ function showSolution(){
 // ── INIT ──
 renderTxns();
 updateDiff();
+
+// ════════════════════════════════════════════════
+// PRACTICE HUB DASHBOARD — DYNAMIC RENDERER
+// ════════════════════════════════════════════════
+
+function launchSimulator(){
+  const lastTab = HUB.getLastTab();
+  window.open('s01-lab.html#'+lastTab, '_blank');
+}
+
+function renderDashboard(){
+  const m = HUB.getMetrics();
+  const journey = HUB.getJourneyStates();
+  const activity = HUB.getActivity();
+  const achievements = HUB.getAchievements();
+
+  // ── STATS ──
+  document.getElementById('db-lessons').textContent = m.lessonsDone || '0';
+  document.getElementById('db-transactions').textContent = m.transactions || '0';
+  document.getElementById('db-sims').textContent = m.simsDone || '0';
+  document.getElementById('db-streak').textContent = (m.streak||0)+'🔥';
+  document.getElementById('db-accuracy').textContent = 'N/A';
+  document.getElementById('db-accuracy').style.fontSize = '1rem';
+
+  // ── PROGRESS BAR ──
+  const pct = m.s01Progress || 0;
+  document.getElementById('db-progress-bar').style.width = pct+'%';
+  document.getElementById('db-progress-pct').textContent = pct+'% complete';
+
+  // ── LAST ACTIVITY ──
+  const acts = HUB.getActivity();
+  if(acts.length > 0){
+    document.getElementById('db-last-activity').textContent = 'Last: '+acts[0].action;
+  } else {
+    document.getElementById('db-last-activity').textContent = 'Start your first lesson to begin';
+  }
+
+  // ── JOURNEY MAP ──
+  const jEl = document.getElementById('db-journey');
+  const jItems = [
+    { key:'foundation', label:'Foundation Lessons',    href:'#',           state: journey.foundation },
+    { key:'qboSetup',   label:'QBO Setup',             href:'qbo-setup-guide.html', state: journey.qboSetup },
+    { key:'lesson0',    label:'Lesson 0 — Quick Recall', href:'lesson0-phase1.html', state: journey.lesson0 },
+    { key:'s01',        label:'S01 Bank Reconciliation', href:'s01-lab.html', state: journey.s01, current:true },
+    { key:'s02',        label:'S02 AR/AP',              href:'#',           state: journey.s02 },
+    { key:'s03',        label:'S03 Inventory',          href:'#',           state: journey.s03 },
+    { key:'s04s06',     label:'S04–S06',                href:'#',           state: journey.s04s06 },
+  ];
+
+  const stateStyle = {
+    complete:   { bg:'var(--qbo-green-lt)', border:'var(--qbo-green)',  icon:'✅', color:'var(--qbo-green)',  sub:'Complete',     opacity:'1',   cursor:'pointer' },
+    inprogress: { bg:'var(--qbo-blue-lt)',  border:'var(--qbo-blue)',   icon:'▶️', color:'var(--qbo-blue)',   sub:'In Progress',  opacity:'1',   cursor:'pointer' },
+    unlocked:   { bg:'#FFF9E6',             border:'var(--gold)',       icon:'🔓', color:'var(--gold)',       sub:'Ready to start', opacity:'1', cursor:'pointer' },
+    locked:     { bg:'var(--qbo-bg)',       border:'var(--qbo-border)', icon:'🔒', color:'var(--qbo-muted)',  sub:'Locked',       opacity:'0.6', cursor:'default'  },
+  };
+
+  jEl.innerHTML = jItems.map(item => {
+    const s = stateStyle[item.state] || stateStyle.locked;
+    const clickable = item.state !== 'locked' && item.href !== '#';
+    const onclick = clickable ? `onclick="window.open('${item.href}','_blank')"` : (item.state==='inprogress'&&item.current ? `onclick="showPreview('s01')"` : '');
+    return `<div ${onclick} style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:${s.bg};border-radius:8px;border-left:3px solid ${s.border};opacity:${s.opacity};cursor:${s.cursor};">
+      <span>${s.icon}</span>
+      <div>
+        <div style="font-size:0.82rem;font-weight:${item.state==='locked'?'600':'700'};color:${s.color};">${item.label}</div>
+        <div style="font-size:0.7rem;color:${item.state==='locked'?'var(--qbo-muted)':s.color};">${s.sub}</div>
+      </div>
+    </div>`;
+  }).join('');
+
+  // ── RECENT ACTIVITY ──
+  const actEl = document.getElementById('db-activity');
+  if(activity.length === 0){
+    actEl.innerHTML = '<div style="font-size:0.78rem;color:var(--qbo-muted);text-align:center;padding:12px;">Start your first lesson to begin tracking activity.</div>';
+  } else {
+    const items = activity.slice(0,4).map((a,i) => {
+      const isLatest = i===0;
+      if(isLatest && HUB.isVisited('s01')){
+        return `<div onclick="launchSimulator()" style="display:flex;align-items:center;gap:8px;font-size:0.78rem;font-weight:600;color:var(--qbo-blue);cursor:pointer;padding:6px 10px;background:var(--qbo-blue-lt);border-radius:6px;">→ Continue Lab: ${a.action}</div>`;
+      }
+      return `<div style="display:flex;align-items:center;gap:8px;font-size:0.78rem;"><span style="color:var(--qbo-green);">✓</span><span>${a.action}</span></div>`;
+    });
+    actEl.innerHTML = items.join('');
+  }
+
+  // ── ACHIEVEMENTS ──
+  const achEl = document.getElementById('db-achievements');
+  if(achievements.every(a=>!a.earned)){
+    achEl.innerHTML = '<div style="font-size:0.78rem;color:var(--qbo-muted);">Complete your first lesson to earn your first achievement.</div>';
+  } else {
+    achEl.innerHTML = achievements.map(a =>
+      `<div style="display:flex;align-items:center;gap:8px;font-size:0.78rem;${!a.earned?'color:var(--qbo-muted);':''}">
+        <span>${a.earned?'🏆':'⬜'}</span><span>${a.label}</span>
+      </div>`
+    ).join('');
+  }
+
+  // ── JOB READINESS ──
+  const lessons = HUB.get('lessons') || {};
+  const completed = HUB.get('completed') || {};
+  const lessonCount = Object.keys(lessons).length;
+  const maxLessons = 8;
+
+  const readinessBars = [
+    { label:'Foundation Knowledge', pct: Math.min(100,Math.round((lessonCount/maxLessons)*100)), color:'var(--qbo-green)' },
+    { label:'QBO Navigation',       pct: completed['qbo-setup'] ? 100 : (HUB.isVisited('qbo-setup')?50:0), color:'var(--qbo-green)' },
+    { label:'Bank Reconciliation',  pct: completed['s01'] ? 100 : (m.s01Progress||0), color:'var(--gold)' },
+    { label:'AR/AP',                pct: completed['s02'] ? 100 : 0, color:'var(--qbo-muted)' },
+    { label:'Payroll',              pct: completed['s04'] ? 100 : 0, color:'var(--qbo-muted)' },
+  ];
+
+  const overallReadiness = m.readiness || 0;
+  const rdEl = document.getElementById('db-readiness');
+  rdEl.innerHTML = readinessBars.map(b => `
+    <div>
+      <div style="display:flex;justify-content:space-between;font-size:0.78rem;margin-bottom:4px;">
+        <span style="font-weight:600;${b.pct===0?'color:var(--qbo-muted);':''}">${b.label}</span>
+        <span style="color:${b.pct>0?b.color:'var(--qbo-muted)'};font-weight:700;">${b.pct}%</span>
+      </div>
+      <div style="background:var(--qbo-border);border-radius:20px;height:7px;overflow:hidden;">
+        <div style="background:${b.pct>0?b.color:'var(--qbo-border)'};width:${b.pct}%;height:100%;border-radius:20px;transition:width 1s ease;"></div>
+      </div>
+    </div>
+  `).join('') + `
+    <div style="margin-top:8px;padding-top:12px;border-top:1px solid var(--qbo-border);display:flex;justify-content:space-between;align-items:center;">
+      <span style="font-size:0.82rem;font-weight:700;">Overall Job Readiness</span>
+      <span style="font-size:1.1rem;font-weight:800;color:${overallReadiness>0?'var(--qbo-green)':'var(--qbo-muted)'};">${overallReadiness}%</span>
+    </div>`;
+}
+
+// ── TRACKER + RENDER ON LOAD ──
+HUB.markVisited('dashboard');
+HUB.updateStreak();
+document.addEventListener('DOMContentLoaded', renderDashboard);
+
 </script>
 </body>
 </html>

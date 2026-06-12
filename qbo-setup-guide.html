@@ -1,3 +1,178 @@
+<script>
+// ============================================================
+// PRACTICE HUB — PROGRESS TRACKER v1.0
+// localStorage-based. No backend. No login required.
+// ============================================================
+
+const HUB = {
+
+  // ── READ / WRITE ──────────────────────────────────────────
+  get(key){ try{ return JSON.parse(localStorage.getItem('ph_'+key)); }catch(e){ return null; } },
+  set(key,val){ localStorage.setItem('ph_'+key, JSON.stringify(val)); },
+
+  // ── STREAK ───────────────────────────────────────────────
+  updateStreak(){
+    const today = new Date().toISOString().slice(0,10);
+    const data = this.get('streak') || { lastDate: null, count: 0 };
+    if(data.lastDate === today) return;
+    const yesterday = new Date(Date.now()-86400000).toISOString().slice(0,10);
+    data.count = (data.lastDate === yesterday) ? data.count + 1 : 1;
+    data.lastDate = today;
+    this.set('streak', data);
+  },
+
+  getStreak(){
+    const today = new Date().toISOString().slice(0,10);
+    const yesterday = new Date(Date.now()-86400000).toISOString().slice(0,10);
+    const data = this.get('streak') || { lastDate: null, count: 0 };
+    if(data.lastDate !== today && data.lastDate !== yesterday) return 0;
+    return data.count || 0;
+  },
+
+  // ── ACTIVITY LOG ─────────────────────────────────────────
+  logActivity(action, detail){
+    const log = this.get('activity') || [];
+    log.unshift({ action, detail, ts: Date.now() });
+    this.set('activity', log.slice(0,20));
+  },
+
+  getActivity(){ return this.get('activity') || []; },
+
+  // ── PAGE VISITS ──────────────────────────────────────────
+  markVisited(page){
+    const v = this.get('visited') || {};
+    if(!v[page]){ v[page] = Date.now(); this.set('visited', v); }
+  },
+
+  markCompleted(page){
+    const c = this.get('completed') || {};
+    c[page] = Date.now();
+    this.set('completed', c);
+  },
+
+  isCompleted(page){ const c = this.get('completed') || {}; return !!c[page]; },
+  isVisited(page){ const v = this.get('visited') || {}; return !!v[page]; },
+
+  // ── S01 TAB TRACKING ─────────────────────────────────────
+  saveTab(tab){
+    this.set('s01_last_tab', tab);
+    // Track tabs visited
+    const tabs = this.get('s01_tabs') || {};
+    tabs[tab] = Date.now();
+    this.set('s01_tabs', tabs);
+    // If answer key reached = sim done
+    if(tab === 'answers'){
+      this.markCompleted('s01');
+      this.logActivity('Completed S01 Bank Reconciliation', 'Reached Answer Key');
+    }
+  },
+
+  getLastTab(){ return this.get('s01_last_tab') || 'scenario'; },
+
+  getS01TabsVisited(){
+    const tabs = this.get('s01_tabs') || {};
+    return Object.keys(tabs).length;
+  },
+
+  // ── LESSON TRACKING ──────────────────────────────────────
+  markLessonPlayed(lessonKey){
+    const lessons = this.get('lessons') || {};
+    if(!lessons[lessonKey]){
+      lessons[lessonKey] = Date.now();
+      this.set('lessons', lessons);
+      this.logActivity('Listened to lesson', lessonKey);
+    }
+  },
+
+  getLessonsCompleted(){
+    const lessons = this.get('lessons') || {};
+    return Object.keys(lessons).length;
+  },
+
+  // ── METRICS ──────────────────────────────────────────────
+  getMetrics(){
+    const completed = this.get('completed') || {};
+    const lessons = this.get('lessons') || {};
+    const s01tabs = this.get('s01_tabs') || {};
+
+    // Lessons done = foundation lessons played
+    const lessonsDone = Object.keys(lessons).length;
+
+    // Transactions = tabs visited in s01 × avg transactions per tab
+    const tabWeights = { scenario:0, statement:4, transactions:6, discrepancies:3, answers:1 };
+    let transactions = 0;
+    Object.keys(s01tabs).forEach(t => { transactions += (tabWeights[t]||0); });
+
+    // Sims done
+    const simsDone = ['s01','s02','s03','s04','s05','s06'].filter(s => completed[s]).length;
+
+    // Streak
+    const streak = this.getStreak();
+
+    // Job readiness weights
+    const weights = {
+      'slide0': 5,
+      'qbo-setup': 10,
+      'lesson0': 10,
+      'lesson-welcome':2,'lesson-equation':2,'lesson-debit':2,
+      'lesson-cycle':2,'lesson-flow':2,'lesson-qbo':2,'lesson-mindset':2,
+      's01': 15, 's02':15, 's03':15, 's04':15, 's05':5, 's06':5
+    };
+    let readiness = 0;
+    Object.keys(weights).forEach(k => {
+      if(completed[k] || lessons[k]) readiness += weights[k];
+    });
+    readiness = Math.min(100, Math.round(readiness));
+
+    // S01 progress (tabs visited / 5)
+    const s01Progress = Math.round((Object.keys(s01tabs).length / 5) * 100);
+
+    return { lessonsDone, transactions, simsDone, streak, readiness, s01Progress };
+  },
+
+  // ── JOURNEY STATES ───────────────────────────────────────
+  getJourneyStates(){
+    const completed = this.get('completed') || {};
+    const visited = this.get('visited') || {};
+
+    const state = (key, unlockedIf) => {
+      if(completed[key]) return 'complete';
+      if(visited[key] || completed[key]) return 'inprogress';
+      if(unlockedIf) return 'unlocked';
+      return 'locked';
+    };
+
+    return {
+      foundation: visited['slide0'] || Object.keys(this.get('lessons')||{}).length > 0 ? (this.getLessonsCompleted()>=7?'complete':'inprogress') : 'unlocked',
+      qboSetup:   state('qbo-setup', true),
+      lesson0:    state('lesson0', true),
+      s01:        state('s01', true),
+      s02:        state('s02', completed['s01']),
+      s03:        state('s03', completed['s02']),
+      s04s06:     state('s04', completed['s03']),
+    };
+  },
+
+  // ── ACHIEVEMENTS ─────────────────────────────────────────
+  getAchievements(){
+    const completed = this.get('completed') || {};
+    const lessons = this.get('lessons') || {};
+    const s01tabs = this.get('s01_tabs') || {};
+    return [
+      { id:'first_lesson',    label:'First Lesson Completed',        earned: Object.keys(lessons).length >= 1 },
+      { id:'foundation_done', label:'Foundation Knowledge Complete',  earned: Object.keys(lessons).length >= 7 },
+      { id:'qbo_setup',       label:'QBO Company Set Up',             earned: !!completed['qbo-setup'] },
+      { id:'first_recon',     label:'First Bank Reconciliation',      earned: !!completed['s01'] },
+      { id:'s01_explorer',    label:'S01 Explorer',                   earned: Object.keys(s01tabs).length >= 3 },
+      { id:'all_tabs',        label:'Full Lab Walkthrough',           earned: Object.keys(s01tabs).length >= 5 },
+    ];
+  }
+};
+
+// Always update streak on load
+HUB.updateStreak();
+
+</script>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -371,7 +546,7 @@ audio.guide-audio{width:100%;height:32px;accent-color:var(--gold);}
     <div style="font-size:1.1rem;flex-shrink:0;">🎙️</div>
     <div class="ap-body">
       <div class="ap-label">Coach Mic — Vendors & Customers <span>· Add them now so transactions go faster</span></div>
-      <audio class="guide-audio" controls src="vendors-and-customers.mp3"></audio>
+      <audio class="guide-audio" controls src="vendors_customers.mp3"></audio>
     </div>
   </div>
   <div class="part-header">
@@ -471,7 +646,7 @@ audio.guide-audio{width:100%;height:32px;accent-color:var(--gold);}
     <div style="font-size:1.1rem;flex-shrink:0;">🎙️</div>
     <div class="ap-body">
       <div class="ap-label">Coach Mic — Build the Chart of Accounts <span>· Follow along in your QBO</span></div>
-      <audio class="guide-audio" controls src="Build-the-Chart-of-Accounts.mp3"></audio>
+      <audio class="guide-audio" controls src="Build_the_Chart_of_Accounts.mp3"></audio>
     </div>
   </div>
   <div class="part-header">
@@ -570,7 +745,7 @@ audio.guide-audio{width:100%;height:32px;accent-color:var(--gold);}
     <div style="font-size:1.1rem;flex-shrink:0;">🎙️</div>
     <div class="ap-body">
       <div class="ap-label">Coach Mic — Verify Setup & Send-Off to S01 <span>· Run your Trial Balance then head to Lesson 0</span></div>
-      <audio class="guide-audio" controls src="Verify-Setup-Send-Off-to-S01.mp3"></audio>
+      <audio class="guide-audio" controls src="Verify_Setup___Send-Off_to_S01.mp3"></audio>
     </div>
   </div>
   <div class="part-header">
@@ -637,6 +812,20 @@ const obs=new IntersectionObserver(entries=>{
   entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('vis');});
 },{threshold:0.08});
 document.querySelectorAll('.fi').forEach(el=>obs.observe(el));
+
+// ── TRACKING ──
+HUB.markVisited('qbo-setup');
+HUB.logActivity('Opened QBO Setup Guide', 'Before S01');
+// Mark complete when last audio plays
+document.querySelectorAll('audio').forEach((a,i,arr)=>{
+  if(i===arr.length-1){
+    a.addEventListener('play',()=>{
+      HUB.markCompleted('qbo-setup');
+      HUB.logActivity('Completed QBO Setup', 'All steps reviewed');
+    },{once:true});
+  }
+});
+
 </script>
 </body>
 </html>
