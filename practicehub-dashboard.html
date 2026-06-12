@@ -521,7 +521,7 @@ html,body{height:100%;font-family:'Inter',sans-serif;color:var(--qbo-text);backg
       <span class="sb-icon">⚡</span> Lesson 0 — Quick Recall
       <span class="sb-badge sb-done">✓</span>
     </div>
-    <div class="sb-item" onclick="showPanel('s01');setActive(this)">
+    <div class="sb-item" onclick="window.open('s01-lab.html','_blank');setActive(this)">
       <span class="sb-icon">🏦</span> S01 — Bank Recon
       <span class="sb-badge sb-current">Now</span>
     </div>
@@ -1025,147 +1025,11 @@ html,body{height:100%;font-family:'Inter',sans-serif;color:var(--qbo-text);backg
     <div class="card completed"><div class="card-top"><div class="card-icon ci-green">💻</div><div><div class="card-title">QBO Navigation</div><div class="card-sub">Banking Center + Reports = your S01 zones</div></div></div><div class="card-desc">Banking Center to reconcile. Reports to verify. + New to add entries.</div><div class="card-footer"><span class="card-status cs-done">✓ Reviewed</span></div></div>
   </div>
   <div style="text-align:center;padding:16px 0;">
-    <button class="card-btn cb-blue" style="padding:12px 32px;font-size:0.9rem;" onclick="showPanel('s01')">✅ I'm Ready — Start S01 →</button>
+    <button class="card-btn cb-blue" style="padding:12px 32px;font-size:0.9rem;" onclick="window.open('s01-lab.html','_blank')">✅ I'm Ready — Start S01 →</button>
   </div>
 </div>
 
 <!-- ─────────── S01 LAB ─────────── -->
-<div class="panel" id="panel-s01">
-  <div class="page-header">
-    <div class="ph-icon ci-blue">🏦</div>
-    <div><div class="ph-title">S01 — Bank Reconciliation</div><div class="ph-sub">Juan's Pet Paradise · First National Bank · March 2024</div></div>
-    <div class="ph-right"><span style="font-size:0.75rem;color:var(--qbo-muted);">Target: </span><span style="font-size:0.9rem;font-weight:700;color:var(--qbo-green);font-family:'DM Mono'">$0.00</span></div>
-  </div>
-
-  <!-- Coach Mic -->
-  <div class="coach-panel">
-    <div class="coach-avatar">M</div>
-    <div class="coach-body">
-      <div class="coach-name">🎙️ Coach Mic</div>
-      <div class="coach-msg" id="coach-msg">Welcome to S01! Start by reading the scenario — understand the client before touching any numbers. Then study the bank statement carefully. <strong>The bank is always right.</strong></div>
-      <div class="hint-row">
-        <button class="hint-btn" onclick="showHint('h1')">💡 What's my goal?</button>
-        <button class="hint-btn" onclick="showHint('h2')">💡 Where do I start?</button>
-        <button class="hint-btn" onclick="showHint('h3')">💡 Difference not $0?</button>
-      </div>
-      <div class="hint-reveal" id="h1">Your goal is to make the QBO Checking account balance match the bank statement closing balance of <strong>$34,390.00</strong>. Find the 3 discrepancies and fix them. Leave the timing item alone.</div>
-      <div class="hint-reveal" id="h2">Start with the <strong>Scenario tab</strong> — know the client. Then read the <strong>Bank Statement</strong> top to bottom before touching QBO. Students who skip this take twice as long to find errors.</div>
-      <div class="hint-reveal" id="h3">Work backwards from the number. <strong>−$35?</strong> Bank fee not added. <strong>+$45?</strong> Interest not recorded. <strong>−$180?</strong> VetMed still shows $420. Check your ending balance too — must be exactly $34,390.00.</div>
-    </div>
-  </div>
-
-  <!-- QBO Simulator -->
-  <div class="qbo-sim">
-    <div class="qbo-sim-bar">
-      <span class="qsb-title">🏦 Reconcile — Checking Account · March 2024</span>
-      <div class="qsb-right">
-        <button class="qsb-btn" onclick="showHint('h1')">Help</button>
-        <button class="qsb-btn" onclick="checkFinish()">Finish Now</button>
-      </div>
-    </div>
-
-    <!-- Recon header -->
-    <div class="recon-header">
-      <div class="rh-item"><div class="rh-label">Statement Ending Date</div><div class="rh-value">03/31/2024</div></div>
-      <div class="rh-divider"></div>
-      <div class="rh-item"><div class="rh-label">Beginning Balance</div><div class="rh-value">$9,850.00</div></div>
-      <div class="rh-divider"></div>
-      <div class="rh-item"><div class="rh-label">Ending Balance</div><div class="rh-value">$34,390.00</div></div>
-      <div class="rh-divider"></div>
-      <div class="rh-item"><div class="rh-label">Cleared Balance</div><div class="rh-value" id="cleared-bal">$0.00</div></div>
-      <div class="diff-box nonzero" id="diff-box">
-        <div class="diff-label">Difference</div>
-        <div class="diff-amount" id="diff-amount">$34,390.00</div>
-      </div>
-    </div>
-
-    <!-- Transaction table -->
-    <table class="txn-table">
-      <thead>
-        <tr>
-          <th style="width:40px;">✓</th>
-          <th>Date</th>
-          <th>Description</th>
-          <th>Type</th>
-          <th style="text-align:right;">Amount</th>
-          <th>Match?</th>
-        </tr>
-      </thead>
-      <tbody id="txn-body">
-        <!-- Populated by JS -->
-      </tbody>
-    </table>
-
-    <div class="finish-row">
-      <button class="finish-btn fb-green" onclick="checkFinish()">Finish Now</button>
-      <span class="finish-note" id="finish-note">Check off all matching transactions — target difference is $0.00</span>
-    </div>
-  </div>
-
-  <!-- Success Banner -->
-  <div class="success-banner" id="success-banner">
-    <div class="sb-icon2">🎉</div>
-    <div class="sb-text">
-      <div class="sb-title">S01 Complete! Difference = $0.00</div>
-      <div class="sb-sub">Juan's March 2024 books are reconciled. Unlock the guided solution below.</div>
-    </div>
-    <div class="sb-action"><button class="card-btn cb-green" onclick="showSolution()">See Guided Solution ↓</button></div>
-  </div>
-
-  <!-- Solution Panel -->
-  <div class="solution-panel" id="solution-panel">
-    <div class="sol-header">
-      <div>
-        <div class="sol-title">📋 S01 Guided Solution — Coach Mic's Walkthrough</div>
-        <div class="sol-sub">The 3 discrepancies explained · What each fix does to the reports</div>
-      </div>
-    </div>
-    <div class="sol-body">
-      <div class="sol-step">
-        <div class="sol-num">1</div>
-        <div class="sol-content">
-          <div class="sol-action">Discrepancy 1 — Wrong Amount: VetMed Supplies</div>
-          <div class="sol-detail">QBO showed <strong>$420.00</strong> but the bank showed <strong>$240.00</strong>. Digits were transposed when the payment was entered. Fix: edit the QBO expense entry from $420 to $240. <strong>Impact:</strong> Expenses decrease by $180 → Net Income increases by $180 → Balance Sheet equity improves.</div>
-        </div>
-      </div>
-      <div class="sol-step">
-        <div class="sol-num">2</div>
-        <div class="sol-content">
-          <div class="sol-action">Discrepancy 2 — Missing Entry: Bank Fee $35</div>
-          <div class="sol-detail">The bank deducted a $35 monthly maintenance fee automatically — but nobody recorded it in QBO. Fix: + New → Expense → Payee: First National Bank → Category: Bank Charges & Fees → Amount: $35 → Date: 03/31/2024. <strong>Journal entry:</strong> DR Bank Charges $35 / CR Checking $35.</div>
-        </div>
-      </div>
-      <div class="sol-step">
-        <div class="sol-num">3</div>
-        <div class="sol-content">
-          <div class="sol-action">Discrepancy 3 — Missing Entry: Interest Income $45</div>
-          <div class="sol-detail">The bank credited $45 interest earned — but it was never recorded in QBO. Fix: + New → Bank Deposit → Account: Interest Income → Amount: $45 → Date: 03/31/2024. <strong>Journal entry:</strong> DR Checking $45 / CR Interest Income $45.</div>
-        </div>
-      </div>
-      <div class="sol-step">
-        <div class="sol-num">✓</div>
-        <div class="sol-content">
-          <div class="sol-action">Timing Item — Check #5503 GroomPro Tools $380 (Leave Unchecked)</div>
-          <div class="sol-detail">This check was written and recorded correctly in QBO on March 31 — but the bank hasn't processed it yet. This is an <strong>outstanding check — a timing difference, not an error.</strong> Leave it unchecked. It will appear on the April bank statement.</div>
-        </div>
-      </div>
-    </div>
-    <!-- Loom placeholder -->
-    <div style="padding:0 20px 20px;">
-      <div class="sol-loom">
-        <div class="sol-loom-icon">🎬</div>
-        <div class="sol-loom-title">Coach Mic's Video Walkthrough</div>
-        <div class="sol-loom-sub">Watch Ate Mic walk through the full S01 reconciliation in QBO step by step</div>
-        <button class="sol-loom-btn" onclick="window.open('https://www.loom.com/share/a1ec337d29ac46c18a18639213c60bfd','_blank')">▶ Watch Loom Walkthrough</button>
-        <div style="font-size:0.7rem;color:#64748b;margin-top:8px;">🎧 Audio also available in the COA section</div>
-      </div>
-    </div>
-    <div style="padding:0 20px 20px;text-align:center;">
-      <button class="card-btn cb-blue" style="padding:10px 28px;" onclick="showPanel('dashboard')">← Back to Dashboard</button>
-    </div>
-  </div>
-</div>
-
 <!-- ─────────── RESOURCES ─────────── -->
 <div class="panel" id="panel-resources">
   <div class="page-header">
@@ -1212,101 +1076,6 @@ function toggleExpand(id){
   const el=document.getElementById(id);
   el.classList.toggle('show');
 }
-
-// ── HINTS ──
-function showHint(id){
-  const el=document.getElementById(id);
-  el.classList.toggle('show');
-}
-
-// ── TRANSACTIONS DATA ──
-const txns=[
-  {id:'T-01',date:'Mar 01',name:'Opening Balance',type:'Balance',amt:9850,dir:'cr',match:'✅ Match'},
-  {id:'T-02',date:'Mar 03',name:'PetCo Wholesale',type:'Expense',amt:-2100,dir:'db',match:'✅ Match'},
-  {id:'T-03',date:'Mar 05',name:'Paws & Claws Clinic',type:'Invoice',amt:3200,dir:'cr',match:'✅ Match'},
-  {id:'T-04',date:'Mar 10',name:'VetMed Supplies',type:'Expense',amt:-420,dir:'db',match:'❌ Wrong Amt',err:true},
-  {id:'T-05',date:'Mar 12',name:'Happy Tails Rescue',type:'Payment',amt:4200,dir:'cr',match:'✅ Match'},
-  {id:'T-06',date:'Mar 14',name:'Lease — 123 Commerce',type:'Expense',amt:-3500,dir:'db',match:'✅ Match'},
-  {id:'T-07',date:'Mar 15',name:'Walk & Wag LLC',type:'Payment',amt:2250,dir:'cr',match:'✅ Match'},
-  {id:'T-08',date:'Mar 18',name:'GroomPro Tools',type:'Expense',amt:-420,dir:'db',match:'✅ Match'},
-  {id:'T-09',date:'Mar 20',name:'Sunshine Pet Hotel',type:'Payment',amt:950,dir:'cr',match:'✅ Match'},
-  {id:'T-10',date:'Mar 22',name:'San Antonio Utilities',type:'Expense',amt:-4790,dir:'db',match:'✅ Match'},
-  {id:'T-11',date:'Mar 28',name:'Fur & Feathers Store',type:'Payment',amt:12500,dir:'cr',match:'✅ Match'},
-  {id:'T-12',date:'Mar 31',name:'Bank Maintenance Fee',type:'Expense',amt:-35,dir:'db',match:'❌ Missing',missing:true},
-  {id:'T-13',date:'Mar 31',name:'Interest Earned',type:'Income',amt:45,dir:'cr',match:'❌ Missing',missing:true},
-  {id:'T-14',date:'Mar 31',name:'Check #5503 GroomPro',type:'Check',amt:-380,dir:'db',match:'⏳ Timing',timing:true},
-];
-
-// ── RENDER TRANSACTIONS ──
-function renderTxns(){
-  const tbody=document.getElementById('txn-body');
-  tbody.innerHTML='';
-  txns.forEach((t,i)=>{
-    const tr=document.createElement('tr');
-    const matchClass=t.err?'txn-err':t.missing?'txn-err':t.timing?'txn-warn':'txn-ok';
-    const disabled=t.missing||t.timing?'disabled':'';
-    const title=t.timing?'Outstanding check — do not check off':t.missing?'Missing entry — add in QBO first':'';
-    tr.innerHTML=`
-      <td><input type="checkbox" class="txn-chk" data-idx="${i}" ${disabled} title="${title}" onchange="updateDiff()"></td>
-      <td class="txn-date">${t.date}</td>
-      <td class="txn-name">${t.name} ${t.err?'<span style="font-size:0.7rem;color:var(--qbo-red);background:#fff0f0;padding:1px 6px;border-radius:3px;margin-left:4px;">$420 → should be $240</span>':''} ${t.missing?'<span style="font-size:0.7rem;color:var(--qbo-red);background:#fff0f0;padding:1px 6px;border-radius:3px;margin-left:4px;">Not in QBO — add first</span>':''} ${t.timing?'<span style="font-size:0.7rem;color:var(--qbo-orange);background:#fff8e1;padding:1px 6px;border-radius:3px;margin-left:4px;">Outstanding — leave unchecked</span>':''}</td>
-      <td><span class="txn-type">${t.type}</span></td>
-      <td class="txn-amt ${t.dir==='cr'?'credit':'debit'}">${t.dir==='cr'?'+':'-'}$${Math.abs(t.amt).toLocaleString('en-US',{minimumFractionDigits:2})}</td>
-      <td class="txn-match ${matchClass}">${t.match}</td>
-    `;
-    if(t.id==='T-01') tr.style.background='#f8f9fa';
-    tbody.appendChild(tr);
-  });
-}
-
-// ── UPDATE DIFFERENCE ──
-function updateDiff(){
-  const checks=document.querySelectorAll('.txn-chk:checked');
-  let cleared=0;
-  checks.forEach(c=>{
-    const t=txns[c.dataset.idx];
-    cleared+=t.amt;
-  });
-  const ending=34390;
-  const diff=ending-cleared;
-  document.getElementById('cleared-bal').textContent='$'+cleared.toLocaleString('en-US',{minimumFractionDigits:2});
-  const diffBox=document.getElementById('diff-box');
-  const diffAmt=document.getElementById('diff-amount');
-  diffAmt.textContent='$'+Math.abs(diff).toLocaleString('en-US',{minimumFractionDigits:2});
-  if(Math.abs(diff)<0.01){
-    diffBox.className='diff-box zero';
-    document.getElementById('finish-note').textContent='✅ Difference is $0.00 — click Finish Now!';
-    document.getElementById('finish-note').style.color='var(--qbo-green)';
-  } else {
-    diffBox.className='diff-box nonzero';
-    document.getElementById('finish-note').textContent='Keep checking off transactions — target is $0.00';
-    document.getElementById('finish-note').style.color='';
-  }
-}
-
-// ── CHECK FINISH ──
-function checkFinish(){
-  const diff=parseFloat(document.getElementById('diff-amount').textContent.replace(/[$,]/g,''));
-  const box=document.getElementById('diff-box');
-  if(box.classList.contains('zero')){
-    document.getElementById('success-banner').classList.add('show');
-    document.getElementById('success-banner').scrollIntoView({behavior:'smooth'});
-    document.getElementById('coach-msg').textContent="🎉 Outstanding! You hit $0.00! Juan's March 2024 books are perfectly reconciled. You found all 3 discrepancies and correctly left the outstanding check alone. Scroll down to see the guided solution.";
-  } else {
-    document.getElementById('coach-msg').textContent="Not quite yet! The difference isn't $0.00. Use the hint buttons above to find what's missing. You're close — don't give up!";
-    document.getElementById('h3').classList.add('show');
-  }
-}
-
-// ── SHOW SOLUTION ──
-function showSolution(){
-  document.getElementById('solution-panel').classList.add('show');
-  document.getElementById('solution-panel').scrollIntoView({behavior:'smooth'});
-}
-
-// ── INIT ──
-renderTxns();
-updateDiff();
 
 // ════════════════════════════════════════════════
 // PRACTICE HUB DASHBOARD — DYNAMIC RENDERER
