@@ -1031,6 +1031,10 @@ function toggle(el){
   const all=document.querySelectorAll('.check-item');
   const done=[...all].filter(i=>i.classList.contains('checked')).length;
   document.getElementById('ready-msg').style.display=done===all.length?'block':'none';
+  if(done === all.length){
+    HUB.markCompleted('lesson0');
+    HUB.logActivity('Completed Lesson 0 Ready Check', 'All 6 items checked');
+  }
 }
 
 // ── TRACKING ──
@@ -1056,17 +1060,7 @@ document.querySelectorAll('audio.lesson-audio').forEach(a => {
   }, {once:true});
 });
 
-// Checklist completion = lesson0 done
-const _origToggle = toggle;
-function toggle(el){
-  _origToggle(el);
-  const all = document.querySelectorAll('.check-item');
-  const done = [...all].filter(i=>i.classList.contains('checked')).length;
-  if(done === all.length){
-    HUB.markCompleted('lesson0');
-    HUB.logActivity('Completed Lesson 0 Ready Check', 'All 6 items checked');
-  }
-}
+
 
 </script>
 </body>
